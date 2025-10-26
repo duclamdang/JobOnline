@@ -1,0 +1,92 @@
+{
+  "welcome": "Welcome",
+  "greeting": "Hello, {{name}}!",
+  "popularJobs": "Popular Job Categories",
+  "explore": "Explore opportunities in trending industries",
+
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "submit": "Submit"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email"
+  },
+  "header": {
+    "applyEasy": "One-touch apply - Anytime, anywhere",
+    "vieclam24h": "Vieclam24h: Quick Job Search",
+    "downloadApp": "Download App Now",
+    "jobs": "Jobs",
+    "findJob": "Find Jobs",
+    "manageJobs": "Manage Jobs",
+    "appliedJobs": "Applied Jobs",
+    "savedJobs": "Saved Jobs",
+    "pendingJobs": "Pending Applications",
+    "jobAlerts": "Job Alerts",
+    "tools": "Tools",
+    "personalityTest": "Personality Test",
+    "salaryCalc": "Gross to Net Salary Calculator",
+    "createCV": "Create CV",
+    "careerGuide": "Career Guide",
+    "regionSouth": "South",
+    "regionNorth": "North",
+    "jobSeeker": "Job Seeker",
+    "loginRegister": "Login / Register",
+    "forEmployer": "For",
+    "employer": "Employer",
+    "goTo": "Go to"
+  },
+  "footer": {
+    "jobSeekerHotline": "Hotline for Job Seekers",
+    "jobSeekerSupportSouth": "Hotline support South",
+    "jobSeekerSupportNorth": "Hotline support North",
+    "jobSeekerConsult": "Consultation for Job Seekers",
+
+    "employerHotline": "Hotline for Employers",
+    "employerSupportSouth": "Hotline support South",
+    "employerSupportNorth": "Hotline support North",
+    "employerConsult": "Consultation for Employers",
+
+    "aboutUs": "About Us",
+    "companyName": "Vieclam24h.vn - 24h Employment Joint Stock Company",
+    "addressHCM": "Room 102, 20-20B Tran Cao Van Building, Sai Gon Ward, HCMC",
+    "addressHN": "Branch: 8th Floor, 789 Ministry of Defense Building, 147 Hoang Quoc Viet, Hanoi",
+    "license": "Employment service license No. 28937/2024/58/SLĐTBXH-VLATLĐ issued by MOLISA on 18/11/2024",
+    "phone": "Phone: (028) 7108 2424 | (024) 7308 2424",
+    "jobSeekerEmail": "Job Seeker Support Email: ntv@vieclam24h.vn",
+    "employerEmail": "Employer Support Email: ntd@vieclam24h.vn",
+
+    "info": "Information",
+    "careerGuide": "Career Guide",
+    "servicePrice": "Service Pricing",
+    "terms": "Terms of Use",
+    "privacy": "Privacy Policy",
+    "sitemap": "Sitemap",
+    "personalData": "Personal Data Policy",
+    "compliance": "Compliance and Customer Consent",
+
+    "connect": "Connect with us",
+    "downloadApp": "Download our App",
+
+    "member": "Member of SieuViet",
+    "copyright": "© 2025 - Copyright belongs to SieuViet Group"
+  },
+  "login": {
+    "title": "Employer Login",
+    "email": "Email Address",
+    "enterEmail": "Enter your email",
+    "password": "Password",
+    "enterPassword": "Enter your password",
+    "signIn": "Sign In",
+    "forgotPassword": "Forgot password?",
+    "newEmployer": "Are you a new employer?",
+    "register": "Register an account",
+    "adminTitle": "Admin Login"
+  }
+}

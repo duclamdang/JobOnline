@@ -1,0 +1,92 @@
+{
+  "welcome": "Chào mừng",
+  "greeting": "Xin chào, {{name}}!",
+  "popularJobs": "Danh mục công việc phổ biến",
+  "explore": "Khám phá các cơ hội trong các ngành công nghiệp đang thịnh hành",
+  "navigation": {
+    "home": "Trang chủ",
+    "about": "Giới thiệu",
+    "contact": "Liên hệ"
+  },
+  "buttons": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "submit": "Gửi"
+  },
+  "validation": {
+    "required": "Trường này là bắt buộc",
+    "email": "Vui lòng nhập email hợp lệ"
+  },
+
+  "header": {
+    "applyEasy": "Ứng tuyển 1 chạm - Mọi lúc mọi nơi",
+    "vieclam24h": "Vieclam24h: Tìm Việc Nhanh",
+    "downloadApp": "Tải app ngay",
+    "jobs": "Việc làm",
+    "findJob": "Tìm việc làm",
+    "manageJobs": "Quản lý việc làm",
+    "appliedJobs": "Việc làm đã ứng tuyển",
+    "savedJobs": "Việc làm đã lưu",
+    "pendingJobs": "Việc làm chờ ứng tuyển",
+    "jobAlerts": "Thông báo việc làm",
+    "tools": "Công cụ",
+    "personalityTest": "Trắc nghiệm tính cách",
+    "salaryCalc": "Tính lương Gross sang Net",
+    "createCV": "Tạo CV",
+    "careerGuide": "Cẩm nang nghề nghiệp",
+    "regionSouth": "Miền Nam",
+    "regionNorth": "Miền Bắc",
+    "jobSeeker": "Người tìm việc",
+    "loginRegister": "Đăng ký/Đăng nhập",
+    "forEmployer": "Dành cho",
+    "employer": "Nhà Tuyển Dụng",
+    "goTo": "Đi tới trang của"
+  },
+  "footer": {
+    "jobSeekerHotline": "Hotline cho Người tìm việc",
+    "jobSeekerSupportSouth": "Hotline hỗ trợ miền Nam",
+    "jobSeekerSupportNorth": "Hotline hỗ trợ miền Bắc",
+    "jobSeekerConsult": "Tư vấn cho Người tìm việc",
+
+    "employerHotline": "Hotline cho Nhà tuyển dụng",
+    "employerSupportSouth": "Hotline hỗ trợ miền Nam",
+    "employerSupportNorth": "Hotline hỗ trợ miền Bắc",
+    "employerConsult": "Tư vấn cho Nhà tuyển dụng",
+
+    "aboutUs": "Về chúng tôi",
+    "companyName": "Vieclam24h.vn - Công Ty Cổ Phần Việc Làm 24h",
+    "addressHCM": "Phòng 102, Tòa nhà 20-20B Trần Cao Vân, P. Sài Gòn, TP. Hồ Chí Minh",
+    "addressHN": "Chi nhánh: Tầng 8, Tòa nhà 789 Bộ Quốc Phòng, 147 Hoàng Quốc Việt, Hà Nội",
+    "license": "Giấy phép hoạt động dịch vụ việc làm số: 28937/2024/58/SLĐTBXH-VLATLĐ do Sở Lao Động Thương Binh và Xã Hội cấp ngày 18/11/2024",
+    "phone": "Điện thoại: (028) 7108 2424 | (024) 7308 2424",
+    "jobSeekerEmail": "Email hỗ trợ người tìm việc: ntv@vieclam24h.vn",
+    "employerEmail": "Email hỗ trợ nhà tuyển dụng: ntd@vieclam24h.vn",
+
+    "info": "Thông tin",
+    "careerGuide": "Cẩm nang nghề nghiệp",
+    "servicePrice": "Báo giá dịch vụ",
+    "terms": "Điều khoản sử dụng",
+    "privacy": "Quy định bảo mật",
+    "sitemap": "Sơ đồ trang web",
+    "personalData": "Chính sách dữ liệu cá nhân",
+    "compliance": "Tuân thủ và sự đồng ý của Khách Hàng",
+
+    "connect": "Kết nối với chúng tôi",
+    "downloadApp": "Tải ứng dụng trên điện thoại",
+
+    "member": "Member of SieuViet",
+    "copyright": "© 2025 - Bản quyền thuộc về SieuViet Group"
+  },
+  "login": {
+    "title": "Nhà tuyển dụng đăng nhập",
+    "email": "Địa chỉ email",
+    "enterEmail": "Nhập email",
+    "password": "Mật khẩu",
+    "enterPassword": "Nhập mật khẩu",
+    "signIn": "Đăng nhập",
+    "forgotPassword": "Quên mật khẩu?",
+    "newEmployer": "Bạn là nhà tuyển dụng mới?",
+    "register": "Đăng ký tài khoản",
+    "adminTitle": "Nhà quản trị đăng nhập"
+  }
+}

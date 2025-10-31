@@ -7,11 +7,6 @@ use Illuminate\Support\Facades\DB;
 
 class UserService
 {
-    private function findUserByAdmin(int $id): ?User
-    {
-        return User::find($id);
-    }
-
     public function getAll(int $perPage = 10): array
     {
         $users = User::paginate($perPage);
@@ -25,26 +20,28 @@ class UserService
 
     public function getById(int $id): array
     {
-        $user = User::query()
-            ->find($id);
+        $user = User::where('id', $id)
+            ->where('is_active', true)
+            ->first();
 
         if (!$user) {
             return [
                 'success' => false,
-                'message' => 'Tài khoản không tồn tại',
+                'message' => 'Không tìm thấy người dùng',
+                'data' => null,
             ];
         }
 
         return [
             'success' => true,
-            'message' => 'Lấy thông tin tài khoản thành công',
-            'user' => $user,
+            'data' => $user,
         ];
     }
 
     public function getUsers()
     {
-        $users = User::all();
+        $users = User::all()
+            ->where('is_active', true);
         return $users;
     }
 

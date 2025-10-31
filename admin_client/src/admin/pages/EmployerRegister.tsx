@@ -1,4 +1,3 @@
-// src/pages/RegisterEmployer.tsx
 import React, { useState, useEffect } from "react";
 import logo24h from "../../assets/vieclam24h.png";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";

@@ -25,7 +25,7 @@ export default function AdminSidebar() {
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const admin = useAppSelector((state) => state.auth.admin);
-  const isRestrictedRole = admin?.role_id === 1;
+  const isRoot = admin?.role_id === 1;
 
   const openMenu = (key: string) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -68,7 +68,6 @@ export default function AdminSidebar() {
   return (
     <aside className="w-40 bg-white border-r h-screen hidden md:flex flex-col py-6 px-3 font-sans">
       <nav className="flex flex-col gap-2 text-gray-700 text-sm font-medium relative">
-        {/* Menu Dashboard chỉ render 1 lần */}
         <MenuWrapper
           id="dashboard"
           label={
@@ -77,22 +76,33 @@ export default function AdminSidebar() {
             </>
           }
         >
-          <Link
-            to="/admin"
-            className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
-          >
-            <FaHome /> Thống kê
-          </Link>
-          <Link
-            to="/admin/reports"
-            className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
-          >
-            <FaFileAlt /> Báo cáo
-          </Link>
+          {isRoot ? (
+            <>
+              <Link
+                to="/admin/root-dashboard"
+                className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
+              >
+                <FaHome /> Thống kê
+              </Link>
+              <Link
+                to="/admin/reports"
+                className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
+              >
+                <FaFileAlt /> Báo cáo
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/admin/employer-dashboard"
+                className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
+              >
+                <FaHome /> Thống kê
+              </Link>
+            </>
+          )}
         </MenuWrapper>
-
-        {/* Menu chỉ hiển thị với role ≠ 1 */}
-        {!isRestrictedRole && (
+        {!isRoot && (
           <>
             <MenuWrapper
               id="job"
@@ -155,8 +165,6 @@ export default function AdminSidebar() {
             </MenuWrapper>
           </>
         )}
-
-        {/* Menu Profile luôn hiện */}
         <MenuWrapper
           id="profile"
           label={
@@ -171,7 +179,7 @@ export default function AdminSidebar() {
           >
             <FaRegUser /> Hồ sơ cá nhân
           </Link>
-          {!isRestrictedRole && (
+          {!isRoot && (
             <Link
               to="/admin/trademark"
               className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
@@ -180,9 +188,7 @@ export default function AdminSidebar() {
             </Link>
           )}
         </MenuWrapper>
-
-        {/* Menu chỉ hiển thị với role = 1 */}
-        {isRestrictedRole && (
+        {isRoot && (
           <>
             <MenuWrapper
               id="account"
@@ -223,8 +229,6 @@ export default function AdminSidebar() {
             </MenuWrapper>
           </>
         )}
-
-        {/* Menu Hỗ trợ luôn hiện */}
         <MenuWrapper
           id="support"
           label={

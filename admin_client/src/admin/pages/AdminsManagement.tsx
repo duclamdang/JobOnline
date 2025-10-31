@@ -1,19 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../context/hooks";
-import { fetchAllAdmins } from "../store/redux/adminSlice";
-import { useNavigate } from "react-router-dom";
-import { Button, Card, Table, Input, Spin, message, Tooltip, Tag } from "antd";
-import {
-  ReloadOutlined,
-  PlusOutlined,
-  EditOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
-import config from "@config/config";
+import { fetchAllAdmins, toggleAdminActive } from "../store/redux/adminSlice";
+import { Button, Card, Table, Input, Spin, Tooltip, Tag } from "antd";
+import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { toast } from "react-toastify";
 
 const AdminsManagement: React.FC = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
 
   const { admins, loading } = useAppSelector((state) => state.admin);
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,10 +18,19 @@ const AdminsManagement: React.FC = () => {
 
   const handleReload = () => {
     dispatch(fetchAllAdmins(20));
-    message.success("Đã tải lại danh sách admin");
+    toast.success("Đã tải lại danh sách admin");
   };
 
-  const adminList = Array.isArray(admins) ? admins : admins?.data ?? [];
+  const handleToggleActive = async (id: number) => {
+    try {
+      const result = await dispatch(toggleAdminActive(id)).unwrap();
+      toast.success(result.toast || "Cập nhật trạng thái thành công");
+    } catch (err) {
+      toast.error("Cập nhật trạng thái thất bại");
+    }
+  };
+
+  const adminList = admins;
 
   const filteredAdmins = adminList.filter(
     (a) =>
@@ -35,19 +38,9 @@ const AdminsManagement: React.FC = () => {
       a.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getAvatarUrl = (avatar: any) => {
-    if (!avatar) return "/default-avatar.png";
-    if (typeof avatar === "string") {
-      return avatar.startsWith("http")
-        ? avatar
-        : `${config.storageUrl}/${avatar}`;
-    }
-    return URL.createObjectURL(avatar);
-  };
-
   const columns = [
     {
-      title: "Tên Admin",
+      title: "Tên Nhà tuyển dụng",
       dataIndex: "name",
       key: "name",
       render: (text: string) => (
@@ -67,15 +60,15 @@ const AdminsManagement: React.FC = () => {
     },
     {
       title: "Công ty",
-      dataIndex: ["company", "name"], // nếu backend trả kèm company
-      key: "company",
-      render: (companyName: string | null) => companyName || "—",
+      dataIndex: "company_name",
+      key: "company_name",
+      render: (company_name: string | null) => company_name || "—",
     },
     {
       title: "Vai trò",
-      dataIndex: ["role", "name"],
-      key: "role",
-      render: (role: string | null) => role || "—",
+      dataIndex: "role_name",
+      key: "role_name",
+      render: (role_name: string | null) => role_name || "—",
     },
     {
       title: "Trạng thái",
@@ -100,12 +93,17 @@ const AdminsManagement: React.FC = () => {
       key: "actions",
       align: "center" as const,
       render: (_: any, record: any) => (
-        <Tooltip title="Chỉnh sửa">
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => navigate(`/admin/admins/${record.id}`)}
-          />
+        <Tooltip title="Chỉnh sửa trạng thái">
+          <button
+            className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600 transition"
+            onClick={() => handleToggleActive(record.id)}
+          >
+            {record.is_active ? (
+              <Visibility fontSize="small" />
+            ) : (
+              <VisibilityOff fontSize="small" />
+            )}
+          </button>
         </Tooltip>
       ),
     },
@@ -134,14 +132,6 @@ const AdminsManagement: React.FC = () => {
               className="rounded-lg border border-gray-300 bg-white px-4 shadow-sm hover:border-purple-500 hover:text-purple-600"
             >
               Tải lại
-            </Button>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              className="rounded-lg bg-purple-700 px-4 shadow-sm hover:bg-purple-800"
-              onClick={() => navigate("/admin/admins/create")}
-            >
-              Thêm admin mới
             </Button>
           </div>
         </div>

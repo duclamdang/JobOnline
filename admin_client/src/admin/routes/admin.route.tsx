@@ -3,7 +3,6 @@ import { RouteObject } from "react-router-dom";
 import RequireAdmin from "@admin/components/RequireAdmin";
 import ProfilePage from "@admin/pages/ProfileAdmin";
 import JobManagement from "@admin/pages/JobManagement";
-import AdminDashboard from "@admin/pages/AdminDashboard";
 import AdminLayout from "@admin/components/AdminLayout";
 import JobDetail from "@admin/pages/JobDetailAdmin";
 import AddJob from "@admin/pages/AddJob";
@@ -20,6 +19,8 @@ import UsersManagement from "@admin/pages/UsersManagement";
 import AdminsManagement from "@admin/pages/AdminsManagement";
 import UserManagement from "@admin/pages/UserManagement";
 import ApplicantSearch from "@admin/pages/ApplicantSearch";
+import RootDashboard from "@admin/pages/AdminRootMain";
+import EmployerDashboard from "@admin/pages/AdminEmployerMain";
 
 const adminRoutes: RouteObject[] = [
   {
@@ -35,7 +36,6 @@ const adminRoutes: RouteObject[] = [
         path: "",
         element: <AdminLayout />,
         children: [
-          { index: true, element: <AdminDashboard /> },
           { path: "profile", element: <ProfilePage /> },
           { path: "company", element: <CompanyPage /> },
           { path: "job", element: <JobManagement /> },
@@ -45,6 +45,12 @@ const adminRoutes: RouteObject[] = [
           { path: "candidates", element: <CandidateManagement /> },
           { path: "candidate/applications/:id", element: <CandidateDetail /> },
           { path: "applicantsearch", element: <ApplicantSearch /> },
+          { index: true, path: "root-dashboard", element: <RootDashboard /> },
+          {
+            index: true,
+            path: "employer-dashboard",
+            element: <EmployerDashboard />,
+          },
 
           {
             element: <RequireAdminRoot />,

@@ -1,30 +1,26 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin\User;
+namespace App\Http\Controllers\Api\Admin\Employer;
 
 use App\Constants\HttpStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Admin\UserApplyResource;
-use App\Http\Resources\Admin\UserResource;
-use App\Http\Services\Admin\User\UserService;
-use App\Models\User;
+use App\Http\Services\Admin\Employer\EmployerService;
 use Illuminate\Http\Request;
 use Exception;
 
-class UserController extends Controller
+class EmployerController extends Controller
 {
-    protected UserService $userService;
+    protected EmployerService $employerService;
 
-    public function __construct(UserService $userService)
+    public function __construct(EmployerService $employerService)
     {
-        $this->userService = $userService;
+        $this->employerService = $employerService;
     }
-
     public function getAll(Request $request)
     {
         try {
             $perPage = $request->get('per_page', 10);
-            $result = $this->userService->getAll($perPage);
+            $result = $this->employerService->getAll($perPage);
 
             if (!$result['success']) {
                 return response()->json([
@@ -37,7 +33,7 @@ class UserController extends Controller
             return response()->json([
                 'status_code' => HttpStatus::OK,
                 'message'     => $result['message'],
-                'data'        => $result['users'],
+                'data'        => $result['employers'],
             ], HttpStatus::OK);
 
         } catch (Exception $e) {
@@ -48,23 +44,23 @@ class UserController extends Controller
             ], HttpStatus::INTERNAL_ERROR);
         }
     }
-
     public function getById(int $id)
     {
         try {
-            $result = $this->userService->getById($id);
+            $result = $this->employerService->getById($id);
 
             if (!$result['success']) {
                 return response()->json([
                     'status_code'    => HttpStatus::NOT_FOUND,
+                    'data'           => [],
                     'error_messages' => $result['message'],
                 ], HttpStatus::NOT_FOUND);
             }
 
             return response()->json([
                 'status_code' => HttpStatus::OK,
-                'message'     => 'Lấy thông tin tài khoản thành công',
-                'data'        => new UserApplyResource($result['data']),
+                'message'     => $result['message'],
+                'data'        => $result['employer'],
             ], HttpStatus::OK);
 
         } catch (Exception $e) {
@@ -76,33 +72,28 @@ class UserController extends Controller
         }
     }
 
-    public function buyContact(Request $request, User $user)
+    public function active(Request $request, int $id)
     {
-        $admin = $request->user();
-        $result = $this->userService->buyContact($admin, $user);
-        $status = $result['success'] ? HttpStatus::OK : HttpStatus::FORBIDDEN;
-        return response()->json($result, $status);
+        try {
+            $result = $this->employerService->active($request, $id);
+
+            if (!$result['success']) {
+                return response()->json([
+                    'status_code'    => HttpStatus::BAD_REQUEST,
+                    'data'           => [],
+                    'error_messages' => $result['message'],
+                ], HttpStatus::BAD_REQUEST);
+            }
+
+            return response()->json([
+                'status_code' => HttpStatus::OK,
+                'message'     => $result['message'],
+            ], HttpStatus::OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status_code' => HttpStatus::INTERNAL_ERROR,
+                'message'     => 'Lỗi hệ thống: ' . $e->getMessage(),
+            ], HttpStatus::INTERNAL_ERROR);
+        }
     }
-
-    public function getUsers(Request $request)
-    {
-        $users = $this->userService->getUsers();
-
-        return response()->json([
-            'success' => true,
-            'data' => UserResource::collection($users)
-        ]);
-    }
-
-    public function points(Request $request)
-    {
-        $admin = $request->user();
-        $points = $this->userService->getPoints($admin);
-
-        return response()->json([
-            'success' => true,
-            'remainingPoints' => $points
-        ]);
-    }
-
 }

@@ -37,102 +37,57 @@ const UserDetailManagement: React.FC = () => {
           Thông tin chi tiết người dùng
         </h2>
 
-        <Card className="rounded-xl shadow-sm p-6">
-          {/* Avatar */}
-          <div className="flex flex-col items-center mb-6">
+        <Card className="rounded-2xl shadow-md p-8">
+          {/* Header */}
+          <div className="flex flex-col items-center mb-8">
             <img
-              src={getAvatarUrl(user.avatar)}
+              src={getAvatarUrl(user.avatar ?? "")}
               alt="avatar"
-              className="w-32 h-32 rounded-full object-cover border shadow-sm mb-3"
+              className="w-32 h-32 rounded-full object-cover border shadow-md mb-4"
             />
-            <h3 className="text-lg font-semibold">{user.name}</h3>
-            <p className="text-gray-500">{user.email}</p>
+
+            <h3 className="text-2xl font-bold text-gray-900">{user.name}</h3>
+            <p className="text-gray-500">{user.email || "—"}</p>
+
+            <div className="mt-3 h-0.5 w-16 bg-gray-300 rounded"></div>
           </div>
 
-          {/* Thông tin cá nhân */}
-          <div className="grid grid-cols-2 gap-y-3 gap-x-6">
-            <div>
-              <span className="font-medium text-gray-700">Số điện thoại:</span>
-              <p>{user.phone || "—"}</p>
-            </div>
-
-            <div>
-              <span className="font-medium text-gray-700">Địa chỉ:</span>
-              <p>{user.address || "—"}</p>
-            </div>
-
-            <div>
-              <span className="font-medium text-gray-700">Ngày sinh:</span>
-              <p>
-                {user.birthday
+          {/* Info grid */}
+          <div className="grid grid-cols-2 gap-x-10 gap-y-5 text-[15px]">
+            {[
+              { label: "Số điện thoại", value: user.phone },
+              { label: "Địa chỉ", value: user.address },
+              {
+                label: "Ngày sinh",
+                value: user.birthday
                   ? dayjs(user.birthday).format("DD/MM/YYYY")
-                  : "—"}
-              </p>
-            </div>
-
-            <div>
-              <span className="font-medium text-gray-700">Giới tính:</span>
-              <p>
-                {user.gender === 1 ? "Nam" : user.gender === 0 ? "Nữ" : "—"}
-              </p>
-            </div>
-
-            <div>
-              <span className="font-medium text-gray-700">
-                Tài khoản ngân hàng:
-              </span>
-              <p>{user.bank_info || "—"}</p>
-            </div>
-
-            <div>
-              <span className="font-medium text-gray-700">
-                Trạng thái tìm việc:
-              </span>
-              <p>
-                {user.job_search_status ? "Đang tìm việc" : "Không tìm việc"}
-              </p>
-            </div>
-
-            <div>
-              <span className="font-medium text-gray-700">
-                Vị trí mong muốn:
-              </span>
-              <p>{user.desired_position || "—"}</p>
-            </div>
-
-            <div>
-              <span className="font-medium text-gray-700">
-                Mức lương mong muốn:
-              </span>
-              <p>
-                {user.min_salary && user.max_salary
-                  ? `${user.min_salary} - ${user.max_salary} VNĐ`
-                  : "—"}
-              </p>
-            </div>
-
-            <div>
-              <span className="font-medium text-gray-700">
-                Trạng thái tài khoản:
-              </span>
-              <p>{user.is_active ? "Hoạt động" : "Bị khóa"}</p>
-            </div>
-
-            <div>
-              <span className="font-medium text-gray-700">
-                Xác minh tài khoản:
-              </span>
-              <p>{user.is_verify ? "Đã xác minh" : "Chưa xác minh"}</p>
-            </div>
-
-            <div>
-              <span className="font-medium text-gray-700">Ngày xác minh:</span>
-              <p>
-                {user.verified_at
-                  ? dayjs(user.verified_at).format("DD/MM/YYYY HH:mm")
-                  : "—"}
-              </p>
-            </div>
+                  : "—",
+              },
+              { label: "Giới tính", value: user.gender },
+              { label: "Ngành nghề", value: user.work_field_title },
+              { label: "Tỉnh / Thành phố", value: user.province_title },
+              { label: "Hình thức làm việc", value: user.working_form_title },
+              { label: "Kinh nghiệm", value: user.work_experience_title },
+              { label: "Trình độ học vấn", value: user.education_title },
+              { label: "Chức vụ hiện tại", value: user.position_title },
+              { label: "Vị trí mong muốn", value: user.desired_position },
+              {
+                label: "Mức lương mong muốn",
+                value:
+                  user.min_salary && user.max_salary
+                    ? `${user.min_salary.toLocaleString()} - ${user.max_salary.toLocaleString()} VNĐ`
+                    : "—",
+              },
+              {
+                label: "Trạng thái tìm việc",
+                value: user.job_search_status_text,
+              },
+            ].map((item, idx) => (
+              <div key={idx}>
+                <p className="text-gray-500 font-medium">{item.label}:</p>
+                <p className="text-gray-800 mt-1">{item.value || "—"}</p>
+              </div>
+            ))}
           </div>
         </Card>
       </div>

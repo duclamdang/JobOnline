@@ -9,7 +9,7 @@ import {
 } from "../services/userService";
 import { AxiosError } from "axios";
 
-interface User {
+export interface User {
   id: number;
   name: string;
   email: string | null;
@@ -17,19 +17,26 @@ interface User {
   password?: string;
   birthday: string | null;
   address: string | null;
-  gender: "1" | "0" | null; 
+  gender: string | null; 
   avatar: string | null;
   bank_info: string | null;
-  job_search_status: number;
+  job_search_status: number; 
+  job_search_status_text?: string; 
   desired_position: string | null;
   work_field_id: number | null;
   province_id: number | null;
-  min_salary: number | null;
-  max_salary: number | null;
   working_form_id: number | null;
   work_experience_id: number | null;
   position_id: number | null;
   education_id: number | null;
+  work_field_title?: string | null;
+  province_title?: string | null;
+  working_form_title?: string | null;
+  work_experience_title?: string | null;
+  position_title?: string | null;
+  education_title?: string | null;
+  min_salary: number | null;
+  max_salary: number | null;
   is_active: boolean;
   is_verify: boolean;
   verified_by: number | null;
@@ -37,6 +44,7 @@ interface User {
   created_at: string;
   updated_at: string;
 }
+
 
 interface UserPagination {
   data: User[];
@@ -58,10 +66,6 @@ const initialState: UserState = {
   loading: false,
   error: null,
 };
-
-// ====================
-// ROOT ADMIN ACTIONS
-// ====================
 
 export const fetchAllUsers = createAsyncThunk(
   "user/fetchAllUsers",
@@ -134,17 +138,12 @@ export const updateUserAvatarById = createAsyncThunk(
   }
 );
 
-// ====================
-// SLICE
-// ====================
-
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch All
       .addCase(fetchAllUsers.pending, (state) => {
         state.loading = true;
       })
@@ -158,8 +157,6 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-
-      // Fetch by ID
       .addCase(fetchUserById.fulfilled, (state, action) => {
         state.user = action.payload;
         state.error = null;

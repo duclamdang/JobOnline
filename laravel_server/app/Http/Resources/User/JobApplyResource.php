@@ -19,7 +19,15 @@ class JobApplyResource extends JsonResource
         return [
             'id'            => $this->id,
             'job_title'     => $this->job->title ?? null,
+            'job_id'     => $this->job->id,
             'company_name'  => $this->job->company->name ?? null,
+            'company_logo'  => $this->job->company?->logo
+                ? asset('storage/' . $this->job->company->logo)
+                : asset('images/default-logo.png'),
+            'salary_range'  => $this->job->salary_from && $this->job->salary_to
+                ? number_format($this->job->salary_from/1000000, 0) . " - " . number_format($this->job->salary_to/1000000, 0) . " triệu"
+                : "Thoả thuận",
+            'location' => $this->job->province?->name,
             'cv'            => $this->cv_id
                 ? optional(CV::find($this->cv_id))->file_path
                 : ['Chưa xác định'],

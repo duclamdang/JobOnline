@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mobile/screens/chat/chat_box.dart';
 import 'package:mobile/screens/job/job_list_screen.dart';
 import 'package:mobile/screens/my_jobs/my_jobs_screen.dart';
 import 'package:mobile/screens/profile/profile_screen.dart';
+import 'package:mobile/widgets/common/draggable_fab.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
 import 'package:mobile/providers/my_jobs_provider.dart';
+import 'package:mobile/screens/chat/chat_box.dart';
 
 class MainTabScreen extends StatefulWidget {
   const MainTabScreen({super.key});
@@ -57,7 +58,6 @@ class _MainTabScreenState extends State<MainTabScreen> {
     } else {
       setState(() => _currentIndex = i);
     }
-
     if (i == 1) {
       Future.microtask(
         () => context.read<MyJobsProvider>().ensureLoaded(context),
@@ -68,33 +68,54 @@ class _MainTabScreenState extends State<MainTabScreen> {
   BottomNavigationBarItem _item({
     required IconData icon,
     required String label,
-  }) {
-    return BottomNavigationBarItem(icon: Icon(icon), label: label);
+  }) => BottomNavigationBarItem(icon: Icon(icon), label: label);
+
+  void _openChatSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) =>
+          const FractionallySizedBox(heightFactor: 0.85, child: ChatBox()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
 
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: _openChatSheet,
-          icon: const Icon(Icons.chat_bubble_outline),
-          label: const Text('Chat AI'),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-
         backgroundColor: Colors.grey.shade100,
-        body: IndexedStack(
-          index: _currentIndex,
-          children: List.generate(_rootPages.length, (i) {
-            return _TabNavigator(
-              navigatorKey: _tabKeys[i],
-              root: _rootPages[i],
-            );
-          }),
+        body: Stack(
+          children: [
+            // ÉP phần nội dung fill toàn body để tránh layout lạ
+            Positioned.fill(
+              child: IndexedStack(
+                index: _currentIndex,
+                children: List.generate(_rootPages.length, (i) {
+                  return _TabNavigator(
+                    navigatorKey: _tabKeys[i],
+                    root: _rootPages[i],
+                  );
+                }),
+              ),
+            ),
+
+            // Nút Chat AI: tròn, nhỏ, kéo thả
+            DraggableFab(
+              heroTag: 'ai-fab',
+              diameter: 56,
+              initialOffset: const Offset(16, 240), // tùy chọn
+              onPressed: _openChatSheet, // ← BẮT BUỘC
+            ),
+          ],
         ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentIndex,
@@ -109,22 +130,6 @@ class _MainTabScreenState extends State<MainTabScreen> {
             _item(icon: Icons.person_outline_rounded, label: 'Tài khoản'),
           ],
         ),
-      ),
-    );
-  }
-
-  void _openChatSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (_) => const FractionallySizedBox(
-        heightFactor: 0.85, // mở cao 85% màn hình
-        child: ChatBox(),
       ),
     );
   }

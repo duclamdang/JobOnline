@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mobile/screens/chat/chat_box.dart';
 import 'package:mobile/screens/job/job_list_screen.dart';
 import 'package:mobile/screens/my_jobs/my_jobs_screen.dart';
 import 'package:mobile/screens/profile/profile_screen.dart';
@@ -78,6 +79,13 @@ class _MainTabScreenState extends State<MainTabScreen> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: _openChatSheet,
+          icon: const Icon(Icons.chat_bubble_outline),
+          label: const Text('Chat AI'),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+
         backgroundColor: Colors.grey.shade100,
         body: IndexedStack(
           index: _currentIndex,
@@ -101,6 +109,22 @@ class _MainTabScreenState extends State<MainTabScreen> {
             _item(icon: Icons.person_outline_rounded, label: 'Tài khoản'),
           ],
         ),
+      ),
+    );
+  }
+
+  void _openChatSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => const FractionallySizedBox(
+        heightFactor: 0.85, // mở cao 85% màn hình
+        child: ChatBox(),
       ),
     );
   }

@@ -5,14 +5,6 @@ use Illuminate\Http\Request;
 use App\Constants\HttpStatus;
 use App\Http\Controllers\Api\User\Auth\AuthController;
 
-/*
-|--------------------------------------------------------------------------
-| User Auth Routes
-|--------------------------------------------------------------------------
-| Xử lý đăng ký, đăng nhập, logout, refresh token,
-| quên mật khẩu và reset mật khẩu cho user (ứng viên).
-|--------------------------------------------------------------------------
-*/
 
 Route::prefix('user')->group(function () {
     // Auth

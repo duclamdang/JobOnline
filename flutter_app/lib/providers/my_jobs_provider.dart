@@ -16,12 +16,15 @@ class MyJobsProvider extends ChangeNotifier {
   int _appliedPage = 1;
   final ScrollController appliedScroll = ScrollController();
 
-  // ===== ĐÃ LƯU =====
   final List<SavedJob> saved = [];
   bool isSavedLoading = false;
   bool isSavedMore = false;
   bool _savedHasMore = true;
+  int _savedPage = 1;
   final ScrollController savedScroll = ScrollController();
+
+  final Set<int> _savingIds = {};
+  bool _saving = false;
 
   MyJobsProvider() {
     appliedScroll.addListener(_onAppliedScroll);
@@ -89,21 +92,23 @@ class MyJobsProvider extends ChangeNotifier {
     }
   }
 
+  /* ================== ĐÃ LƯU ================== */
+
   Future<void> refreshSaved() async {
     if (isSavedLoading) return;
     isSavedLoading = true;
+    _savedPage = 1;
     _savedHasMore = true;
     saved.clear();
     notifyListeners();
 
     try {
-      // final page = await MyJobsService.fetchSaved(page: _savedPage);
-      // saved.addAll(page.items);
-      // _savedHasMore = page.hasMore;
-
-      await Future.delayed(const Duration(milliseconds: 500)); // mock
+      final res = await MyJobsService.fetchSaved(page: _savedPage);
+      saved.addAll(res.items);
+      _savedHasMore = res.currentPage < res.lastPage;
     } catch (e) {
       if (kDebugMode) print('refreshSaved error: $e');
+      _savedHasMore = false;
     } finally {
       isSavedLoading = false;
       notifyListeners();
@@ -116,12 +121,12 @@ class MyJobsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // final page = await MyJobsService.fetchSaved(page: _savedPage);
-      // saved.addAll(page.items);
-      // _savedHasMore = page.hasMore;
-
-      await Future.delayed(const Duration(milliseconds: 500)); // mock
+      _savedPage += 1;
+      final res = await MyJobsService.fetchSaved(page: _savedPage);
+      saved.addAll(res.items);
+      _savedHasMore = res.currentPage < res.lastPage;
     } catch (e) {
+      _savedPage -= 1;
       if (kDebugMode) print('loadMoreSaved error: $e');
     } finally {
       isSavedMore = false;
@@ -135,6 +140,71 @@ class MyJobsProvider extends ChangeNotifier {
       loadMoreSaved();
     }
   }
+
+  Future<bool> _ensureLoggedIn(BuildContext context) async {
+    final auth = context.read<AuthProvider>();
+    if (auth.isLoggedIn) return true;
+    Navigator.of(context).pushNamed('/login');
+    return false;
+  }
+
+  Future<void> toggleSaveWithAuth(BuildContext context, int jobId) async {
+    if (!await _ensureLoggedIn(context)) return;
+    await toggleSave(jobId);
+  }
+
+  Future<void> unsave(int id) async {
+    final idx = saved.indexWhere((e) => e.id == id);
+    SavedJob? removed;
+    if (idx >= 0) {
+      removed = saved.removeAt(idx);
+      notifyListeners();
+    }
+
+    try {
+      await MyJobsService.unsaveJob(jobId: id);
+    } catch (e) {
+      if (removed != null) {
+        saved.insert(idx, removed);
+        notifyListeners();
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> save(int jobId) async {
+    if (_saving) return;
+    _saving = true;
+    try {
+      final res = await MyJobsService.saveJob(jobId: jobId);
+      if (!res.alreadySaved) {
+        await refreshSaved();
+      }
+    } finally {
+      _saving = false;
+    }
+  }
+
+  bool isSaved(int jobId) => saved.any((e) => e.id == jobId);
+
+  Future<void> toggleSave(int jobId) async {
+    if (_savingIds.contains(jobId)) return;
+    _savingIds.add(jobId);
+    notifyListeners();
+    try {
+      if (isSaved(jobId)) {
+        await unsave(jobId);
+      } else {
+        final res = await MyJobsService.saveJob(jobId: jobId);
+        if (!res.alreadySaved) await refreshSaved();
+      }
+    } finally {
+      _savingIds.remove(jobId);
+      notifyListeners();
+    }
+  }
+
+  /* ================== KHÁC ================== */
 
   void openJobDetail(
     BuildContext context,
@@ -151,13 +221,6 @@ class MyJobsProvider extends ChangeNotifier {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Không tìm thấy ID công việc.')),
     );
-  }
-
-  Future<void> unsave(int id) async {
-    // TODO: gọi API bỏ lưu
-    // await MyJobsService.unsave(id);
-    saved.removeWhere((e) => e.id == id);
-    notifyListeners();
   }
 
   @override

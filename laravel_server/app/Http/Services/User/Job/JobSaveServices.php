@@ -30,8 +30,11 @@ class JobSaveServices
     {
         $userId = $request->user()->id;
         $perPage = 10;
-        $savedJob = JobSaved::with('job.company', 'job.province')
-        ->where('user_id', $userId)
+        $savedJob = JobSaved::with(['job.company', 'job.province'])
+            ->where('user_id', $userId)
+            ->whereHas('job', function ($query) {
+                $query->where('end_date', '>=', now());
+            })
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
         $savedJob->setCollection(

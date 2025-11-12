@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/providers/auth_provider.dart';
+import 'package:mobile/providers/my_jobs_provider.dart';
+import 'package:mobile/screens/auth/login_screen.dart';
 import 'package:mobile/screens/job/job_detail_screen.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
@@ -25,6 +28,8 @@ class _JobListScreenState extends State<JobListScreen> {
       if (!_initialized) {
         _initialized = true;
         await context.read<JobProvider>().fetchFirstPage();
+        // ignore: use_build_context_synchronously
+        await context.read<MyJobsProvider>().ensureLoaded(context);
       }
     });
 
@@ -49,6 +54,8 @@ class _JobListScreenState extends State<JobListScreen> {
 
   Future<void> _onRefresh() async {
     await context.read<JobProvider>().fetchFirstPage();
+    // ignore: use_build_context_synchronously
+    await context.read<MyJobsProvider>().refreshSaved();
   }
 
   @override
@@ -104,21 +111,70 @@ class _JobListScreenState extends State<JobListScreen> {
                         final job = provider.jobs[index];
                         final remainingDays = job.deadline ?? 0;
 
-                        return JobItemWidget(
-                          title: job.title,
-                          company: job.companyName,
-                          salary: job.salaryRange,
-                          location: job.location,
-                          remainingDays: remainingDays,
-                          urgent: job.isUrgent == '1' || job.isUrgent == 'true',
-                          imageUrl: job.companyLogo,
-                          isFavorite: false,
-                          onFavoriteTap: () {},
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => JobDetailScreen(jobId: job.id),
-                              ),
+                        return Selector<MyJobsProvider, (bool, bool)>(
+                          selector: (_, p) =>
+                              (p.isSaved(job.id), p.isSavedLoading),
+                          builder: (context, tuple, _) {
+                            final (isFav, savedLoading) = tuple;
+                            context.read<MyJobsProvider>();
+
+                            return JobItemWidget(
+                              title: job.title,
+                              company: job.companyName,
+                              salary: job.salaryRange,
+                              location: job.location,
+                              remainingDays: remainingDays,
+                              urgent:
+                                  job.isUrgent == '1' || job.isUrgent == 'true',
+                              imageUrl: job.companyLogo is Uri
+                                  ? job.companyLogo.toString()
+                                  : job.companyLogo,
+                              isFavorite: isFav,
+                              onFavoriteTap: savedLoading
+                                  ? null
+                                  : () async {
+                                      final auth = context.read<AuthProvider>();
+                                      if (!auth.isLoggedIn) {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (_) => const LoginScreen(),
+                                          ),
+                                        );
+                                        return;
+                                      }
+
+                                      final my = context.read<MyJobsProvider>();
+                                      try {
+                                        await my.toggleSave(job.id);
+                                        if (!context.mounted) return;
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              isFav
+                                                  ? 'Đã bỏ lưu'
+                                                  : 'Đã lưu công việc',
+                                            ),
+                                          ),
+                                        );
+                                      } catch (e) {
+                                        if (!context.mounted) return;
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(content: Text('Lỗi: $e')),
+                                        );
+                                      }
+                                    },
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        JobDetailScreen(jobId: job.id),
+                                  ),
+                                );
+                              },
                             );
                           },
                         );

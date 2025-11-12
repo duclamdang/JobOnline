@@ -190,7 +190,7 @@ class ApiService {
 
   // ===== Helpers =====
   static String get _platformBaseUrl {
-    if (Platform.isAndroid) return 'http://192.168.1.17:8000/api';
-    return 'http://192.168.1.17:8000/api';
+    if (Platform.isAndroid) return 'http://192.168.183.1:8000/api';
+    return 'http://192.168.183.1:8000/api';
   }
 }

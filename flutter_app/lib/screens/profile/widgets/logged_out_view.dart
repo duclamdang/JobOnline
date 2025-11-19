@@ -37,24 +37,22 @@ class LoggedOutView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: () => Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                ),
-
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  );
+                },
                 child: const Text('Đăng nhập'),
               ),
             ),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pushReplacement(
+                Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const RegisterScreen()),
                 );
               },
-              child: const Text(
-                'Đăng ký tài khoản',
-                selectionColor: Colors.blue,
-              ),
+              child: const Text('Đăng ký tài khoản'),
             ),
           ],
         ),

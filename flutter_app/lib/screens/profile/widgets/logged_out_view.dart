@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/screens/auth/login_screen.dart';
+import 'package:mobile/screens/auth/register_screen.dart';
 
 class LoggedOutView extends StatelessWidget {
   const LoggedOutView({super.key});
@@ -35,10 +37,9 @@ class LoggedOutView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: () => Navigator.of(
-                  context,
-                  rootNavigator: true,
-                ).pushNamed('/login'),
+                onPressed: () => Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                ),
 
                 child: const Text('Đăng nhập'),
               ),
@@ -46,9 +47,14 @@ class LoggedOutView extends StatelessWidget {
             const SizedBox(height: 8),
             TextButton(
               onPressed: () {
-                // Navigator.pushNamed(context, '/register');
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                );
               },
-              child: const Text('Đăng ký tài khoản'),
+              child: const Text(
+                'Đăng ký tài khoản',
+                selectionColor: Colors.blue,
+              ),
             ),
           ],
         ),

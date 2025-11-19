@@ -16,7 +16,7 @@ class BaseInputDecoration {
       prefixIcon: leading == null
           ? null
           // ignore: deprecated_member_use
-          : Icon(leading, color: primary.withOpacity(.9)),
+          : Icon(leading, color: Colors.blue.withOpacity(.9)),
       suffixIcon: trailing,
       filled: true,
       fillColor: Colors.white,

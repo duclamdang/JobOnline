@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/api/models/applied_job.dart';
 import 'package:mobile/api/models/saved_job.dart';
 import 'package:mobile/api/services/my_jobs_service.dart';
+import 'package:mobile/screens/auth/login_screen.dart';
 import 'package:mobile/screens/job/job_detail_screen.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
@@ -144,7 +145,9 @@ class MyJobsProvider extends ChangeNotifier {
   Future<bool> _ensureLoggedIn(BuildContext context) async {
     final auth = context.read<AuthProvider>();
     if (auth.isLoggedIn) return true;
-    Navigator.of(context).pushNamed('/login');
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => const LoginScreen()));
     return false;
   }
 

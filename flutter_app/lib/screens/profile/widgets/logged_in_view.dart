@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:mobile/api/models/profile_model.dart';
 import 'package:mobile/api/services/profile_service.dart';
 import 'package:mobile/screens/profile/cv_screen.dart';
+import 'package:mobile/screens/profile/general-info_screen.dart';
+import 'package:mobile/screens/profile/job_criteria_screen.dart';
 import 'package:mobile/screens/profile/widgets/logout_setting_item.dart';
 // ignore: depend_on_referenced_packages
 import 'package:mobile/screens/profile/basic_info_screen.dart';
@@ -128,7 +130,6 @@ class LoggedInViewState extends State<LoggedInView> {
                 ),
                 child: Column(
                   children: [
-                    // Avatar + nút thay ảnh
                     Stack(
                       alignment: Alignment.bottomRight,
                       children: [
@@ -155,7 +156,6 @@ class LoggedInViewState extends State<LoggedInView> {
                                   ),
                           ),
                         ),
-                        // nút camera
                         Material(
                           color: Colors.white,
                           shape: const CircleBorder(),
@@ -253,7 +253,14 @@ class LoggedInViewState extends State<LoggedInView> {
                 icon: Icons.tune,
                 iconColor: primaryBlue,
                 title: 'Tiêu chí tìm việc',
-                onTap: () {},
+                onTap: () async {
+                  final changed = await Navigator.of(context).push<bool>(
+                    MaterialPageRoute(
+                      builder: (_) => const JobCriteriaScreen(),
+                    ),
+                  );
+                  if (changed == true) _reload();
+                },
               ),
               const DividerInset(),
 
@@ -263,9 +270,7 @@ class LoggedInViewState extends State<LoggedInView> {
                 title: 'Thông tin chung',
                 onTap: () async {
                   final changed = await Navigator.of(context).push<bool>(
-                    MaterialPageRoute(
-                      builder: (_) => BasicInfoScreen(initial: u),
-                    ),
+                    MaterialPageRoute(builder: (_) => GeneralInfoScreen()),
                   );
                   if (changed == true) _reload();
                 },

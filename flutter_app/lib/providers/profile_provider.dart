@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:mobile/providers/auth_provider.dart';
 import 'package:mobile/utils/auth_guard.dart';
 
-/// Khai báo các route name để điều hướng
 class ProfileRoutes {
   static const editProfile = '/profile/edit';
   static const verifyAccount = '/profile/verify';
@@ -34,8 +33,6 @@ class ProfileProvider extends ChangeNotifier {
     Navigator.of(context).maybePop();
     notifyListeners();
   }
-
-  /* ------------ Điều hướng các màn con ------------- */
 
   Future<void> openEditProfile(BuildContext context) async {
     final ok = await requireLogin(context);

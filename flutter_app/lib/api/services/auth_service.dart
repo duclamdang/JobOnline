@@ -1,4 +1,3 @@
-// lib/api/services/auth_service.dart
 import 'package:mobile/api/services/api_service.dart';
 import 'package:mobile/api/models/user_model.dart';
 
@@ -12,10 +11,6 @@ class AuthService {
       body: {'account': account, 'password': password},
       parser: (json) => Map<String, dynamic>.from(json as Map),
     );
-
-    // HỖ TRỢ CẢ 2 KIỂU:
-    // - ApiService đã unwrap -> raw = { user, access_token, expires_in }
-    // - ApiService KHÔNG unwrap -> raw = { status_code, message, data: {...} }
     final data = raw.containsKey('data')
         ? Map<String, dynamic>.from(raw['data'])
         : raw;
@@ -24,12 +19,9 @@ class AuthService {
     final expiresIn = (data['expires_in'] as num?)?.toInt() ?? 0;
 
     if (token.isEmpty) {
-      // Gợi ý debug: in ra để thấy cấu trúc thực tế
-      // print('login response data: $data');
       throw 'Máy chủ không trả về access_token';
     }
 
-    // user có thể đang nằm trong data['user'] hoặc data trực tiếp
     final userSrc = data['user'] ?? data['profile'] ?? {};
     final user = UserModel.fromJson({'data': userSrc});
 
@@ -38,5 +30,32 @@ class AuthService {
 
   static Future<void> logout() {
     return ApiService.post<dynamic>('/user/logout', parser: (_) => null);
+  }
+
+  static Future<void> register({
+    required String name,
+    String? phone,
+    String? email,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    final body = <String, dynamic>{
+      'name': name.trim(),
+      'password': password.trim(),
+      'password_confirmation': passwordConfirmation.trim(),
+    };
+
+    if (phone != null && phone.trim().isNotEmpty) {
+      body['phone'] = phone.trim();
+    }
+    if (email != null && email.trim().isNotEmpty) {
+      body['email'] = email.trim();
+    }
+
+    await ApiService.post<dynamic>(
+      '/user/register',
+      body: body,
+      parser: (_) => null,
+    );
   }
 }

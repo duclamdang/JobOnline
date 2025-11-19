@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 
 class HeaderSearch extends StatelessWidget {
-  final TextEditingController controller;
   final VoidCallback onSearch;
   final VoidCallback onBellTap;
 
   const HeaderSearch({
-    required this.controller,
+    super.key,
     required this.onSearch,
     required this.onBellTap,
   });
@@ -25,41 +24,41 @@ class HeaderSearch extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              height: 44,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(22),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 6,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Row(
-                children: [
-                  const Icon(Icons.search, color: Colors.grey),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TextField(
-                      controller: controller,
-                      decoration: const InputDecoration(
-                        hintText: 'Tìm công việc tại đây...',
-                        border: InputBorder.none,
-                        isDense: true,
-                      ),
-                      textInputAction: TextInputAction.search,
-                      onSubmitted: (_) => onSearch(),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(22),
+              onTap: onSearch,
+              child: Container(
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(22),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  children: const [
+                    Icon(Icons.search, color: Colors.grey),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Tìm công việc tại đây...',
+                        style: TextStyle(color: Colors.grey),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
           const SizedBox(width: 10),
+
           InkWell(
             onTap: onBellTap,
             borderRadius: BorderRadius.circular(22),

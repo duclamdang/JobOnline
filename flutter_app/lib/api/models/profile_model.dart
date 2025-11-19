@@ -7,21 +7,37 @@ class ProfileModel {
   final String? phone;
   final String? address;
   final String? birthday;
-  final String? gender; // "0"/"1"/"2"
+  final String? gender;
   final String? bankInfo;
   final int? jobSearchStatus;
 
   // thêm cho detail
-  final String? avatar; // path hoặc url
+  final String? avatar;
   final String? desiredPosition;
+
+  // Job criteria
+  final int? workFieldId;
   final String? workFieldTitle;
+
+  final int? provinceId;
   final String? provinceName;
+
   final int? minSalary;
   final int? maxSalary;
+
+  final int? workingFormId;
   final String? workingFormTitle;
+
+  // Thông tin chung
+  final int? workExperienceId;
   final String? workExperienceTitle;
+
+  final int? positionId;
   final String? positionTitle;
+
+  final int? educationId;
   final String? educationTitle;
+
   final List<UserCV> cvs;
   final bool? isVerify;
 
@@ -37,13 +53,19 @@ class ProfileModel {
     this.jobSearchStatus,
     this.avatar,
     this.desiredPosition,
+    this.workFieldId,
     this.workFieldTitle,
+    this.provinceId,
     this.provinceName,
     this.minSalary,
     this.maxSalary,
+    this.workingFormId,
     this.workingFormTitle,
+    this.workExperienceId,
     this.workExperienceTitle,
+    this.positionId,
     this.positionTitle,
+    this.educationId,
     this.educationTitle,
     this.cvs = const [],
     this.isVerify,
@@ -51,6 +73,13 @@ class ProfileModel {
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
     final data = Map<String, dynamic>.from(json['data'] ?? json);
+
+    int? i(v) => v is int
+        ? v
+        : (v is num)
+        ? v.toInt()
+        : int.tryParse('$v');
+
     return ProfileModel(
       id: _asInt(data['id']),
       name: data['name'] ?? '',
@@ -64,6 +93,14 @@ class ProfileModel {
       jobSearchStatus: data['job_search_status'] is num
           ? (data['job_search_status'] as num).toInt()
           : int.tryParse('${data['job_search_status'] ?? ''}'),
+
+      // nếu API cơ bản có trả id ở root thì map luôn
+      workFieldId: i(data['work_field_id']),
+      provinceId: i(data['province_id']),
+      workingFormId: i(data['working_form_id']),
+      workExperienceId: i(data['work_experience_id']),
+      positionId: i(data['position_id']),
+      educationId: i(data['education_id']),
     );
   }
 
@@ -78,6 +115,15 @@ class ProfileModel {
     if (jobSearchStatus != null) 'job_search_status': jobSearchStatus,
   };
 
+  Map<String, dynamic> toJobCriteriaPayload() => {
+    if (desiredPosition != null) 'desired_position': desiredPosition,
+    if (workFieldTitle != null) 'work_field_title': workFieldTitle,
+    if (provinceName != null) 'province_name': provinceName,
+    if (minSalary != null) 'min_salary': minSalary,
+    if (maxSalary != null) 'max_salary': maxSalary,
+    if (workingFormTitle != null) 'working_form_title': workingFormTitle,
+  };
+
   static int _asInt(dynamic v) {
     if (v is int) return v;
     if (v is num) return v.toInt();
@@ -87,9 +133,9 @@ class ProfileModel {
   factory ProfileModel.fromDetailJson(Map<String, dynamic> json) {
     final data = Map<String, dynamic>.from(json['data'] ?? json);
 
-    Map<String, dynamic> _m(v) => Map<String, dynamic>.from(v ?? const {});
-    int? _i(v) => v is int ? v : (v is num ? v.toInt() : int.tryParse('$v'));
-    bool? _b(v) {
+    Map<String, dynamic> m(v) => Map<String, dynamic>.from(v ?? const {});
+    int? i(v) => v is int ? v : (v is num ? v.toInt() : int.tryParse('$v'));
+    bool? b(v) {
       if (v == null) return null;
       if (v is bool) return v;
       final s = '$v'.toLowerCase();
@@ -102,8 +148,15 @@ class ProfileModel {
       cvs.add(UserCV.fromJson(Map<String, dynamic>.from(e)));
     }
 
+    final workField = m(data['work_field']);
+    final province = m(data['province']);
+    final workingForm = m(data['working_form']);
+    final workExp = m(data['work_experience']);
+    final position = m(data['position']);
+    final education = m(data['education']);
+
     return ProfileModel(
-      id: _i(data['id']) ?? 0,
+      id: i(data['id']) ?? 0,
       name: data['name'] ?? '',
       email: data['email'] ?? '',
       phone: data['phone'],
@@ -111,19 +164,30 @@ class ProfileModel {
       birthday: data['birthday'],
       gender: data['gender']?.toString(),
       bankInfo: data['bank_info'],
-      jobSearchStatus: _i(data['job_search_status']),
+      jobSearchStatus: i(data['job_search_status']),
       avatar: data['avatar'],
+
+      // job criteria
       desiredPosition: data['desired_position'],
-      workFieldTitle: _m(data['work_field'])['title'],
-      provinceName: _m(data['province'])['name'],
-      minSalary: _i(data['min_salary']),
-      maxSalary: _i(data['max_salary']),
-      workingFormTitle: _m(data['working_form'])['title'],
-      workExperienceTitle: _m(data['work_experience'])['title'],
-      positionTitle: _m(data['position'])['title'],
-      educationTitle: _m(data['education'])['title'],
+      workFieldId: i(workField['id']),
+      workFieldTitle: workField['title'],
+      provinceId: i(province['id']),
+      provinceName: province['name'],
+      minSalary: i(data['min_salary']),
+      maxSalary: i(data['max_salary']),
+      workingFormId: i(workingForm['id']),
+      workingFormTitle: workingForm['title'],
+
+      // general info
+      workExperienceId: i(workExp['id']),
+      workExperienceTitle: workExp['title'],
+      positionId: i(position['id']),
+      positionTitle: position['title'],
+      educationId: i(education['id']),
+      educationTitle: education['title'],
+
       cvs: cvs,
-      isVerify: _b(data['is_verify']),
+      isVerify: b(data['is_verify']),
     );
   }
 }
@@ -142,7 +206,7 @@ class UserCV {
   });
 
   factory UserCV.fromJson(Map<String, dynamic> j) {
-    bool _b(v) {
+    bool b(v) {
       if (v is bool) return v;
       final s = '$v'.toLowerCase();
       return s == 'true' || s == '1';
@@ -152,7 +216,7 @@ class UserCV {
       id: (j['id'] is int) ? j['id'] : int.tryParse('${j['id']}') ?? 0,
       fileName: j['file_name'] ?? '',
       filePath: j['file_path'] ?? '',
-      mainCV: _b(j['main_cv']),
+      mainCV: b(j['main_cv']),
     );
   }
 }

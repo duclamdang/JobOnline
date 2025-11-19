@@ -14,7 +14,7 @@ class ChatProvider extends ChangeNotifier {
   ];
   bool _loading = false;
   String? _error;
-  bool _ready = false; // đã ping OK chưa
+  bool _ready = false;
 
   ChatProvider(AiService service) : _service = service {
     _init();

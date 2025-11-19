@@ -3,7 +3,6 @@ import 'package:mobile/providers/auth_provider.dart';
 import 'package:mobile/providers/company_provider.dart';
 import 'package:mobile/providers/my_jobs_provider.dart';
 import 'package:mobile/providers/profile_provider.dart';
-import 'package:mobile/screens/auth/login_screen.dart';
 import 'package:mobile/screens/main_tab_screen.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
@@ -38,7 +37,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'JobOnline',
       home: const MainTabScreen(),
-      routes: {'/login': (_) => const LoginScreen()},
     );
   }
 }

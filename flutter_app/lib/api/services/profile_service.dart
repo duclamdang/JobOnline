@@ -87,4 +87,64 @@ class ProfileService {
       },
     );
   }
+
+  static Future<ProfileModel> fetchJobCriteria() {
+    return ApiService.get<ProfileModel>(
+      'user/profile/job-criteria',
+      parser: (json) =>
+          ProfileModel.fromDetailJson(Map<String, dynamic>.from(json as Map)),
+    );
+  }
+
+  static Future<void> updateJobCriteria({
+    String? desiredPosition,
+    int? workFieldId,
+    int? provinceId,
+    int? minSalary,
+    int? maxSalary,
+    int? workingFormId,
+  }) {
+    final body = <String, dynamic>{};
+
+    if (desiredPosition != null && desiredPosition.isNotEmpty) {
+      body['desired_position'] = desiredPosition;
+    }
+    if (workFieldId != null) body['work_field_id'] = workFieldId;
+    if (provinceId != null) body['province_id'] = provinceId;
+    if (minSalary != null) body['min_salary'] = minSalary;
+    if (maxSalary != null) body['max_salary'] = maxSalary;
+    if (workingFormId != null) body['working_form_id'] = workingFormId;
+
+    return ApiService.put<dynamic>(
+      'user/profile/job-criteria',
+      body: body,
+      parser: (_) => null,
+    );
+  }
+
+  static Future<ProfileModel> fetchGeneralInfo() {
+    return ApiService.get<ProfileModel>(
+      'user/profile/general-info',
+      parser: (json) =>
+          ProfileModel.fromDetailJson(Map<String, dynamic>.from(json as Map)),
+    );
+  }
+
+  static Future<void> updateGeneralInfo({
+    int? workExperienceId,
+    int? positionId,
+    int? educationId,
+  }) {
+    final body = <String, dynamic>{};
+
+    if (workExperienceId != null) body['work_experience_id'] = workExperienceId;
+    if (positionId != null) body['position_id'] = positionId;
+    if (educationId != null) body['education_id'] = educationId;
+
+    return ApiService.put<dynamic>(
+      'user/profile/general-info',
+      body: body,
+      parser: (_) => null,
+    );
+  }
 }

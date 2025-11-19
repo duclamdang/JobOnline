@@ -60,6 +60,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
     }
     if (i == 1) {
       Future.microtask(
+        // ignore: use_build_context_synchronously
         () => context.read<MyJobsProvider>().ensureLoaded(context),
       );
     }

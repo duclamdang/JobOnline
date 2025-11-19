@@ -405,7 +405,7 @@ class ProfileController extends Controller
         $validator = Validator::make($request->all(), [
             'work_experience_id' => 'nullable|integer|exists:work_experiences,id',
             'position_id'        => 'nullable|integer|exists:positions,id',
-            'education_id'       => 'nullable|integer|exists:educatiods,id',
+            'education_id'       => 'nullable|integer|exists:educations,id',
         ]);
 
         if ($validator->fails()) {

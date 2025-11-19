@@ -7,25 +7,21 @@ class ApiException implements Exception {
   final String message;
   ApiException(this.message, {this.statusCode});
   @override
-  String toString() => 'ApiException($statusCode): $message';
+  String toString() => message;
 }
 
 class ApiService {
-  // 1) Base URL (ưu tiên --dart-define=BASE_URL)
   static final String baseUrl = String.fromEnvironment(
     'BASE_URL',
     defaultValue: _platformBaseUrl,
   );
 
-  // 2) HTTP client + timeout mặc định
   static final http.Client _client = http.Client();
   static const Duration _timeout = Duration(seconds: 20);
 
-  // 3) Token
   static String? _token;
   static void setToken(String? token) => _token = token;
 
-  // 4) Header mặc định
   static Map<String, String> _headers({
     bool json = true,
     Map<String, String>? extra,
@@ -40,7 +36,6 @@ class ApiService {
     return h;
   }
 
-  // 5) Build Uri + query (hỗ trợ URL tuyệt đối)
   static Uri _uri(String endpoint, [Map<String, dynamic>? query]) {
     if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
       return Uri.parse(endpoint).replace(queryParameters: _encodeQuery(query));
@@ -64,29 +59,31 @@ class ApiService {
     return map;
   }
 
-  // 6) Xử lý response chung (+ unwrap 'status_code/message/data')
   static T _decode<T>(http.Response r, {T Function(dynamic json)? parser}) {
     dynamic body;
     try {
       body = r.body.isNotEmpty ? jsonDecode(r.body) : null;
     } catch (_) {
-      body = r.body; // non-JSON fallback
+      body = r.body;
     }
 
-    // HTTP error
     final httpOk = r.statusCode >= 200 && r.statusCode < 300;
     if (!httpOk) {
-      final msg = (body is Map && body['message'] is String)
-          ? body['message'] as String
-          : 'Request failed';
+      String msg = 'Request failed';
+      if (body is Map) {
+        msg =
+            (body['error_messages'] ?? body['message'] ?? body['error'] ?? msg)
+                .toString();
+      }
       throw ApiException(msg, statusCode: r.statusCode);
     }
 
-    // App-level: { status_code, message, data? }
     if (body is Map && body.containsKey('status_code')) {
       final sc = (body['status_code'] as num?)?.toInt() ?? 200;
       if (sc < 200 || sc >= 300) {
-        final msg = (body['message'] ?? 'Request failed').toString();
+        final msg =
+            (body['error_messages'] ?? body['message'] ?? 'Request failed')
+                .toString();
         throw ApiException(msg, statusCode: sc);
       }
       if (body.containsKey('data')) {
@@ -97,7 +94,6 @@ class ApiService {
     return parser != null ? parser(body) : (body as T);
   }
 
-  // 7) GET
   static Future<T> get<T>(
     String endpoint, {
     Map<String, dynamic>? query,
@@ -113,7 +109,6 @@ class ApiService {
     return _decode<T>(res, parser: parser);
   }
 
-  // 8) POST (JSON)
   static Future<T> post<T>(
     String endpoint, {
     Map<String, dynamic>? body,
@@ -131,7 +126,6 @@ class ApiService {
     return _decode<T>(res, parser: parser);
   }
 
-  // 9) PUT
   static Future<T> put<T>(
     String endpoint, {
     Map<String, dynamic>? body,
@@ -149,7 +143,6 @@ class ApiService {
     return _decode<T>(res, parser: parser);
   }
 
-  // 10) DELETE
   static Future<T> delete<T>(
     String endpoint, {
     Map<String, dynamic>? query,
@@ -165,7 +158,6 @@ class ApiService {
     return _decode<T>(res, parser: parser);
   }
 
-  // 11) MULTIPART (upload file)
   static Future<T> upload<T>(
     String endpoint, {
     required Map<String, String> fields,
@@ -188,9 +180,8 @@ class ApiService {
 
   static void dispose() => _client.close();
 
-  // ===== Helpers =====
   static String get _platformBaseUrl {
-    if (Platform.isAndroid) return 'http://192.168.183.1:8000/api';
-    return 'http://192.168.183.1:8000/api';
+    if (Platform.isAndroid) return 'http://192.168.37.1:8000/api';
+    return 'http://192.168.37.1:8000/api';
   }
 }

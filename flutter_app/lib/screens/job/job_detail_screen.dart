@@ -2,15 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:mobile/api/models/company_model.dart';
 import 'package:mobile/api/models/job_model.dart';
 import 'package:mobile/api/services/company_service.dart';
+import 'package:mobile/providers/my_jobs_provider.dart';
 import 'package:mobile/screens/company/widgets/company_header.dart';
 import 'package:mobile/screens/company/widgets/company_info_row.dart';
+import 'package:mobile/screens/job/job_apply_screen.dart';
 import 'package:mobile/screens/job/widgets/bottom_apply_bar.dart';
+import 'package:mobile/screens/job/widgets/bullet_text.dart';
 import 'package:mobile/screens/job/widgets/info_group.dart';
 import 'package:mobile/screens/job/widgets/job_item_widget.dart';
 import 'package:mobile/screens/job/widgets/top_card.dart';
+import 'package:mobile/screens/profile/cv_pdf_viewer_screen.dart';
+import 'package:mobile/screens/profile/widgets/section_title.dart';
+import 'package:mobile/utils/day_utils.dart';
+import 'package:mobile/utils/url_utils.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import 'package:mobile/providers/job_provider.dart';
 import 'package:mobile/utils/auth_guard.dart';
 
@@ -31,7 +37,7 @@ class JobDetailScreen extends StatefulWidget {
 }
 
 class _JobDetailScreenState extends State<JobDetailScreen> {
-  bool? _hasApplied; // null: chưa biết, true/false: đã xác định
+  bool? _hasApplied;
   String? _appliedStatus;
 
   @override
@@ -48,26 +54,46 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     await context.read<JobProvider>().fetchJobDetail(widget.jobId);
   }
 
-  // ====== BOTTOM BAR: đưa vào trong State để dùng được context/_hasApplied ======
-  Widget _buildBottomBar(JobModel d) {
+  Widget _buildBottomBar(JobModel d, bool hasApplied, bool isSaved) {
     final isActive = _asBool(d.isActive);
 
     if (!isActive) {
       return BottomApplyBar(
         isActive: false,
+        isSaved: isSaved,
         onApply: () {},
         onSave: () async {
           final ok = await requireLogin(context);
           if (!ok) return;
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Đã lưu việc')));
+
+          // ignore: use_build_context_synchronously
+          final myJobs = context.read<MyJobsProvider>();
+          final isCurrentlySaved = myJobs.isSaved(d.id);
+
+          try {
+            if (isCurrentlySaved) {
+              await myJobs.unsave(d.id);
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Đã bỏ lưu công việc')),
+              );
+            } else {
+              await myJobs.save(d.id);
+              if (!mounted) return;
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Đã lưu việc')));
+            }
+          } catch (e) {
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Không thể cập nhật lưu việc: $e')),
+            );
+          }
         },
       );
     }
-
-    // Đã ứng tuyển: hiện trạng thái + nút Xem hồ sơ
-    if (_hasApplied == true) {
+    if (hasApplied) {
       return Card(
         margin: EdgeInsets.zero,
         elevation: 2,
@@ -93,7 +119,47 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               const SizedBox(width: 8),
               OutlinedButton(
                 onPressed: () {
-                  // TODO: mở màn xem hồ sơ đã nộp
+                  final cv = d.appliedCv;
+                  if (cv == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Không tìm thấy CV đã dùng để ứng tuyển.',
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+
+                  final path = (cv.filePath).trim();
+                  if (path.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('CV không có file đính kèm để hiển thị.'),
+                      ),
+                    );
+                    return;
+                  }
+
+                  final url = fullUrl(path);
+                  if (url.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Không tạo được đường dẫn CV.'),
+                      ),
+                    );
+                    return;
+                  }
+
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => CvPdfViewerScreen(
+                        id: cv.id,
+                        title: cv.fileName,
+                        pdfUrl: url,
+                      ),
+                    ),
+                  );
                 },
                 child: const Text('Xem hồ sơ'),
               ),
@@ -103,33 +169,57 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       );
     }
 
-    // Chưa ứng tuyển: CTA mặc định
     return BottomApplyBar(
       isActive: true,
+      isSaved: isSaved,
       onApply: () async {
         final ok = await requireLogin(context);
         if (!ok) return;
 
-        // TODO: call API apply
-        setState(() {
-          _hasApplied = true;
-          _appliedStatus = 'Đã ứng tuyển';
-        });
-        ScaffoldMessenger.of(
+        final applied = await Navigator.of(
+          // ignore: use_build_context_synchronously
           context,
-        ).showSnackBar(const SnackBar(content: Text('Ứng tuyển thành công')));
+        ).push<bool>(MaterialPageRoute(builder: (_) => JobApplyScreen(job: d)));
+
+        if (applied == true && mounted) {
+          setState(() {
+            _hasApplied = true;
+            _appliedStatus = 'Đã ứng tuyển';
+          });
+          context.read<MyJobsProvider>().markApplied(d.id);
+        }
       },
       onSave: () async {
         final ok = await requireLogin(context);
         if (!ok) return;
-        // TODO: call API save
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Đã lưu việc')));
+
+        // ignore: use_build_context_synchronously
+        final myJobs = context.read<MyJobsProvider>();
+        final isCurrentlySaved = myJobs.isSaved(d.id);
+
+        try {
+          if (isCurrentlySaved) {
+            await myJobs.unsave(d.id);
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Đã bỏ lưu công việc')),
+            );
+          } else {
+            await myJobs.save(d.id);
+            if (!mounted) return;
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Đã lưu việc')));
+          }
+        } catch (e) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Không thể cập nhật lưu việc: $e')),
+          );
+        }
       },
     );
   }
-  // ============================================================================
 
   @override
   Widget build(BuildContext context) {
@@ -177,11 +267,20 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           }
 
           final remainedDays =
-              d.deadline ?? _calcRemainingDaysFromString(d.endDate);
+              d.deadline ?? calcRemainingDaysFromString(d.endDate);
+
+          final myJobs = context.watch<MyJobsProvider>();
+
+          // ĐÃ ỨNG TUYỂN?
+          final bool hasApplied =
+              (_hasApplied ?? false) || d.isApplied || myJobs.isApplied(d.id);
+
+          // ĐÃ LƯU?
+          final bool isSaved = myJobs.isSaved(d.id);
 
           return Scaffold(
             backgroundColor: Colors.grey.shade100,
-            bottomNavigationBar: _buildBottomBar(d),
+            bottomNavigationBar: _buildBottomBar(d, hasApplied, isSaved),
             body: RefreshIndicator(
               onRefresh: _onRefresh,
               child: NestedScrollView(
@@ -251,7 +350,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                               InfoItem(
                                 icon: Icons.event_available_outlined,
                                 label: 'Hạn nộp',
-                                value: _formatEndDate(d.endDate) ?? '—',
+                                value: toDdMMyyyy(d.endDate),
                               ),
                               if (remainedDays != null)
                                 InfoItem(
@@ -273,25 +372,25 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                           ),
                           const SizedBox(height: 16),
                           if ((d.description ?? '').isNotEmpty) ...[
-                            const _SectionTitle(title: 'Mô tả công việc'),
+                            const SectionTitle(title: 'Mô tả công việc'),
                             const SizedBox(height: 8),
-                            _BulletText(d.description!),
+                            BulletText(d.description!),
                             const SizedBox(height: 16),
                           ],
                           if ((d.benefit ?? '').isNotEmpty) ...[
-                            const _SectionTitle(title: 'Quyền lợi'),
+                            const SectionTitle(title: 'Quyền lợi'),
                             const SizedBox(height: 8),
-                            _BulletText(d.benefit!),
+                            BulletText(d.benefit!),
                             const SizedBox(height: 16),
                           ],
                           if ((d.requirement ?? '').isNotEmpty) ...[
-                            const _SectionTitle(title: 'Yêu cầu'),
+                            const SectionTitle(title: 'Yêu cầu'),
                             const SizedBox(height: 8),
-                            _BulletText(d.requirement!),
+                            BulletText(d.requirement!),
                             const SizedBox(height: 16),
                           ],
                           if ((d.skills ?? '').isNotEmpty) ...[
-                            const _SectionTitle(title: 'Kỹ năng yêu cầu'),
+                            const SectionTitle(title: 'Kỹ năng yêu cầu'),
                             const SizedBox(height: 8),
                             Text(
                               d.skills!,
@@ -340,8 +439,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                               onTap: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (_) =>
-                                        JobDetailScreen(jobId: job.id),
+                                    builder: (_) => JobDetailScreen(
+                                      jobId: job.id,
+                                      initialApplied: myJobs.isApplied(job.id),
+                                    ),
                                   ),
                                 );
                               },
@@ -408,7 +509,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   CompanyHeader(
-                                    logo: _fullUrl(company.logo),
+                                    logo: fullUrl(company.logo),
                                     name: company.name,
                                     address: company.address,
                                   ),
@@ -472,7 +573,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                     value: '${company.activeJobsCount} việc',
                                   ),
                                   const SizedBox(height: 8),
-                                  const _SectionTitle(
+                                  const SectionTitle(
                                     title: 'Giới thiệu công ty',
                                   ),
                                   const SizedBox(height: 8),
@@ -506,74 +607,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
 /* ================== helpers & widgets nhỏ ================== */
 
-String? _formatEndDate(String? endDateStr) {
-  if (endDateStr == null || endDateStr.trim().isEmpty) return null;
-  final dt = DateTime.tryParse(endDateStr);
-  if (dt == null) return null;
-  return DateFormat('dd/MM/yyyy').format(dt);
-}
-
-int? _calcRemainingDaysFromString(String? endDateStr) {
-  if (endDateStr == null || endDateStr.trim().isEmpty) return null;
-  final dt = DateTime.tryParse(endDateStr);
-  if (dt == null) return null;
-  final diff = dt.difference(DateTime.now());
-  return diff.isNegative ? 0 : diff.inDays;
-}
-
 bool _asBool(String? raw) {
   if (raw == null) return false;
   final s = raw.toLowerCase().trim();
   return s == '1' || s == 'true' || s == 'còn tuyển' || s == 'con tuyen';
-}
-
-class _SectionTitle extends StatelessWidget {
-  final String title;
-  const _SectionTitle({required this.title});
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-    );
-  }
-}
-
-class _BulletText extends StatelessWidget {
-  final String text;
-  const _BulletText(this.text);
-  @override
-  Widget build(BuildContext context) {
-    final lines = text
-        .split(RegExp(r'\r?\n'))
-        .where((e) => e.trim().isNotEmpty)
-        .toList();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: lines.map((l) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 6),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('•  ', style: TextStyle(height: 1.4)),
-              Expanded(
-                child: Text(l.trim(), style: const TextStyle(height: 1.4)),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-String _fullUrl(String? p) {
-  if (p == null || p.isEmpty) return '';
-  if (p.startsWith('http')) return p;
-  // sửa base theo server của bạn
-  const base = 'http://192.168.56.1:8000';
-  // API thường trả "companies/images/..." -> cần prefix 'storage/'
-  final path = p.startsWith('storage/') ? p : 'storage/$p';
-  return '$base/$path';
 }

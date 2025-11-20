@@ -20,3 +20,11 @@ String toYyyyMmDdFromDdMMyyyy(String? ddMMyyyy) {
     return '';
   }
 }
+
+int? calcRemainingDaysFromString(String? endDateStr) {
+  if (endDateStr == null || endDateStr.trim().isEmpty) return null;
+  final dt = DateTime.tryParse(endDateStr);
+  if (dt == null) return null;
+  final diff = dt.difference(DateTime.now());
+  return diff.isNegative ? 0 : diff.inDays;
+}

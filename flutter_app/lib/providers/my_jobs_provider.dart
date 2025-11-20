@@ -10,13 +10,24 @@ import 'package:provider/provider.dart';
 import 'package:mobile/providers/auth_provider.dart';
 
 class MyJobsProvider extends ChangeNotifier {
+  // ============= ĐÃ ỨNG TUYỂN =============
   final List<AppliedJob> applied = [];
   bool isAppliedLoading = false;
   bool isAppliedMore = false;
   bool _appliedHasMore = true;
   int _appliedPage = 1;
   final ScrollController appliedScroll = ScrollController();
+  final Set<int> _appliedJobIds = {};
 
+  bool isApplied(int jobId) => _appliedJobIds.contains(jobId);
+
+  void markApplied(int jobId) {
+    if (_appliedJobIds.add(jobId)) {
+      notifyListeners();
+    }
+  }
+
+  // ============= ĐÃ LƯU =============
   final List<SavedJob> saved = [];
   bool isSavedLoading = false;
   bool isSavedMore = false;
@@ -32,16 +43,14 @@ class MyJobsProvider extends ChangeNotifier {
     savedScroll.addListener(_onSavedScroll);
   }
 
+  /// Gọi hàm này trong initState của màn MyJobs
+  /// để mỗi lần vào MyJobs đều reload lại cả 2 tab
   Future<void> ensureLoaded(BuildContext context) async {
     final auth = context.read<AuthProvider>();
     if (!auth.isLoggedIn) return;
 
-    if (applied.isEmpty && !isAppliedLoading) {
-      await refreshApplied();
-    }
-    if (saved.isEmpty && !isSavedLoading) {
-      await refreshSaved();
-    }
+    // Lần nào gọi cũng bắn lại cả 2 API -> cả tab Apply & Saved đều loading như nhau
+    await Future.wait([refreshApplied(), refreshSaved()]);
   }
 
   /* ================== ĐÃ ỨNG TUYỂN ================== */
@@ -52,11 +61,13 @@ class MyJobsProvider extends ChangeNotifier {
     _appliedPage = 1;
     _appliedHasMore = true;
     applied.clear();
+    _appliedJobIds.clear();
     notifyListeners();
 
     try {
       final res = await MyJobsService.fetchApplied(page: _appliedPage);
       applied.addAll(res.items);
+      _appliedJobIds.addAll(res.items.map((e) => e.jobId));
       _appliedHasMore = res.currentPage < res.lastPage;
     } catch (e) {
       if (kDebugMode) print('refreshApplied error: $e');
@@ -76,6 +87,7 @@ class MyJobsProvider extends ChangeNotifier {
       _appliedPage += 1;
       final res = await MyJobsService.fetchApplied(page: _appliedPage);
       applied.addAll(res.items);
+      _appliedJobIds.addAll(res.items.map((e) => e.jobId));
       _appliedHasMore = res.currentPage < res.lastPage;
     } catch (e) {
       _appliedPage -= 1;
@@ -142,6 +154,8 @@ class MyJobsProvider extends ChangeNotifier {
     }
   }
 
+  /* ================== LOGIN CHECK ================== */
+
   Future<bool> _ensureLoggedIn(BuildContext context) async {
     final auth = context.read<AuthProvider>();
     if (auth.isLoggedIn) return true;
@@ -155,6 +169,8 @@ class MyJobsProvider extends ChangeNotifier {
     if (!await _ensureLoggedIn(context)) return;
     await toggleSave(jobId);
   }
+
+  /* ================== LƯU / BỎ LƯU ================== */
 
   Future<void> unsave(int id) async {
     final idx = saved.indexWhere((e) => e.id == id);

@@ -1,3 +1,5 @@
+import 'package:mobile/api/models/cv_model.dart';
+
 class JobModel {
   final int id;
   final String title;
@@ -28,6 +30,8 @@ class JobModel {
   final bool? salaryNegotiable;
   final String? address;
   final String? district;
+  final bool isApplied;
+  final CvModel? appliedCv;
   final List<SimilarJob> similar;
 
   JobModel({
@@ -60,6 +64,8 @@ class JobModel {
     this.salaryNegotiable,
     this.address,
     this.district,
+    this.isApplied = false,
+    this.appliedCv,
     this.similar = const [],
   });
 
@@ -99,6 +105,15 @@ class JobModel {
       salaryNegotiable: json["salary_negotiable"],
       address: json["address"],
       district: json["district"],
+      isApplied:
+          (json['is_applied'] ?? false) == true ||
+          (json['is_applied'] ?? 0) == 1 ||
+          (json['is_applied']?.toString() == '1'),
+      appliedCv: src['applied_cv'] != null
+          ? CvModel.fromJson(
+              Map<String, dynamic>.from(src['applied_cv'] as Map),
+            )
+          : null,
       similar: (src['similar_job'] as List? ?? [])
           .map((e) => SimilarJob.fromJson(Map<String, dynamic>.from(e)))
           .toList(),

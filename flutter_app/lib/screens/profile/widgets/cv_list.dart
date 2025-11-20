@@ -38,8 +38,11 @@ class CvList extends StatelessWidget {
               final url = fullUrl(cv.filePath);
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (_) =>
-                      CvPdfViewerScreen(title: cv.fileName, pdfUrl: url),
+                  builder: (_) => CvPdfViewerScreen(
+                    id: cv.id,
+                    title: cv.filePath,
+                    pdfUrl: url,
+                  ),
                 ),
               );
             },

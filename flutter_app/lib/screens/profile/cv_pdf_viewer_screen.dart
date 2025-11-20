@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class CvPdfViewerScreen extends StatelessWidget {
+  final int id;
   final String title;
   final String pdfUrl;
 
   const CvPdfViewerScreen({
     super.key,
+    required this.id,
     required this.title,
     required this.pdfUrl,
   });

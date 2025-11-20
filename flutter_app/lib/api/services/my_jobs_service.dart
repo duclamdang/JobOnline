@@ -43,6 +43,28 @@ class MyJobsService {
     );
   }
 
+  static Future<void> applyJob({required int jobId, required int cvId}) async {
+    final raw = await ApiService.post<dynamic>(
+      '/job/user/apply',
+      body: {'job_id': jobId, 'cv_id': cvId},
+    );
+    int code = 200;
+    String? msg;
+
+    if (raw is Map) {
+      if (raw['status_code'] is num) {
+        code = (raw['status_code'] as num).toInt();
+      }
+      if (raw['message'] is String) {
+        msg = raw['message'] as String;
+      }
+    }
+
+    if (code != 200 && code != 201) {
+      throw Exception(msg ?? 'Ứng tuyển thất bại (status_code=$code)');
+    }
+  }
+
   //Saved job
   static Future<({List<SavedJob> items, int currentPage, int lastPage})>
   fetchSaved({int page = 1}) async {
@@ -95,7 +117,6 @@ class MyJobsService {
       return const SaveResult(alreadySaved: false);
     }
     if (code == 409) {
-      // ĐÃ lưu trước đó -> coi là OK, không throw
       return SaveResult(
         alreadySaved: true,
         message: msg ?? 'Bạn đã lưu công việc này rồi.',

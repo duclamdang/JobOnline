@@ -3,6 +3,7 @@ import 'package:mobile/api/models/company_model.dart';
 import 'package:mobile/api/models/job_model.dart';
 import 'package:mobile/api/services/company_service.dart';
 import 'package:mobile/providers/my_jobs_provider.dart';
+import 'package:mobile/screens/company/company_detail_screen.dart';
 import 'package:mobile/screens/company/widgets/company_header.dart';
 import 'package:mobile/screens/company/widgets/company_info_row.dart';
 import 'package:mobile/screens/job/job_apply_screen.dart';
@@ -512,6 +513,15 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                     logo: fullUrl(company.logo),
                                     name: company.name,
                                     address: company.address,
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => CompanyDetailScreen(
+                                            companyId: company.id,
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                   const SizedBox(height: 8),
                                   CompanyInfoRow(

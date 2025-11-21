@@ -18,6 +18,7 @@ import {
   FaHandsHelping,
   FaEnvelope,
   FaSearch,
+  FaPlus,
 } from "react-icons/fa";
 
 export default function AdminSidebar() {
@@ -114,9 +115,18 @@ export default function AdminSidebar() {
             >
               <Link
                 to="/admin/job"
-                className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
+                className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
               >
-                <FaListAlt /> Danh sách Job
+                <FaListAlt className="text-blue-600" />
+                <span>Danh sách công việc</span>
+              </Link>
+
+              <Link
+                to="/admin/job/add"
+                className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
+              >
+                <FaPlus className="text-blue-600" />
+                <span>Thêm công việc</span>
               </Link>
             </MenuWrapper>
 
@@ -222,9 +232,18 @@ export default function AdminSidebar() {
             >
               <Link
                 to="/admin/companies"
-                className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
+                className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
               >
-                <FaListAlt /> Danh sách công ty
+                <FaListAlt className="text-blue-600" />
+                <span>Danh sách công ty</span>
+              </Link>
+
+              <Link
+                to="/admin/companies/create"
+                className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
+              >
+                <FaPlus className="text-blue-600" />
+                <span>Thêm mới công ty</span>
               </Link>
             </MenuWrapper>
           </>

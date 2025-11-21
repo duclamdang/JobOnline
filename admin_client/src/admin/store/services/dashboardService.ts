@@ -1,7 +1,7 @@
 import { apiAuth } from "../../../services/api";
 
 export const dashboardService = {
-  fetchDashboardData: async () => {
+  fetchRootDashboardData: async () => {
     const [
       jobsRes,
       applicantsRes,
@@ -12,11 +12,15 @@ export const dashboardService = {
       totalUsersRes,
     ] = await Promise.all([
       apiAuth.get("/admin/dashboard/jobs-per-month", { withCredentials: true }),
-      apiAuth.get("/admin/dashboard/applicants-per-week", { withCredentials: true }),
+      apiAuth.get("/admin/dashboard/applicants-per-week", {
+        withCredentials: true,
+      }),
       apiAuth.get("/admin/dashboard/top-companies", { withCredentials: true }),
       apiAuth.get("/admin/dashboard/total-jobs", { withCredentials: true }),
       apiAuth.get("/admin/dashboard/new-jobs-week", { withCredentials: true }),
-      apiAuth.get("/admin/dashboard/total-companies", { withCredentials: true }),
+      apiAuth.get("/admin/dashboard/total-companies", {
+        withCredentials: true,
+      }),
       apiAuth.get("/admin/dashboard/total-users", { withCredentials: true }),
     ]);
 
@@ -49,6 +53,48 @@ export const dashboardService = {
         new_jobs: newJobsWeekRes.data.data ?? 0,
         new_applicants: totalUsersRes.data.data ?? 0,
         new_companies: totalCompaniesRes.data.data ?? 0,
+      },
+    };
+  },
+
+  fetchEmployerDashboardData: async () => {
+    const [
+      applicantsPerWeekRes,
+      totalJobsRes,
+      newJobsWeekRes,
+      newJobsMonthRes,
+    ] = await Promise.all([
+      apiAuth.get("/admin/employer-dashboard/applicants-per-week", {
+        withCredentials: true,
+      }),
+      apiAuth.get("/admin/employer-dashboard/total-jobs", {
+        withCredentials: true,
+      }),
+      apiAuth.get("/admin/employer-dashboard/new-jobs-week", {
+        withCredentials: true,
+      }),
+      apiAuth.get("/admin/employer-dashboard/new-jobs-month", {
+        withCredentials: true,
+      }),
+    ]);
+
+    return {
+      applicantsData: {
+        labels: applicantsPerWeekRes.data.labels ?? [],
+        datasets: [
+          {
+            label: "Số lượng ứng viên",
+            data: applicantsPerWeekRes.data.data ?? [],
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59,130,246,0.3)",
+            tension: 0.4,
+          },
+        ],
+      },
+      generalStats: {
+        total_jobs: totalJobsRes.data.data ?? 0,
+        new_jobs_week: newJobsWeekRes.data.data ?? 0,
+        new_jobs_month: newJobsMonthRes.data.data ?? 0,
       },
     };
   },

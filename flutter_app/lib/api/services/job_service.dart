@@ -94,4 +94,17 @@ class JobService {
       },
     );
   }
+
+  static Future<List<JobModel>> fetchJobsByCompany(int companyId) async {
+    final raw = await ApiService.get<Map<String, dynamic>>(
+      '/user/companies/$companyId/jobs',
+      parser: (json) => Map<String, dynamic>.from(json as Map),
+    );
+
+    final list = (raw['data'] as List?) ?? const [];
+
+    return list
+        .map((e) => JobModel.fromJson(Map<String, dynamic>.from(e as Map)))
+        .toList();
+  }
 }

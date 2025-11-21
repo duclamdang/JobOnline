@@ -4,49 +4,59 @@ class CompanyHeader extends StatelessWidget {
   final String? logo;
   final String name;
   final String? address;
+  final VoidCallback? onTap;
+
   const CompanyHeader({
     super.key,
-    required this.logo,
+    this.logo,
     required this.name,
     this.address,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: 24,
-          backgroundColor: Colors.grey.shade200,
-          backgroundImage: (logo != null && logo!.isNotEmpty)
-              ? NetworkImage(logo!)
-              : null,
-          child: (logo == null || logo!.isEmpty)
-              ? const Icon(
-                  Icons.apartment_outlined,
-                  size: 24,
-                  color: Colors.grey,
-                )
-              : null,
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                name,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                ),
+    return InkWell(
+      onTap: onTap,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (logo != null)
+            ClipOval(
+              child: Image.network(
+                logo!,
+                width: 48,
+                height: 48,
+                fit: BoxFit.cover,
               ),
-              if ((address ?? '').isNotEmpty)
-                Text(address!, style: const TextStyle(color: Colors.black54)),
-            ],
+            )
+          else
+            const Icon(Icons.business, size: 48, color: Colors.black26),
+
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                if (address != null && address!.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    address!,
+                    style: const TextStyle(fontSize: 13, color: Colors.black54),
+                  ),
+                ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

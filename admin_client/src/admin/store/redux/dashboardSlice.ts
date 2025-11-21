@@ -22,6 +22,8 @@ interface ChartData {
 }
 
 interface GeneralStats {
+  new_jobs_month: number;
+  new_jobs_week: number;
   total_jobs: number;
   new_jobs: number;
   new_applicants: number;
@@ -48,7 +50,14 @@ const initialState: DashboardState = {
   jobsData: { labels: [], datasets: [] },
   applicantsData: { labels: [], datasets: [] },
   topCompanies: [],
-  generalStats: { total_jobs: 0, new_jobs: 0, new_applicants: 0, new_companies: 0 },
+  generalStats: {
+    total_jobs: 0,
+    new_jobs: 0,
+    new_applicants: 0,
+    new_companies: 0,
+    new_jobs_week: 0,
+    new_jobs_month: 0,
+  },
   loading: false,
   error: null,
 };
@@ -59,10 +68,27 @@ export const fetchDashboardData = createAsyncThunk<
   { rejectValue: string }
 >("dashboard/fetchDashboardData", async (_, { rejectWithValue }) => {
   try {
-    const data = await dashboardService.fetchDashboardData();
+    const data = await dashboardService.fetchRootDashboardData();
     return data as DashboardResponse;
   } catch (err: any) {
-    return rejectWithValue(err.response?.data?.message || "Fetch dashboard failed");
+    return rejectWithValue(
+      err.response?.data?.message || "Fetch dashboard failed"
+    );
+  }
+});
+
+export const fetchEmployerDashboardData = createAsyncThunk<
+  DashboardResponse,
+  void,
+  { rejectValue: string }
+>("dashboard/fetchDashboardData", async (_, { rejectWithValue }) => {
+  try {
+    const data = await dashboardService.fetchEmployerDashboardData();
+    return data as unknown as DashboardResponse;
+  } catch (err: any) {
+    return rejectWithValue(
+      err.response?.data?.message || "Fetch dashboard failed"
+    );
   }
 });
 

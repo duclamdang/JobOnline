@@ -166,7 +166,7 @@ const TopCompaniesTable = ({ companies }: { companies: Company[] }) => {
   );
 };
 
-export default function AdminDashboard() {
+export default function AdminRootDashboard() {
   const dispatch = useAppDispatch();
   const { jobsData, applicantsData, topCompanies, generalStats, loading } =
     useAppSelector((state) => state.dashboard);

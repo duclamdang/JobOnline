@@ -96,7 +96,6 @@ class _MainTabScreenState extends State<MainTabScreen> {
         backgroundColor: Colors.grey.shade100,
         body: Stack(
           children: [
-            // ÉP phần nội dung fill toàn body để tránh layout lạ
             Positioned.fill(
               child: IndexedStack(
                 index: _currentIndex,
@@ -109,12 +108,11 @@ class _MainTabScreenState extends State<MainTabScreen> {
               ),
             ),
 
-            // Nút Chat AI: tròn, nhỏ, kéo thả
             DraggableFab(
               heroTag: 'ai-fab',
               diameter: 56,
-              initialOffset: const Offset(16, 240), // tùy chọn
-              onPressed: _openChatSheet, // ← BẮT BUỘC
+              initialOffset: const Offset(16, 240),
+              onPressed: _openChatSheet,
             ),
           ],
         ),

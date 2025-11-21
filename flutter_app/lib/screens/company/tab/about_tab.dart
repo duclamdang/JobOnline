@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/api/models/company_model.dart';
 import 'package:mobile/screens/job/widgets/section_title.dart';
+import 'package:mobile/utils/expandable.dart';
 import 'package:mobile/utils/open_map.dart';
 import 'package:mobile/utils/open_website.dart';
 
@@ -48,13 +49,11 @@ class AboutTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Giới thiệu
           const SectionTitle(title: 'Giới thiệu công ty'),
           const SizedBox(height: 8),
-          ExpandableDescription(text: description),
+          Expandable(text: description),
           const SizedBox(height: 16),
 
-          // Email
           if (hasEmail) ...[
             const SectionTitle(title: 'Email'),
             const SizedBox(height: 8),
@@ -69,7 +68,6 @@ class AboutTab extends StatelessWidget {
             const SizedBox(height: 16),
           ],
 
-          // Số điện thoại
           if (hasPhone) ...[
             const SectionTitle(title: 'Số điện thoại'),
             const SizedBox(height: 8),
@@ -84,7 +82,6 @@ class AboutTab extends StatelessWidget {
             const SizedBox(height: 16),
           ],
 
-          // Địa chỉ
           if (hasAddress) ...[
             const SectionTitle(title: 'Địa chỉ'),
             const SizedBox(height: 8),
@@ -99,7 +96,6 @@ class AboutTab extends StatelessWidget {
             const SizedBox(height: 16),
           ],
 
-          // Khu vực
           if (hasLocation) ...[
             const SectionTitle(title: 'Khu vực'),
             const SizedBox(height: 8),
@@ -114,7 +110,6 @@ class AboutTab extends StatelessWidget {
             const SizedBox(height: 16),
           ],
 
-          // Website
           if (hasWebsite) ...[
             const SectionTitle(title: 'Website'),
             const SizedBox(height: 8),
@@ -133,7 +128,6 @@ class AboutTab extends StatelessWidget {
             const SizedBox(height: 16),
           ],
 
-          // Quy mô
           if (hasCompanySize) ...[
             const SectionTitle(title: 'Quy mô công ty'),
             const SizedBox(height: 8),
@@ -148,7 +142,6 @@ class AboutTab extends StatelessWidget {
             const SizedBox(height: 16),
           ],
 
-          // Ngành nghề
           if (hasIndustry) ...[
             const SectionTitle(title: 'Ngành nghề'),
             const SizedBox(height: 8),
@@ -163,7 +156,6 @@ class AboutTab extends StatelessWidget {
             const SizedBox(height: 16),
           ],
 
-          // Bản đồ
           if (hasMap) ...[
             const SectionTitle(title: 'Bản đồ'),
             const SizedBox(height: 8),
@@ -235,65 +227,6 @@ class AboutTab extends StatelessWidget {
           ],
         ],
       ),
-    );
-  }
-}
-
-/// Chỉ thu gọn / mở rộng phần mô tả
-class ExpandableDescription extends StatefulWidget {
-  final String text;
-
-  const ExpandableDescription({super.key, required this.text});
-
-  @override
-  State<ExpandableDescription> createState() => _ExpandableDescriptionState();
-}
-
-class _ExpandableDescriptionState extends State<ExpandableDescription> {
-  bool _expanded = false;
-  static const int _trimLength = 220; // ngưỡng coi là dài
-
-  @override
-  Widget build(BuildContext context) {
-    final raw = widget.text.trim().isEmpty ? '—' : widget.text.trim();
-    final bool isLong = raw.length > _trimLength;
-
-    final String displayText;
-    if (!_expanded && isLong) {
-      displayText = raw.substring(0, _trimLength).trimRight() + '...';
-    } else {
-      displayText = raw;
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          displayText,
-          style: const TextStyle(
-            fontSize: 15,
-            height: 1.6,
-            color: Colors.black87,
-          ),
-        ),
-        if (isLong)
-          TextButton(
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
-              minimumSize: const Size(0, 0),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            onPressed: () {
-              setState(() {
-                _expanded = !_expanded;
-              });
-            },
-            child: Text(
-              _expanded ? 'Thu gọn' : 'Xem thêm',
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-            ),
-          ),
-      ],
     );
   }
 }

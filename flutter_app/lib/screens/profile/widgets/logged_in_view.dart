@@ -277,11 +277,35 @@ class LoggedInViewState extends State<LoggedInView> {
               ),
               const DividerInset(),
 
-              const SectionTitle(title: 'Tài khoản'),
+              const SectionTitle(title: 'Hệ thống'),
               SettingItem(
                 icon: Icons.lock_outline,
                 iconColor: primaryBlue,
                 title: 'Quyền riêng tư & bảo mật',
+                onTap: () {},
+              ),
+              const DividerInset(),
+
+              SettingItem(
+                icon: Icons.help_outline,
+                iconColor: primaryBlue,
+                title: 'Hướng dẫn sự dụng',
+                onTap: () {},
+              ),
+              const DividerInset(),
+
+              SettingItem(
+                icon: Icons.privacy_tip_outlined,
+                iconColor: primaryBlue,
+                title: 'Chính sách bảo mật',
+                onTap: () {},
+              ),
+              const DividerInset(),
+
+              SettingItem(
+                icon: Icons.person_outline,
+                iconColor: primaryBlue,
+                title: 'Chính sách dự liệu cá nhân',
                 onTap: () {},
               ),
               const DividerInset(),

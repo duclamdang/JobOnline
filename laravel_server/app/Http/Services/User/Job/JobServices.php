@@ -7,7 +7,6 @@ use App\Http\Resources\User\JobResource;
 use App\Models\Job;
 use App\Models\WorkField;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class JobServices
 {
@@ -50,10 +49,14 @@ class JobServices
             ->where('is_active', Job::IS_ACTIVE);
 
         if (!empty($conditions['keyword'])) {
-            $keyword = strtolower(trim($conditions['keyword']));
+            $keyword = trim($conditions['keyword']);
+
             $query->where(function ($q) use ($keyword) {
-                $q->whereRaw('LOWER(title) LIKE ?', ["%{$keyword}%"])
-                    ->orWhereRaw('LOWER(description) LIKE ?', ["%{$keyword}%"]);
+                $kw = mb_strtolower($keyword, 'UTF-8');
+                $like = "%{$kw}%";
+
+                $q->whereRaw('unaccent(lower(title)) LIKE unaccent(?)', [$like])
+                    ->orWhereRaw('unaccent(lower(description)) LIKE unaccent(?)', [$like]);
             });
         }
 

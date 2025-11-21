@@ -117,29 +117,32 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                       collapseMode: CollapseMode.pin,
                       titlePadding: EdgeInsets.zero,
                       centerTitle: true,
-                      // Header giờ chứa luôn cả InfoCard
                       background: _Header(
                         name: company.name,
                         logoUrl: logoUrl,
                         coverUrl: coverUrl,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 60, 16, 16),
-                          child: _InfoCard(
-                            address: company.address,
-                            employeeCountText: company.companySize,
-                            responseRateText: null,
-                            website: company.website,
-                            onWebsiteTap: () => _openWebsite(company.website),
-                          ),
-                        ),
+                        child: const SizedBox(height: 70),
                       ),
                     ),
-                    // bottom chỉ còn TabBar + Divider, không còn card nên không đè logo nữa
+                    // tăng height để KHÔNG bị overflow
                     bottom: PreferredSize(
-                      preferredSize: const Size.fromHeight(60.0),
+                      preferredSize: const Size.fromHeight(210.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                            ),
+                            child: _InfoCard(
+                              address: company.address,
+                              employeeCountText: company.companySize,
+                              responseRateText: null,
+                              website: company.website,
+                              onWebsiteTap: () => _openWebsite(company.website),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
                           Container(
                             color: Colors.white,
                             width: double.infinity,
@@ -373,6 +376,7 @@ class _InfoCard extends StatelessWidget {
     }
 
     return Container(
+      margin: const EdgeInsets.only(top: 8, bottom: 4),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),

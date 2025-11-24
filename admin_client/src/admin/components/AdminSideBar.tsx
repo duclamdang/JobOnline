@@ -161,7 +161,7 @@ export default function AdminSidebar() {
               }
             >
               <Link
-                to="/admin/packages"
+                to="/admin/payment"
                 className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
               >
                 <FaBoxOpen /> Gói dịch vụ

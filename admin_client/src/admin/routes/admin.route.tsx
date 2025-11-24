@@ -21,6 +21,7 @@ import UserManagement from "@admin/pages/UserManagement";
 import ApplicantSearch from "@admin/pages/ApplicantSearch";
 import RootDashboard from "@admin/pages/AdminRootMain";
 import EmployerDashboard from "@admin/pages/AdminEmployerMain";
+import PaymentResultPage from "@admin/pages/PaymentResultPage";
 
 const adminRoutes: RouteObject[] = [
   {
@@ -50,6 +51,11 @@ const adminRoutes: RouteObject[] = [
             index: true,
             path: "employer-dashboard",
             element: <EmployerDashboard />,
+          },
+          {
+            index: true,
+            path: "payment",
+            element: <PaymentResultPage />,
           },
 
           {

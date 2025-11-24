@@ -342,4 +342,6 @@ class BaseConstants
   public const EMPLOYER_ADMIN = 2;
   public const EMPLOYER_HR = 3;
   public const EMPLOYER_VIEWER = 4;
+
+  public const PAYMENT_POINT_RATE=1000;
 }

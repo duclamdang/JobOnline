@@ -86,24 +86,30 @@ class PaymentController extends Controller
         $vnpSecureHash = $vnpData['vnp_SecureHash'] ?? '';
         unset($vnpData['vnp_SecureHash'], $vnpData['vnp_SecureHashType']);
 
+        // ==== SỬA ĐOẠN NÀY ====
         ksort($vnpData);
-        $hashData = [];
-        foreach ($vnpData as $k => $v) {
-            $hashData[] = $k . '=' . $v;
-        }
-        $hashDataStr = implode('&', $hashData);
 
-        $secureHash = hash_hmac('sha512', $hashDataStr, $config['hash_secret']);
+        $hashData = '';
+        foreach ($vnpData as $k => $v) {
+            if ($hashData !== '') {
+                $hashData .= '&';
+            }
+            // dùng cùng kiểu urlencode như khi tạo payment
+            $hashData .= urlencode($k) . '=' . urlencode($v);
+        }
+
+        $secureHash = hash_hmac('sha512', $hashData, $config['hash_secret']);
+        // =======================
 
         $orderCode = $vnpData['vnp_TxnRef'] ?? null;
-        $payment = Payment::where('order_code', $orderCode)->first();
+        $payment   = Payment::where('order_code', $orderCode)->first();
 
         $success = false;
 
-        if ($payment && $secureHash === $vnpSecureHash && ($vnpData['vnp_ResponseCode'] ?? null) == '00') {
+        if ($payment && hash_equals($secureHash, $vnpSecureHash) && ($vnpData['vnp_ResponseCode'] ?? null) == '00') {
             $alreadySuccess = $payment->status === 'success';
 
-            $payment->status = 'success';
+            $payment->status          = 'success';
             $payment->gateway_tran_id = $vnpData['vnp_TransactionNo'] ?? null;
             $payment->meta = array_merge($payment->meta ?? [], ['vnp_return' => $request->all()]);
             $payment->save();
@@ -136,13 +142,15 @@ class PaymentController extends Controller
         if ($rate <= 0) {
             $rate = 1000;
         }
+
         $points = intdiv($payment->amount, $rate);
         if ($points <= 0) {
             return;
         }
-
-        $user->point = ($user->point ?? 0) + $points;
+        $user->points = ($user->points ?? 0) + $points;
         $user->save();
     }
+
+
 
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "753395542622",
+    "project_id": "jobonline-a5c65",
+    "storage_bucket": "jobonline-a5c65.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:753395542622:android:e0d79eb4bec4372fa5a2cf",
+        "android_client_info": {
+          "package_name": "com.example.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsOpX3M15Ni1fF9QHKBJQPPrCXeIsCRgk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

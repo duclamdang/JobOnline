@@ -181,7 +181,7 @@ class ApiService {
   static void dispose() => _client.close();
 
   static String get _platformBaseUrl {
-    if (Platform.isAndroid) return 'http://192.168.183.1:8000/api';
-    return 'http://192.168.183.1:8000/api';
+    if (Platform.isAndroid) return 'http://192.168.56.1:8000/api';
+    return 'http://192.168.56.1:8000/api';
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/api/services/push_service.dart';
 import 'package:mobile/screens/auth/register_screen.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
@@ -34,6 +35,17 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (ok) {
+      final user = p.currentUser;
+
+      if (user != null) {
+        try {
+          await PushService.initAndRegisterToken(user.id);
+        } catch (e) {
+          debugPrint('PushService error: $e');
+        }
+      }
+
+      if (!mounted) return;
       Navigator.of(context).pop(true);
     } else {
       final msg = p.error ?? 'Đăng nhập thất bại. Vui lòng thử lại.';

@@ -38,4 +38,8 @@ return [
         'return_url'   => env('VNPAY_RETURN_URL'),
         'frontend_url' => env('VNPAY_FRONTEND_URL'),
     ],
+
+    'fcm' => [
+        'server_key' => env('FCM_SERVER_KEY'),
+    ],
 ];

@@ -10,6 +10,9 @@ export const dashboardService = {
       newJobsWeekRes,
       totalCompaniesRes,
       totalUsersRes,
+      revenuePerMonthRes,
+      pointsPerMonthRes,
+      paymentSummaryRes,
     ] = await Promise.all([
       apiAuth.get("/admin/dashboard/jobs-per-month", { withCredentials: true }),
       apiAuth.get("/admin/dashboard/applicants-per-week", {
@@ -22,6 +25,16 @@ export const dashboardService = {
         withCredentials: true,
       }),
       apiAuth.get("/admin/dashboard/total-users", { withCredentials: true }),
+
+      apiAuth.get("/admin/dashboard/revenue-per-month", {
+        withCredentials: true,
+      }),
+      apiAuth.get("/admin/dashboard/points-per-month", {
+        withCredentials: true,
+      }),
+      apiAuth.get("/admin/dashboard/payment-summary", {
+        withCredentials: true,
+      }),
     ]);
 
     return {
@@ -53,6 +66,40 @@ export const dashboardService = {
         new_jobs: newJobsWeekRes.data.data ?? 0,
         new_applicants: totalUsersRes.data.data ?? 0,
         new_companies: totalCompaniesRes.data.data ?? 0,
+        new_jobs_week: newJobsWeekRes.data.data ?? 0,
+        new_jobs_month: 0,
+      },
+
+      revenuePerMonthData: {
+        labels: revenuePerMonthRes.data.labels ?? [],
+        datasets: [
+          {
+            label: "Doanh thu nạp điểm (VND)",
+            data: revenuePerMonthRes.data.data ?? [],
+            borderColor: "#22c55e",
+            backgroundColor: "rgba(34,197,94,0.3)",
+            tension: 0.4,
+          },
+        ],
+      },
+      pointPerMonthData: {
+        labels: pointsPerMonthRes.data.labels ?? [],
+        datasets: [
+          {
+            label: "Điểm đã mua",
+            data: pointsPerMonthRes.data.data ?? [],
+            borderColor: "#f97316",
+            backgroundColor: "rgba(249,115,22,0.3)",
+            tension: 0.4,
+          },
+        ],
+      },
+      paymentSummary: paymentSummaryRes.data.data ?? {
+        total_amount: 0,
+        total_points: 0,
+        total_orders: 0,
+        successful_orders: 0,
+        last_payment_at: null,
       },
     };
   },

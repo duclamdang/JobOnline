@@ -168,8 +168,16 @@ const TopCompaniesTable = ({ companies }: { companies: Company[] }) => {
 
 export default function AdminRootDashboard() {
   const dispatch = useAppDispatch();
-  const { jobsData, applicantsData, topCompanies, generalStats, loading } =
-    useAppSelector((state) => state.dashboard);
+  const {
+    jobsData,
+    applicantsData,
+    topCompanies,
+    generalStats,
+    revenuePerMonthData,
+    pointPerMonthData,
+    paymentSummary,
+    loading,
+  } = useAppSelector((state) => state.dashboard);
 
   useEffect(() => {
     dispatch(fetchDashboardData());
@@ -178,23 +186,76 @@ export default function AdminRootDashboard() {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <main className="flex-1 p-6 bg-gray-50 min-h-screen overflow-y-auto font-sans">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <StatCard title="Tổng số công việc" value={generalStats.total_jobs} />
-        <StatCard title="Công việc mới" value={generalStats.new_jobs} />
-        <StatCard title="Tổng ứng viên" value={generalStats.new_applicants} />
-        <StatCard title="Tổng công ty" value={generalStats.new_companies} />
-      </div>
+    <main className="flex-1 bg-gray-50 min-h-screen overflow-y-auto font-sans">
+      <div className="max-w-6xl mx-auto p-6 space-y-8">
+        <section>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Tổng quan hệ thống
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard
+              title="Tổng số công việc"
+              value={generalStats.total_jobs}
+            />
+            <StatCard
+              title="Công việc mới (tuần)"
+              value={generalStats.new_jobs}
+            />
+            <StatCard
+              title="Tổng ứng viên"
+              value={generalStats.new_applicants}
+            />
+            <StatCard title="Tổng công ty" value={generalStats.new_companies} />
+          </div>
+        </section>
+        <section>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Tổng quan nạp điểm
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard
+              title="Tổng tiền đã nạp (VND)"
+              value={paymentSummary?.total_amount ?? 0}
+            />
+            <StatCard
+              title="Tổng điểm đã mua"
+              value={paymentSummary?.total_points ?? 0}
+            />
+            <StatCard
+              title="Tổng giao dịch nạp"
+              value={paymentSummary?.total_orders ?? 0}
+            />
+            <StatCard
+              title="Giao dịch thành công"
+              value={paymentSummary?.successful_orders ?? 0}
+            />
+          </div>
+        </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <ChartCard title="Công việc theo tháng" type="line" data={jobsData} />
-        <ChartCard
-          title="Ứng viên theo tuần"
-          type="bar"
-          data={applicantsData}
-        />
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ChartCard title="Công việc theo tháng" type="line" data={jobsData} />
+          <ChartCard
+            title="Ứng viên theo tuần"
+            type="bar"
+            data={applicantsData}
+          />
+        </section>
+
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ChartCard
+            title="Doanh thu nạp điểm theo tháng (VND)"
+            type="line"
+            data={revenuePerMonthData}
+          />
+          <ChartCard
+            title="Điểm đã mua theo tháng"
+            type="line"
+            data={pointPerMonthData}
+          />
+        </section>
+
+        <TopCompaniesTable companies={topCompanies} />
       </div>
-      <TopCompaniesTable companies={topCompanies} />
     </main>
   );
 }

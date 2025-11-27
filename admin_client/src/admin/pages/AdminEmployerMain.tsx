@@ -51,7 +51,6 @@ const ChartCard = ({
       y: {
         beginAtZero: true,
         ticks: {
-          // nếu không truyền stepSize thì ChartJS tự tính
           ...(stepSize ? { stepSize } : {}),
         },
       },
@@ -86,7 +85,6 @@ export default function AdminEmployerDashboard() {
 
   return (
     <main className="flex-1 p-6 bg-gray-50 min-h-screen overflow-y-auto font-sans">
-      {/* cards tổng quan công việc (GIỮ NGUYÊN) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         <StatCard title="Tổng số công việc" value={generalStats.total_jobs} />
         <StatCard
@@ -99,7 +97,6 @@ export default function AdminEmployerDashboard() {
         />
       </div>
 
-      {/* cards tổng quan thanh toán / điểm MỚI */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <StatCard
           title="Tổng tiền đã nạp (VND)"
@@ -119,12 +116,11 @@ export default function AdminEmployerDashboard() {
         />
       </div>
 
-      {/* Hàng 1: Ứng viên theo tuần + Job theo trạng thái */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <ChartCard
           title="Ứng viên theo tuần"
           data={applicantsData}
-          stepSize={1} // số lượng nên để bước 1
+          stepSize={1}
         />
         <ChartCard
           title="Công việc theo trạng thái"
@@ -133,18 +129,12 @@ export default function AdminEmployerDashboard() {
         />
       </div>
 
-      {/* Hàng 2: Doanh thu & Điểm theo tháng */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard
           title="Doanh thu mua điểm theo tháng (VND)"
           data={revenuePerMonthData}
-          // không set stepSize để ChartJS tự scale theo số tiền
         />
-        <ChartCard
-          title="Điểm đã mua theo tháng"
-          data={pointPerMonthData}
-          // có thể stepSize 100, 500... nếu muốn, tạm để auto
-        />
+        <ChartCard title="Điểm đã mua theo tháng" data={pointPerMonthData} />
       </div>
     </main>
   );

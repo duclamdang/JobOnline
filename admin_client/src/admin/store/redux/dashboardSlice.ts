@@ -38,19 +38,16 @@ interface PaymentSummary {
   last_payment_at: string | null;
 }
 
-/**
- * Response cho dashboard tổng (root admin)
- */
 type DashboardResponse = {
   jobsData: ChartData;
   applicantsData: ChartData;
   topCompanies: Company[];
   generalStats: GeneralStats;
+  revenuePerMonthData: ChartData;
+  pointPerMonthData: ChartData;
+  paymentSummary: PaymentSummary;
 };
 
-/**
- * Response cho dashboard employer
- */
 type EmployerDashboardResponse = {
   applicantsData: ChartData;
   generalStats: GeneralStats;
@@ -61,18 +58,14 @@ type EmployerDashboardResponse = {
 };
 
 interface DashboardState {
-  // root admin
   jobsData: ChartData;
   applicantsData: ChartData;
   topCompanies: Company[];
   generalStats: GeneralStats;
-
-  // employer dashboard
   jobByStatusData: ChartData;
   revenuePerMonthData: ChartData;
   pointPerMonthData: ChartData;
   paymentSummary: PaymentSummary;
-
   loading: boolean;
   error: string | null;
 }
@@ -107,7 +100,7 @@ const initialState: DashboardState = {
   error: null,
 };
 
-// -------- ROOT DASHBOARD (admin) ----------
+// -------- ROOT DASHBOARD ----------
 export const fetchDashboardData = createAsyncThunk<
   DashboardResponse,
   void,
@@ -144,7 +137,6 @@ const dashboardSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    // ----- root dashboard -----
     builder
       .addCase(fetchDashboardData.pending, (state) => {
         state.loading = true;
@@ -156,13 +148,15 @@ const dashboardSlice = createSlice({
         state.applicantsData = action.payload.applicantsData;
         state.topCompanies = action.payload.topCompanies;
         state.generalStats = action.payload.generalStats;
+        state.revenuePerMonthData = action.payload.revenuePerMonthData;
+        state.pointPerMonthData = action.payload.pointPerMonthData;
+        state.paymentSummary = action.payload.paymentSummary;
       })
       .addCase(fetchDashboardData.rejected, (state, action) => {
         state.loading = false;
         state.error = (action.payload as string) ?? "Fetch dashboard failed";
       });
 
-    // ----- employer dashboard -----
     builder
       .addCase(fetchEmployerDashboardData.pending, (state) => {
         state.loading = true;
@@ -171,11 +165,8 @@ const dashboardSlice = createSlice({
       .addCase(fetchEmployerDashboardData.fulfilled, (state, action) => {
         state.loading = false;
 
-        // dùng lại applicantsData + generalStats
         state.applicantsData = action.payload.applicantsData;
         state.generalStats = action.payload.generalStats;
-
-        // các chart + summary mới
         state.jobByStatusData = action.payload.jobByStatusData;
         state.revenuePerMonthData = action.payload.revenuePerMonthData;
         state.pointPerMonthData = action.payload.pointPerMonthData;

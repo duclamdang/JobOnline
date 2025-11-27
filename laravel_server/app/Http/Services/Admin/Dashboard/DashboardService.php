@@ -94,7 +94,92 @@ class DashboardService
         return $companies;
     }
 
+    public function getRevenuePerMonth(): array
+    {
+        $startMonth = Carbon::now()->subMonths(11)->startOfMonth();
+        $endMonth   = Carbon::now()->startOfMonth();
 
+        $labels = [];
+        $data   = [];
+
+        $cursor = $startMonth->copy();
+
+        while ($cursor <= $endMonth) {
+            $year  = $cursor->year;
+            $month = $cursor->month;
+
+            $sumAmount = Payment::where('status', 'success')
+                ->whereYear('created_at', $year)
+                ->whereMonth('created_at', $month)
+                ->sum('amount');
+
+            $labels[] = $cursor->format('m/Y');
+            $data[]   = (int) $sumAmount;
+
+            $cursor->addMonth();
+        }
+
+        return [
+            'labels' => $labels,
+            'data'   => $data,
+        ];
+    }
+
+    public function getPointsPerMonth(): array
+    {
+        $startMonth = Carbon::now()->subMonths(11)->startOfMonth();
+        $endMonth   = Carbon::now()->startOfMonth();
+
+        $labels = [];
+        $data   = [];
+
+        $cursor = $startMonth->copy();
+
+        while ($cursor <= $endMonth) {
+            $year  = $cursor->year;
+            $month = $cursor->month;
+
+            $sumAmount = Payment::where('status', 'success')
+                ->whereYear('created_at', $year)
+                ->whereMonth('created_at', $month)
+                ->sum('amount');
+
+            $points = (int) floor($sumAmount / 1000);
+
+            $labels[] = $cursor->format('m/Y');
+            $data[]   = $points;
+
+            $cursor->addMonth();
+        }
+
+        return [
+            'labels' => $labels,
+            'data'   => $data,
+        ];
+    }
+
+    public function getPaymentSummary(): array
+    {
+        $successfulQuery = Payment::where('status', 'success');
+
+        $totalAmount      = (int) $successfulQuery->sum('amount');
+        $successfulOrders = (int) $successfulQuery->count();
+        $lastPaymentAt    = $successfulQuery->max('created_at');
+
+        $allOrders = (int) Payment::count();
+
+        $totalPoints = (int) floor($totalAmount / 1000);
+
+        return [
+            'total_amount'      => $totalAmount,
+            'total_points'      => $totalPoints,
+            'total_orders'      => $allOrders,
+            'successful_orders' => $successfulOrders,
+            'last_payment_at'   => $lastPaymentAt,
+        ];
+    }
+
+    //EMPLOYER
     public function getEmployerJobs($request)
     {
         $companyId = $request->user()->company_id;

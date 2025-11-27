@@ -14,6 +14,9 @@ Route::middleware(['auth:admin', 'check.root.role'])
         Route::get('/jobs-per-month', [DashboardController::class, 'getJobsPerMonth']);
         Route::get('/applicants-per-week', [DashboardController::class, 'getApplicantsPerWeek']);
         Route::get('/top-companies', [DashboardController::class, 'getTopCompanies']);
+        Route::get('/revenue-per-month', [DashboardController::class, 'getRevenuePerMonth']);
+        Route::get('/points-per-month', [DashboardController::class, 'getPointsPerMonth']);
+        Route::get('/payment-summary', [DashboardController::class, 'getPaymentSummary']);
     });
 
 Route::middleware(['auth:admin'])

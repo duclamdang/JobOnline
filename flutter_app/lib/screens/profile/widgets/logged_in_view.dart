@@ -1,19 +1,23 @@
 import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile/api/models/profile_model.dart';
 import 'package:mobile/api/services/profile_service.dart';
+import 'package:mobile/screens/profile/basic_info_screen.dart';
 import 'package:mobile/screens/profile/cv_screen.dart';
 import 'package:mobile/screens/profile/general-info_screen.dart';
 import 'package:mobile/screens/profile/job_criteria_screen.dart';
-import 'package:mobile/screens/profile/widgets/logout_setting_item.dart';
-// ignore: depend_on_referenced_packages
-import 'package:mobile/screens/profile/basic_info_screen.dart';
 import 'package:mobile/screens/profile/widgets/divider_inset.dart';
+import 'package:mobile/screens/profile/widgets/logout_setting_item.dart';
 import 'package:mobile/screens/profile/widgets/section_title.dart';
 import 'package:mobile/screens/profile/widgets/setting_item.dart';
+import 'package:mobile/screens/profile/widgets/logged_out_view.dart';
 import 'package:mobile/utils/url_utils.dart';
 import 'package:path_provider/path_provider.dart';
+// ignore: depend_on_referenced_packages
+import 'package:provider/provider.dart';
+import 'package:mobile/providers/auth_provider.dart';
 
 class LoggedInView extends StatefulWidget {
   const LoggedInView({super.key});
@@ -84,17 +88,36 @@ class LoggedInViewState extends State<LoggedInView> {
     return FutureBuilder<ProfileModel>(
       future: _future,
       builder: (context, snap) {
+        // loading
         if (snap.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
+
+        // lỗi (ví dụ token sai / hết hạn)
         if (snap.hasError) {
+          final msg = snap.error.toString();
+
+          // Nếu lỗi kiểu "Please check your login credentials..."
+          // => coi như hết phiên đăng nhập -> logout & show LoggedOutView
+          if (msg.contains('login credentials') ||
+              msg.contains('Unauthenticated') ||
+              msg.contains('401')) {
+            // gọi logout sau frame build để tránh setState trong build
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              context.read<AuthProvider>().logout();
+            });
+            return const LoggedOutView();
+          }
+
+          // các lỗi khác (mạng, server...)
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Lỗi tải hồ sơ: ${snap.error}'),
+                  Text('Lỗi tải hồ sơ: $msg'),
                   const SizedBox(height: 8),
                   OutlinedButton(
                     onPressed: _reload,
@@ -106,6 +129,7 @@ class LoggedInViewState extends State<LoggedInView> {
           );
         }
 
+        // có data
         final u = snap.data!;
         final avatarUrl = fullUrl(u.avatar);
 
@@ -114,7 +138,7 @@ class LoggedInViewState extends State<LoggedInView> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
             children: [
-              // Header
+              // HEADER
               Container(
                 padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
                 decoration: BoxDecoration(
@@ -182,7 +206,6 @@ class LoggedInViewState extends State<LoggedInView> {
                       ],
                     ),
                     const SizedBox(height: 12),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -305,10 +328,11 @@ class LoggedInViewState extends State<LoggedInView> {
               SettingItem(
                 icon: Icons.person_outline,
                 iconColor: primaryBlue,
-                title: 'Chính sách dự liệu cá nhân',
+                title: 'Chính sách dữ liệu cá nhân',
                 onTap: () {},
               ),
               const DividerInset(),
+
               const LogoutSettingItem(),
             ],
           ),

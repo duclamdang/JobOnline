@@ -39,7 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (user != null) {
         try {
-          await PushService.initAndRegisterToken(user.id);
+          await PushService.initAndRegisterToken();
         } catch (e) {
           debugPrint('PushService error: $e');
         }

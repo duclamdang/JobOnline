@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
+import 'package:provider/provider.dart';
+import 'package:mobile/providers/notifications_provider.dart';
 
 class HeaderSearch extends StatelessWidget {
   final VoidCallback onSearch;
@@ -12,6 +15,8 @@ class HeaderSearch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final unread = context.watch<NotificationsProvider>().unreadCount;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       decoration: const BoxDecoration(
@@ -23,6 +28,7 @@ class HeaderSearch extends StatelessWidget {
       ),
       child: Row(
         children: [
+          // Ô tìm kiếm
           Expanded(
             child: InkWell(
               borderRadius: BorderRadius.circular(22),
@@ -59,24 +65,63 @@ class HeaderSearch extends StatelessWidget {
           ),
           const SizedBox(width: 10),
 
+          // Chuông + badge
           InkWell(
             onTap: onBellTap,
             borderRadius: BorderRadius.circular(22),
-            child: Container(
-              height: 44,
-              width: 44,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(22),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 6,
-                    offset: Offset(0, 2),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  height: 44,
+                  width: 44,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(22),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: const Icon(Icons.notifications_none, color: Colors.blue),
+                  child: const Icon(
+                    Icons.notifications_none,
+                    color: Colors.blue,
+                  ),
+                ),
+
+                // Badge số lượng
+                if (unread > 0)
+                  Positioned(
+                    right: -2,
+                    top: -2,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 18,
+                        minHeight: 18,
+                      ),
+                      child: Text(
+                        unread > 9 ? '9+' : '$unread',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],

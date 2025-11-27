@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/providers/auth_provider.dart';
 import 'package:mobile/providers/my_jobs_provider.dart';
+import 'package:mobile/providers/notifications_provider.dart';
 import 'package:mobile/screens/auth/login_screen.dart';
 import 'package:mobile/screens/job/job_detail_screen.dart';
+import 'package:mobile/screens/notification/notification_screen.dart';
 import 'package:mobile/screens/search/job_search_screen.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
@@ -72,7 +74,14 @@ class _JobListScreenState extends State<JobListScreen> {
                   MaterialPageRoute(builder: (_) => const JobSearchScreen()),
                 );
               },
-              onBellTap: () {},
+              onBellTap: () async {
+                final noti = context.read<NotificationsProvider>();
+                await noti.fetch();
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const NotificationScreen()),
+                );
+              },
             ),
             const SizedBox(height: 8),
 

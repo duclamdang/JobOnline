@@ -8,6 +8,7 @@ use App\Models\Admin;
 use App\Models\Job;
 use App\Models\JobApply;
 use App\Models\UserDevice;
+use App\Models\UserNotification;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -75,6 +76,29 @@ class JobApplyServices
 
             $jobApply->status = $status;
             $jobApply->save();
+
+            $statusText = match ($status) {
+                JobApply::STATUS_PENDING   => 'ĐANG ĐƯỢC XEM XÉT',
+                JobApply::STATUS_ACCEPTED  => 'ĐÃ ĐƯỢC CHẤP NHẬN',
+                JobApply::STATUS_REJECTED  => 'BỊ TỪ CHỐI',
+                JobApply::STATUS_INTERVIEW => 'MỜI PHỎNG VẤN',
+                JobApply::STATUS_OFFER     => 'ĐƯỢC ĐỀ NGHỊ LÀM VIỆC',
+                JobApply::STATUS_HIRED     => 'ĐÃ TRÚNG TUYỂN',
+                default                    => 'ĐÃ CẬP NHẬT',
+            };
+            $jobTitle = $jobApply->job->title ?? 'công việc';
+            UserNotification::create([
+                'user_id' => $jobApply->user_id,
+                'title'   => 'Cập nhật trạng thái ứng tuyển',
+                'body'    => "Đơn ứng tuyển vị trí {$jobTitle} của bạn đã được cập nhật thành: {$statusText}.",
+                'data'    => [
+                    'job_apply_id' => $jobApply->id,
+                    'job_id'       => $jobApply->job_id,
+                    'status'       => $status,
+                    'status_text'  => $statusText,
+                ],
+            ]);
+
 
             $this->notifyApplicantStatusChanged($jobApply);
 

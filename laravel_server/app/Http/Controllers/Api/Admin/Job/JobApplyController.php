@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Admin\Job;
 
 use App\Constants\HttpStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Admin\JobApplyByIdResource;
 use App\Http\Resources\Admin\JobApplyResource;
 use App\Http\Resources\Admin\JobResource;
 use App\Http\Resources\User\DetailApplyResource;
@@ -104,7 +103,7 @@ class JobApplyController extends Controller
             ->toArray();
 
         if (empty($tokens)) {
-            \Log::info('No device tokens for user when update status', [
+            Log::info('No device tokens for user when update status', [
                 'user_id'      => $userId,
                 'job_apply_id' => $jobApply->id,
             ]);

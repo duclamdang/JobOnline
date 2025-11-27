@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:mobile/app_navigator.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
 
@@ -12,6 +13,7 @@ import 'package:mobile/providers/my_jobs_provider.dart';
 import 'package:mobile/providers/profile_provider.dart';
 import 'package:mobile/providers/job_provider.dart';
 import 'package:mobile/screens/main_tab_screen.dart';
+import 'package:mobile/providers/notifications_provider.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -36,6 +38,9 @@ Future<void> main() async {
         ChangeNotifierProvider<ProfileProvider>(
           create: (_) => ProfileProvider(),
         ),
+        ChangeNotifierProvider<NotificationsProvider>(
+          create: (_) => NotificationsProvider(),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -56,10 +61,11 @@ class MyApp extends StatelessWidget {
           );
         }
 
-        return const MaterialApp(
+        return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'JobOnline',
-          home: MainTabScreen(),
+          navigatorKey: appNavigatorKey,
+          home: const MainTabScreen(),
         );
       },
     );

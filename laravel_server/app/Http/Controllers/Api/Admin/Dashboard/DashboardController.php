@@ -123,4 +123,68 @@ class DashboardController extends Controller
             'data' => $data['data']
         ], 200);
     }
+
+    /**
+     * Thống kê số lượng job theo trạng thái (draft, pending, active, expired, closed...)
+     * Dùng cho chart dạng doughnut/pie.
+     */
+    public function getEmployerJobsByStatus(Request $request)
+    {
+        $data = $this->dashboardService->getEmployerJobsByStatus($request);
+
+        return response()->json([
+            'success' => true,
+            'labels'  => $data['labels'],
+            'data'    => $data['data'],
+        ], 200);
+    }
+
+    /**
+     * Doanh thu mua điểm theo tháng (từ bảng payments)
+     * Sum(amount) theo tháng, chỉ tính payment status = 'success'.
+     */
+    public function getEmployerRevenuePerMonth(Request $request)
+    {
+        $data = $this->dashboardService->getEmployerRevenuePerMonth($request);
+
+        return response()->json([
+            'success'   => true,
+            'labels'    => $data['labels'],
+            'data'      => $data['data'],   // tổng tiền theo tháng
+            'currency'  => 'VND',
+        ], 200);
+    }
+
+    /**
+     * Số điểm đã mua theo tháng
+     * Hoặc lấy từ cột points trong bảng payments,
+     * hoặc từ logic quy đổi (vd: amount / 1000) trong DashboardService.
+     */
+    public function getEmployerPointsPerMonth(Request $request)
+    {
+        $data = $this->dashboardService->getEmployerPointsPerMonth($request);
+
+        return response()->json([
+            'success' => true,
+            'labels'  => $data['labels'],
+            'data'    => $data['data'], // số điểm theo tháng
+        ], 200);
+    }
+
+    /**
+     * Tổng quan payment: dùng cho các "stat card" trên dashboard
+     * (Tổng tiền đã nạp, tổng điểm đã mua, số giao dịch thành công...)
+     */
+    public function getEmployerPaymentSummary(Request $request)
+    {
+        $summary = $this->dashboardService->getEmployerPaymentSummary($request);
+
+        return response()->json([
+            'status_code' => HttpStatus::OK,
+            'message'     => 'Tổng quan doanh thu / điểm đã mua',
+            'data'        => $summary,
+        ], HttpStatus::OK);
+    }
+
+
 }

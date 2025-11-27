@@ -23,4 +23,8 @@ Route::middleware(['auth:admin'])
         Route::get('/new-jobs-week', [DashboardController::class, 'getEmployerNewJobsWeek']);
         Route::get('/new-jobs-month', [DashboardController::class, 'getEmployerNewJobsMonth']);
         Route::get('/applicants-per-week', [DashboardController::class, 'getEmployerApplicantsPerWeek']);
+        Route::get('/job-by-status', [DashboardController::class, 'getEmployerJobsByStatus']);
+        Route::get('/revenue-per-month', [DashboardController::class, 'getEmployerRevenuePerMonth']);
+        Route::get('/point-per-month', [DashboardController::class, 'getEmployerPointsPerMonth']);
+        Route::get('/payment-summary', [DashboardController::class, 'getEmployerPaymentSummary']);
     });

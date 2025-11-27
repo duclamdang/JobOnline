@@ -30,15 +30,17 @@ interface GeneralStats {
   new_companies: number;
 }
 
-interface DashboardState {
-  jobsData: ChartData;
-  applicantsData: ChartData;
-  topCompanies: Company[];
-  generalStats: GeneralStats;
-  loading: boolean;
-  error: string | null;
+interface PaymentSummary {
+  total_amount: number;
+  total_points: number;
+  total_orders: number;
+  successful_orders: number;
+  last_payment_at: string | null;
 }
 
+/**
+ * Response cho dashboard tổng (root admin)
+ */
 type DashboardResponse = {
   jobsData: ChartData;
   applicantsData: ChartData;
@@ -46,9 +48,40 @@ type DashboardResponse = {
   generalStats: GeneralStats;
 };
 
+/**
+ * Response cho dashboard employer
+ */
+type EmployerDashboardResponse = {
+  applicantsData: ChartData;
+  generalStats: GeneralStats;
+  jobByStatusData: ChartData;
+  revenuePerMonthData: ChartData;
+  pointPerMonthData: ChartData;
+  paymentSummary: PaymentSummary;
+};
+
+interface DashboardState {
+  // root admin
+  jobsData: ChartData;
+  applicantsData: ChartData;
+  topCompanies: Company[];
+  generalStats: GeneralStats;
+
+  // employer dashboard
+  jobByStatusData: ChartData;
+  revenuePerMonthData: ChartData;
+  pointPerMonthData: ChartData;
+  paymentSummary: PaymentSummary;
+
+  loading: boolean;
+  error: string | null;
+}
+
+const emptyChart: ChartData = { labels: [], datasets: [] };
+
 const initialState: DashboardState = {
-  jobsData: { labels: [], datasets: [] },
-  applicantsData: { labels: [], datasets: [] },
+  jobsData: emptyChart,
+  applicantsData: emptyChart,
   topCompanies: [],
   generalStats: {
     total_jobs: 0,
@@ -58,10 +91,23 @@ const initialState: DashboardState = {
     new_jobs_week: 0,
     new_jobs_month: 0,
   },
+
+  jobByStatusData: emptyChart,
+  revenuePerMonthData: emptyChart,
+  pointPerMonthData: emptyChart,
+  paymentSummary: {
+    total_amount: 0,
+    total_points: 0,
+    total_orders: 0,
+    successful_orders: 0,
+    last_payment_at: null,
+  },
+
   loading: false,
   error: null,
 };
 
+// -------- ROOT DASHBOARD (admin) ----------
 export const fetchDashboardData = createAsyncThunk<
   DashboardResponse,
   void,
@@ -77,17 +123,18 @@ export const fetchDashboardData = createAsyncThunk<
   }
 });
 
+// -------- EMPLOYER DASHBOARD ----------
 export const fetchEmployerDashboardData = createAsyncThunk<
-  DashboardResponse,
+  EmployerDashboardResponse,
   void,
   { rejectValue: string }
->("dashboard/fetchDashboardData", async (_, { rejectWithValue }) => {
+>("dashboard/fetchEmployerDashboardData", async (_, { rejectWithValue }) => {
   try {
     const data = await dashboardService.fetchEmployerDashboardData();
-    return data as unknown as DashboardResponse;
+    return data as unknown as EmployerDashboardResponse;
   } catch (err: any) {
     return rejectWithValue(
-      err.response?.data?.message || "Fetch dashboard failed"
+      err.response?.data?.message || "Fetch employer dashboard failed"
     );
   }
 });
@@ -97,6 +144,7 @@ const dashboardSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+    // ----- root dashboard -----
     builder
       .addCase(fetchDashboardData.pending, (state) => {
         state.loading = true;
@@ -112,6 +160,31 @@ const dashboardSlice = createSlice({
       .addCase(fetchDashboardData.rejected, (state, action) => {
         state.loading = false;
         state.error = (action.payload as string) ?? "Fetch dashboard failed";
+      });
+
+    // ----- employer dashboard -----
+    builder
+      .addCase(fetchEmployerDashboardData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchEmployerDashboardData.fulfilled, (state, action) => {
+        state.loading = false;
+
+        // dùng lại applicantsData + generalStats
+        state.applicantsData = action.payload.applicantsData;
+        state.generalStats = action.payload.generalStats;
+
+        // các chart + summary mới
+        state.jobByStatusData = action.payload.jobByStatusData;
+        state.revenuePerMonthData = action.payload.revenuePerMonthData;
+        state.pointPerMonthData = action.payload.pointPerMonthData;
+        state.paymentSummary = action.payload.paymentSummary;
+      })
+      .addCase(fetchEmployerDashboardData.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          (action.payload as string) ?? "Fetch employer dashboard failed";
       });
   },
 });

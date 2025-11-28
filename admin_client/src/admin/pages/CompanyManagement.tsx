@@ -14,7 +14,6 @@ import { toast } from "react-toastify";
 import { Editor } from "@tinymce/tinymce-react";
 import { useDropzone } from "react-dropzone";
 import Loading from "@components/Loading";
-import config from "../../config/config";
 
 export default function CompanyManagement() {
   const { id } = useParams<{ id: string }>();
@@ -196,13 +195,13 @@ export default function CompanyManagement() {
   const coverSrc = coverFile
     ? URL.createObjectURL(coverFile)
     : company.cover_image
-    ? `${config.storageUrl}/${company.cover_image}`
+    ? `${company.cover_image}`
     : "";
 
   const logoSrc = logoFile
     ? URL.createObjectURL(logoFile)
     : company.logo
-    ? `${config.storageUrl}/${company.logo}`
+    ? `${company.logo}`
     : "";
 
   return (
@@ -520,7 +519,7 @@ export default function CompanyManagement() {
                 <p className="mb-3 text-sm text-gray-600">
                   Giấy phép hiện tại:
                   <a
-                    href={`${config.storageUrl}/${company.business_license}`}
+                    href={`${company.business_license}`}
                     target="_blank"
                     rel="noreferrer"
                     className="ml-2 font-medium text-purple-700 underline"

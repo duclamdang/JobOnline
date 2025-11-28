@@ -9,7 +9,6 @@ import { toast } from "react-toastify";
 import ChangePasswordModal from "../components/ChangePasswordModal";
 import Loading from "@components/Loading";
 import { useNavigate } from "react-router-dom";
-import config from "../../config/config";
 
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
@@ -72,7 +71,8 @@ export default function ProfilePage() {
     const next: typeof errors = {};
     if (!formData.name.trim()) next.name = "Vui lòng nhập họ và tên.";
     // VN: 10 số, bắt đầu bằng 0
-    if (!/^0\d{9}$/.test(formData.phone)) next.phone = "Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0).";
+    if (!/^0\d{9}$/.test(formData.phone))
+      next.phone = "Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0).";
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -125,18 +125,20 @@ export default function ProfilePage() {
 
   if (loading) return <Loading />;
   if (error) return <div className="p-6 text-red-600">Lỗi: {error}</div>;
-  if (!profile) return <div className="p-6">Không tìm thấy thông tin người dùng</div>;
+  if (!profile)
+    return <div className="p-6">Không tìm thấy thông tin người dùng</div>;
 
-  const avatarUrl =
-    formData.avatar
-      ? typeof formData.avatar === "string"
-        ? formData.avatar.startsWith("http")
-          ? formData.avatar
-          : `${config.storageUrl}/${formData.avatar}`
-        : URL.createObjectURL(formData.avatar)
-      : "";
+  const avatarUrl = formData.avatar
+    ? typeof formData.avatar === "string"
+      ? formData.avatar.startsWith("http")
+        ? formData.avatar
+        : `${formData.avatar}`
+      : URL.createObjectURL(formData.avatar)
+    : "";
 
-  const initials = (formData.name || profile.email || "?").trim().charAt(0).toUpperCase() || "?";
+  const initials =
+    (formData.name || profile.email || "?").trim().charAt(0).toUpperCase() ||
+    "?";
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-6 font-sans">
@@ -168,15 +170,21 @@ export default function ProfilePage() {
         <section className="md:col-span-2 rounded-2xl border border-gray-200 bg-white shadow-sm">
           <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
             <div>
-              <h2 className="text-sm font-medium text-gray-900">Thông tin tài khoản</h2>
-              <p className="text-xs text-gray-500">Cập nhật thông tin liên hệ và bảo mật.</p>
+              <h2 className="text-sm font-medium text-gray-900">
+                Thông tin tài khoản
+              </h2>
+              <p className="text-xs text-gray-500">
+                Cập nhật thông tin liên hệ và bảo mật.
+              </p>
             </div>
           </div>
 
           <div className="px-6 py-6 space-y-8">
             {/* Đăng nhập */}
             <div>
-              <h3 className="mb-3 text-sm font-semibold text-gray-700">Thông tin đăng nhập</h3>
+              <h3 className="mb-3 text-sm font-semibold text-gray-700">
+                Thông tin đăng nhập
+              </h3>
               <label className="mb-1.5 block text-sm font-medium text-gray-600">
                 Địa chỉ email <span className="text-red-500">*</span>
               </label>
@@ -187,7 +195,9 @@ export default function ProfilePage() {
                 className="w-full rounded-lg border border-gray-300 bg-gray-100 px-3 py-2.5 text-gray-700 outline-none"
               />
 
-              <label className="mt-4 mb-1.5 block text-sm font-medium text-gray-600">Mật khẩu</label>
+              <label className="mt-4 mb-1.5 block text-sm font-medium text-gray-600">
+                Mật khẩu
+              </label>
               <input
                 type="password"
                 value="********"
@@ -204,7 +214,9 @@ export default function ProfilePage() {
 
             {/* Liên hệ */}
             <div>
-              <h3 className="mb-3 text-sm font-semibold text-gray-700">Thông tin liên hệ</h3>
+              <h3 className="mb-3 text-sm font-semibold text-gray-700">
+                Thông tin liên hệ
+              </h3>
 
               <label className="mb-1.5 block text-sm font-medium text-gray-600">
                 Họ và tên <span className="text-red-500">*</span>
@@ -216,9 +228,15 @@ export default function ProfilePage() {
                 onChange={handleChange}
                 placeholder="VD: Nguyễn Văn A"
                 className={`w-full rounded-lg border px-3 py-2.5 text-gray-900 outline-none transition
-                ${errors.name ? "border-red-300 ring-2 ring-red-100" : "border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-100"}`}
+                ${
+                  errors.name
+                    ? "border-red-300 ring-2 ring-red-100"
+                    : "border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
+                }`}
               />
-              {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
+              {errors.name && (
+                <p className="mt-1 text-xs text-red-600">{errors.name}</p>
+              )}
 
               <label className="mt-4 mb-1.5 block text-sm font-medium text-gray-600">
                 Số điện thoại <span className="text-red-500">*</span>
@@ -230,9 +248,15 @@ export default function ProfilePage() {
                 onChange={handleChange}
                 placeholder="VD: 0912345678"
                 className={`w-full rounded-lg border px-3 py-2.5 text-gray-900 outline-none transition
-                ${errors.phone ? "border-red-300 ring-2 ring-red-100" : "border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-100"}`}
+                ${
+                  errors.phone
+                    ? "border-red-300 ring-2 ring-red-100"
+                    : "border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
+                }`}
               />
-              {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone}</p>}
+              {errors.phone && (
+                <p className="mt-1 text-xs text-red-600">{errors.phone}</p>
+              )}
 
               <label className="mt-4 mb-1.5 block text-sm font-medium text-gray-600">
                 Email liên hệ
@@ -255,7 +279,9 @@ export default function ProfilePage() {
                 placeholder="Nhập địa chỉ…"
                 className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
               />
-              <p className="mt-1 text-xs text-gray-500">Giúp nhà tuyển dụng liên hệ khi cần.</p>
+              <p className="mt-1 text-xs text-gray-500">
+                Giúp nhà tuyển dụng liên hệ khi cần.
+              </p>
             </div>
 
             {/* Actions */}
@@ -275,8 +301,22 @@ export default function ProfilePage() {
               >
                 {submitting && (
                   <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" className="opacity-20" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path d="M4 12a8 8 0 018-8" className="opacity-75" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      className="opacity-20"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      d="M4 12a8 8 0 018-8"
+                      className="opacity-75"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
                   </svg>
                 )}
                 {submitting ? "Đang cập nhật..." : "Cập nhật"}
@@ -289,7 +329,9 @@ export default function ProfilePage() {
         <aside className="rounded-2xl border border-gray-200 bg-white shadow-sm self-start">
           <div className="border-b border-gray-100 px-6 py-4">
             <h2 className="text-sm font-medium text-gray-900">Ảnh đại diện</h2>
-            <p className="text-xs text-gray-500">Tải ảnh rõ nét, tỉ lệ 1:1 (PNG/JPG, &lt;= 5MB).</p>
+            <p className="text-xs text-gray-500">
+              Tải ảnh rõ nét, tỉ lệ 1:1 (PNG/JPG, &lt;= 5MB).
+            </p>
           </div>
 
           <div className="px-6 py-6">
@@ -307,7 +349,13 @@ export default function ProfilePage() {
               )}
 
               <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
                   <path d="M12 16v-6M9 13h6" />
                   <path d="M20 7h-3l-2-2H9L7 7H4v12h16z" />
                 </svg>

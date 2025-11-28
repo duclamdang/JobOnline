@@ -4,6 +4,10 @@ namespace App\Http\Services\Admin\Company;
 
 use App\Models\Company;
 use App\Models\Admin;
+use Cloudinary\Cloudinary;
+use Cloudinary\Configuration\Configuration;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Exception;
 
@@ -280,24 +284,60 @@ class CompanyService
 
     public function updateImage(Company $company, array $data): array
     {
-        $handleUpload = function ($file, $oldPath) {
+        /** @var UploadedFile|null $logoFile */
+        $logoFile = $data['logo'] ?? null;
+
+        /** @var UploadedFile|null $coverFile */
+        $coverFile = $data['cover_image'] ?? null;
+
+        if (!$logoFile && !$coverFile) {
+            return [
+                'success' => false,
+                'message' => 'Không có ảnh nào được tải lên',
+            ];
+        }
+
+        $config = new Configuration([
+            'cloud' => [
+                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                'api_key'    => env('CLOUDINARY_API_KEY'),
+                'api_secret' => env('CLOUDINARY_API_SECRET'),
+            ],
+        ]);
+        $cloudinary = new Cloudinary($config);
+
+        $handleUpload = function (?UploadedFile $file, string $oldUrl = null, string $folder = 'companies/images') use ($cloudinary) {
             if ($file && is_object($file)) {
                 $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
                 $extension    = $file->getClientOriginalExtension();
                 $uniqueId     = uniqid();
                 $filename     = $originalName . '_' . $uniqueId . '.' . $extension;
 
-                return $file->storeAs('companies/images', $filename, 'public');
+                try {
+                    $uploaded = $cloudinary->uploadApi()->upload(
+                        $file->getRealPath(),
+                        [
+                            'folder'        => $folder,
+                            'resource_type' => 'image',
+                        ]
+                    );
+
+                    return $uploaded['secure_url'];
+                } catch (\Exception $e) {
+                    Log::error('Cloudinary upload company image error: ' . $e->getMessage());
+                    return $oldUrl;
+                }
             }
-            return $file ?? $oldPath;
+
+            return $oldUrl;
         };
 
-        $logoPath       = $handleUpload($data['logo'] ?? null, $company->logo);
-        $coverImagePath = $handleUpload($data['cover_image'] ?? null, $company->cover_image);
+        $logoUrl       = $handleUpload($logoFile, $company->logo, 'companies/logos');
+        $coverImageUrl = $handleUpload($coverFile, $company->cover_image, 'companies/covers');
 
         $company->update([
-            'logo'        => $logoPath,
-            'cover_image' => $coverImagePath,
+            'logo'        => $logoUrl,
+            'cover_image' => $coverImageUrl,
         ]);
 
         return [

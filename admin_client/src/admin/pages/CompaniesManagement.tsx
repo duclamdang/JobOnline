@@ -9,7 +9,6 @@ import {
   EditOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import config from "@config/config";
 
 const CompaniesManagement: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -39,7 +38,7 @@ const CompaniesManagement: React.FC = () => {
   const getLogoUrl = (logo: any) => {
     if (!logo) return "";
     if (typeof logo === "string") {
-      return logo.startsWith("http") ? logo : `${config.storageUrl}/${logo}`;
+      return logo.startsWith("http") ? logo : `${logo}`;
     }
     return URL.createObjectURL(logo);
   };

@@ -341,10 +341,13 @@ class CompanyController extends Controller
                 ], HttpStatus::UNPROCESSABLE);
             }
 
-            $data = [
-                'logo'        => $request->file('logo'),
-                'cover_image' => $request->file('cover_image'),
-            ];
+            $data = [];
+            if ($request->hasFile('logo')) {
+                $data['logo'] = $request->file('logo');
+            }
+            if ($request->hasFile('cover_image')) {
+                $data['cover_image'] = $request->file('cover_image');
+            }
 
             $admin = $request->user();
 

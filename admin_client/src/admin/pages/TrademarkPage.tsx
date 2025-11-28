@@ -8,7 +8,6 @@ import {
 import { toast } from "react-toastify";
 import Loading from "@components/Loading";
 import { Editor } from "@tinymce/tinymce-react";
-import config from "../../config/config";
 
 export default function TrademarkPage() {
   const dispatch = useAppDispatch();
@@ -79,7 +78,9 @@ export default function TrademarkPage() {
     if (!validateInfo()) return;
     try {
       setSavingInfo(true);
-      const resultAction = await dispatch(updateCompanyAdditional(additionalForm));
+      const resultAction = await dispatch(
+        updateCompanyAdditional(additionalForm)
+      );
       if (updateCompanyAdditional.fulfilled.match(resultAction)) {
         toast.success("Cập nhật thông tin bổ sung thành công 🎉");
         await dispatch(fetchMyCompany());
@@ -143,18 +144,19 @@ export default function TrademarkPage() {
 
   if (loading) return <Loading />;
   if (error) return <div className="p-6 text-red-600">Lỗi: {error}</div>;
-  if (!company) return <div className="p-6">Không tìm thấy thông tin công ty</div>;
+  if (!company)
+    return <div className="p-6">Không tìm thấy thông tin công ty</div>;
 
   const coverSrc = coverFile
     ? URL.createObjectURL(coverFile)
     : company.cover_image
-    ? `${config.storageUrl}/${company.cover_image}`
+    ? `${company.cover_image}`
     : "";
 
   const logoSrc = logoFile
     ? URL.createObjectURL(logoFile)
     : company.logo
-    ? `${config.storageUrl}/${company.logo}`
+    ? `${company.logo}`
     : "";
 
   return (
@@ -162,7 +164,8 @@ export default function TrademarkPage() {
       {/* Banner chỉ xem */}
       {!canEdit && (
         <div className="mx-auto mb-4 max-w-5xl rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-          Bạn đang ở <b>chế độ chỉ xem</b>. Vui lòng liên hệ quản trị viên nếu cần quyền chỉnh sửa.
+          Bạn đang ở <b>chế độ chỉ xem</b>. Vui lòng liên hệ quản trị viên nếu
+          cần quyền chỉnh sửa.
         </div>
       )}
 
@@ -170,14 +173,32 @@ export default function TrademarkPage() {
       <section className="mx-auto mb-6 max-w-5xl rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
           <div>
-            <h2 className="text-sm font-medium text-gray-900">Giới thiệu công ty</h2>
-            <p className="text-xs text-gray-500">Mô tả, website và năm thành lập.</p>
+            <h2 className="text-sm font-medium text-gray-900">
+              Giới thiệu công ty
+            </h2>
+            <p className="text-xs text-gray-500">
+              Mô tả, website và năm thành lập.
+            </p>
           </div>
           {savingInfo && (
             <div className="inline-flex items-center gap-2 text-xs text-gray-500">
               <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" className="opacity-20" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path d="M4 12a8 8 0 018-8" className="opacity-75" stroke="currentColor" strokeWidth="4" fill="none" />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  className="opacity-20"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                />
+                <path
+                  d="M4 12a8 8 0 018-8"
+                  className="opacity-75"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                />
               </svg>
               Đang lưu…
             </div>
@@ -185,28 +206,35 @@ export default function TrademarkPage() {
         </div>
 
         <div className="px-6 py-6">
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Giới thiệu doanh nghiệp</label>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            Giới thiệu doanh nghiệp
+          </label>
           <Editor
             apiKey="haxna3coe03d4qdw3k17ba77ij7f5jt1hgglor6y0yc0yu3s"
             value={additionalForm.description}
-            init={{
-              height: 280,
-              menubar: false,
-              plugins:
-                "anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount",
-              toolbar: canEdit
-                ? "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat"
-                : false,
-              readonly: !canEdit ? 1 : 0, // TinyMCE readonly
-            } as any}
+            init={
+              {
+                height: 280,
+                menubar: false,
+                plugins:
+                  "anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount",
+                toolbar: canEdit
+                  ? "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat"
+                  : false,
+                readonly: !canEdit ? 1 : 0, // TinyMCE readonly
+              } as any
+            }
             onEditorChange={(content) =>
-              canEdit && setAdditionalForm({ ...additionalForm, description: content })
+              canEdit &&
+              setAdditionalForm({ ...additionalForm, description: content })
             }
           />
 
           <div className="mt-5 grid gap-5 md:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">Website</label>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                Website
+              </label>
               <input
                 type="text"
                 name="website"
@@ -216,11 +244,15 @@ export default function TrademarkPage() {
                 placeholder="https://example.com"
                 className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100 disabled:cursor-not-allowed disabled:bg-gray-50"
               />
-              <p className="mt-1 text-xs text-gray-500">Nhập link đầy đủ để ứng viên có thể truy cập.</p>
+              <p className="mt-1 text-xs text-gray-500">
+                Nhập link đầy đủ để ứng viên có thể truy cập.
+              </p>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">Năm thành lập</label>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                Năm thành lập
+              </label>
               <input
                 type="text"
                 name="founded_year"
@@ -242,8 +274,22 @@ export default function TrademarkPage() {
               >
                 {savingInfo && (
                   <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" className="opacity-20" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path d="M4 12a8 8 0 018-8" className="opacity-75" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      className="opacity-20"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      d="M4 12a8 8 0 018-8"
+                      className="opacity-75"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
                   </svg>
                 )}
                 {savingInfo ? "Đang lưu..." : "Cập nhật thông tin"}
@@ -257,7 +303,9 @@ export default function TrademarkPage() {
       <section className="mx-auto max-w-5xl rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div className="border-b border-gray-100 px-6 py-4">
           <h2 className="text-sm font-medium text-gray-900">Ảnh công ty</h2>
-          <p className="text-xs text-gray-500">Ảnh bìa và logo thương hiệu (PNG/JPG, ≤ 5MB).</p>
+          <p className="text-xs text-gray-500">
+            Ảnh bìa và logo thương hiệu (PNG/JPG, ≤ 5MB).
+          </p>
         </div>
 
         <div className="px-6 py-6">
@@ -265,7 +313,11 @@ export default function TrademarkPage() {
           <div className="relative w-full mb-20">
             <div className="h-56 w-full overflow-hidden rounded-xl bg-gray-200 md:h-72">
               {coverSrc ? (
-                <img src={coverSrc} alt="Cover" className="h-full w-full object-cover" />
+                <img
+                  src={coverSrc}
+                  alt="Cover"
+                  className="h-full w-full object-cover"
+                />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-sm text-gray-500">
                   Chưa có ảnh bìa
@@ -274,7 +326,11 @@ export default function TrademarkPage() {
 
               {canEdit && (
                 <label className="absolute right-3 top-3 inline-flex cursor-pointer items-center gap-2 rounded-full bg-white/95 px-3 py-2 text-xs font-medium text-gray-700 shadow-md transition hover:bg-white">
-                  <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <svg
+                    className="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
                     <path d="M4 13V16H7L14.293 8.707L11.293 5.707L4 13Z" />
                   </svg>
                   Đổi ảnh bìa
@@ -291,7 +347,11 @@ export default function TrademarkPage() {
             <div className="absolute left-1/2 top-full z-10 -translate-x-1/2 -translate-y-1/2 pb-10">
               <div className="relative w-36 aspect-square rounded-full border-4 border-white bg-gray-100 shadow-lg md:w-44 overflow-hidden">
                 {logoSrc ? (
-                  <img src={logoSrc} alt="Logo" className="h-full w-full rounded-full object-cover" />
+                  <img
+                    src={logoSrc}
+                    alt="Logo"
+                    className="h-full w-full rounded-full object-cover"
+                  />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center rounded-full bg-purple-600 text-4xl font-bold text-white">
                     {company.name ? company.name.charAt(0).toUpperCase() : "?"}
@@ -301,7 +361,11 @@ export default function TrademarkPage() {
 
               {canEdit && (
                 <label className="absolute translate-x-1/4 translate-y-1/4 right-7 bottom-10 inline-flex cursor-pointer items-center gap-2 rounded-full bg-white/95 p-2 shadow-md transition hover:bg-white">
-                  <svg className="h-5 w-5 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
+                  <svg
+                    className="h-5 w-5 text-gray-700"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
                     <path d="M4 13V16H7L14.293 8.707L11.293 5.707L4 13Z" />
                   </svg>
                   <input
@@ -320,7 +384,9 @@ export default function TrademarkPage() {
               <div className="mt-2 flex flex-wrap items-center pt-10 gap-3">
                 {coverFile && (
                   <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs">
-                    <span className="text-gray-700 font-medium">Cover: {coverFile.name}</span>
+                    <span className="text-gray-700 font-medium">
+                      Cover: {coverFile.name}
+                    </span>
                     <button
                       type="button"
                       onClick={() => setCoverFile(null)}
@@ -335,7 +401,11 @@ export default function TrademarkPage() {
                         stroke="currentColor"
                         strokeWidth={2}
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -343,7 +413,9 @@ export default function TrademarkPage() {
 
                 {logoFile && (
                   <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs">
-                    <span className="text-gray-700 font-medium">Logo: {logoFile.name}</span>
+                    <span className="text-gray-700 font-medium">
+                      Logo: {logoFile.name}
+                    </span>
                     <button
                       type="button"
                       onClick={() => setLogoFile(null)}
@@ -358,7 +430,11 @@ export default function TrademarkPage() {
                         stroke="currentColor"
                         strokeWidth={2}
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -373,8 +449,22 @@ export default function TrademarkPage() {
                 >
                   {savingImages && (
                     <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="10" className="opacity-20" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path d="M4 12a8 8 0 018-8" className="opacity-75" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        className="opacity-20"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
+                      <path
+                        d="M4 12a8 8 0 018-8"
+                        className="opacity-75"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
                     </svg>
                   )}
                   {savingImages ? "Đang cập nhật..." : "Cập nhật hình ảnh"}

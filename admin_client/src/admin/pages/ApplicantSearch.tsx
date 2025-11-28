@@ -10,7 +10,6 @@ import {
   Candidate,
 } from "@admin/store/redux/applicantsearchSlice";
 import { RootState, AppDispatch } from "@context/store";
-import config from "@config/config";
 
 const CandidatesSearch = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -25,7 +24,7 @@ const CandidatesSearch = () => {
   }, [dispatch]);
   const getAvatarUrl = (avatar?: string | null) => {
     if (!avatar) return "/images/default-avatar.png";
-    return `${config.storageUrl}/${avatar}`;
+    return `${avatar}`;
   };
 
   const handleSelect = (candidate: Candidate) => {

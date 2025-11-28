@@ -11,7 +11,6 @@ import { toast } from "react-toastify";
 import Loading from "@components/Loading";
 import { useNavigate } from "react-router-dom";
 import { useDropzone } from "react-dropzone";
-import config from "../../config/config";
 
 export default function CompanyPage() {
   const dispatch = useAppDispatch();
@@ -60,7 +59,9 @@ export default function CompanyPage() {
   }, [company]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -132,7 +133,8 @@ export default function CompanyPage() {
 
   if (loading) return <Loading />;
   if (error) return <div className="p-6 text-red-600">Lỗi: {error}</div>;
-  if (!company) return <div className="p-6">Không tìm thấy thông tin công ty</div>;
+  if (!company)
+    return <div className="p-6">Không tìm thấy thông tin công ty</div>;
 
   const fieldDisabled = !canEdit || submittingBasic;
 
@@ -159,7 +161,8 @@ export default function CompanyPage() {
 
         {!canEdit && (
           <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-            Bạn đang ở <b>chế độ chỉ xem</b>. Vui lòng liên hệ quản trị viên nếu cần quyền chỉnh sửa.
+            Bạn đang ở <b>chế độ chỉ xem</b>. Vui lòng liên hệ quản trị viên nếu
+            cần quyền chỉnh sửa.
           </div>
         )}
       </div>
@@ -182,15 +185,33 @@ export default function CompanyPage() {
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Thông tin công ty</p>
-                <p className="text-xs text-gray-500">Cập nhật tên, MST, địa chỉ, liên hệ…</p>
+                <p className="text-sm font-medium text-gray-900">
+                  Thông tin công ty
+                </p>
+                <p className="text-xs text-gray-500">
+                  Cập nhật tên, MST, địa chỉ, liên hệ…
+                </p>
               </div>
             </div>
             {submittingBasic && canEdit && (
               <div className="inline-flex items-center gap-2 text-xs text-gray-500">
                 <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" className="opacity-20" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path d="M4 12a8 8 0 018-8" className="opacity-75" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    className="opacity-20"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                  />
+                  <path
+                    d="M4 12a8 8 0 018-8"
+                    className="opacity-75"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                  />
                 </svg>
                 Đang lưu…
               </div>
@@ -201,14 +222,18 @@ export default function CompanyPage() {
             <div className="grid gap-5 md:grid-cols-2">
               {/* Mã số thuế */}
               <div className="flex flex-col">
-                <label className="mb-1.5 text-sm font-medium text-gray-700">Mã số thuế</label>
+                <label className="mb-1.5 text-sm font-medium text-gray-700">
+                  Mã số thuế
+                </label>
                 <input
                   type="text"
                   value={company.tax_code || ""}
                   disabled
                   className="w-full rounded-lg border border-gray-300 bg-gray-100 px-3 py-2.5 text-gray-700 outline-none"
                 />
-                <p className="mt-1 text-xs text-gray-500">MST được cấp và không thể chỉnh sửa tại đây.</p>
+                <p className="mt-1 text-xs text-gray-500">
+                  MST được cấp và không thể chỉnh sửa tại đây.
+                </p>
               </div>
 
               {/* Tên công ty */}
@@ -228,7 +253,9 @@ export default function CompanyPage() {
 
               {/* Quy mô */}
               <div className="flex flex-col">
-                <label className="mb-1.5 text-sm font-medium text-gray-700">Quy mô nhân sự</label>
+                <label className="mb-1.5 text-sm font-medium text-gray-700">
+                  Quy mô nhân sự
+                </label>
                 <select
                   name="company_size"
                   value={formData.company_size}
@@ -239,14 +266,18 @@ export default function CompanyPage() {
                   <option value="">Chọn quy mô</option>
                   <option value="Dưới 10 nhân viên">Dưới 10 nhân viên</option>
                   <option value="10 - 150 nhân viên">10 - 150 nhân viên</option>
-                  <option value="150 - 300 nhân viên">150 - 300 nhân viên</option>
+                  <option value="150 - 300 nhân viên">
+                    150 - 300 nhân viên
+                  </option>
                   <option value="Trên 300 nhân viên">Trên 300 nhân viên</option>
                 </select>
               </div>
 
               {/* Địa điểm */}
               <div className="flex flex-col">
-                <label className="mb-1.5 text-sm font-medium text-gray-700">Địa điểm</label>
+                <label className="mb-1.5 text-sm font-medium text-gray-700">
+                  Địa điểm
+                </label>
                 <select
                   name="location_id"
                   value={formData.location_id}
@@ -261,12 +292,16 @@ export default function CompanyPage() {
                     </option>
                   ))}
                 </select>
-                <p className="mt-1 text-xs text-gray-500">Phục vụ hiển thị vị trí trên hồ sơ công ty.</p>
+                <p className="mt-1 text-xs text-gray-500">
+                  Phục vụ hiển thị vị trí trên hồ sơ công ty.
+                </p>
               </div>
 
               {/* Địa chỉ */}
               <div className="flex flex-col">
-                <label className="mb-1.5 text-sm font-medium text-gray-700">Địa chỉ</label>
+                <label className="mb-1.5 text-sm font-medium text-gray-700">
+                  Địa chỉ
+                </label>
                 <input
                   type="text"
                   name="address"
@@ -279,7 +314,9 @@ export default function CompanyPage() {
 
               {/* Lĩnh vực */}
               <div className="flex flex-col">
-                <label className="mb-1.5 text-sm font-medium text-gray-700">Lĩnh vực hoạt động</label>
+                <label className="mb-1.5 text-sm font-medium text-gray-700">
+                  Lĩnh vực hoạt động
+                </label>
                 <select
                   name="industry_id"
                   value={formData.industry_id}
@@ -298,7 +335,9 @@ export default function CompanyPage() {
 
               {/* Email */}
               <div className="flex flex-col">
-                <label className="mb-1.5 text-sm font-medium text-gray-700">Địa chỉ email liên hệ</label>
+                <label className="mb-1.5 text-sm font-medium text-gray-700">
+                  Địa chỉ email liên hệ
+                </label>
                 <input
                   type="text"
                   name="email"
@@ -312,7 +351,9 @@ export default function CompanyPage() {
 
               {/* Điện thoại */}
               <div className="flex flex-col">
-                <label className="mb-1.5 text-sm font-medium text-gray-700">Điện thoại cố định</label>
+                <label className="mb-1.5 text-sm font-medium text-gray-700">
+                  Điện thoại cố định
+                </label>
                 <input
                   type="text"
                   name="phone"
@@ -340,8 +381,22 @@ export default function CompanyPage() {
                 >
                   {submittingBasic && (
                     <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="10" className="opacity-20" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path d="M4 12a8 8 0 018-8" className="opacity-75" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        className="opacity-20"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
+                      <path
+                        d="M4 12a8 8 0 018-8"
+                        className="opacity-75"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
                     </svg>
                   )}
                   {submittingBasic ? "Đang cập nhật..." : "Cập nhật"}
@@ -354,8 +409,12 @@ export default function CompanyPage() {
         {/* Card: Giấy phép kinh doanh */}
         <section className="rounded-2xl border border-gray-200 bg-white shadow-sm">
           <div className="border-b border-gray-100 px-6 py-4">
-            <h2 className="text-sm font-medium text-gray-900">Giấy phép kinh doanh</h2>
-            <p className="mt-1 text-xs text-gray-500">Tải lên bản PDF GPKD có dấu giáp lai hoặc công chứng.</p>
+            <h2 className="text-sm font-medium text-gray-900">
+              Giấy phép kinh doanh
+            </h2>
+            <p className="mt-1 text-xs text-gray-500">
+              Tải lên bản PDF GPKD có dấu giáp lai hoặc công chứng.
+            </p>
           </div>
 
           <div className="px-6 py-6">
@@ -363,7 +422,7 @@ export default function CompanyPage() {
               <p className="mb-3 text-sm text-gray-600">
                 Giấy phép hiện tại:
                 <a
-                  href={`${config.storageUrl}/${company.business_license}`}
+                  href={`${company.business_license}`}
                   target="_blank"
                   rel="noreferrer"
                   className="ml-2 font-medium text-purple-700 underline"
@@ -372,34 +431,62 @@ export default function CompanyPage() {
                 </a>
               </p>
             ) : (
-              <p className="mb-3 text-sm italic text-gray-500">Chưa cập nhật giấy phép kinh doanh</p>
+              <p className="mb-3 text-sm italic text-gray-500">
+                Chưa cập nhật giấy phép kinh doanh
+              </p>
             )}
 
             {/* Dropzone */}
             <div
               {...(canEdit ? getRootProps() : {})}
               className={`group rounded-xl border-2 border-dashed p-6 text-center transition
-                ${!canEdit ? "cursor-not-allowed opacity-60" :
-                isDragActive ? "border-purple-600 bg-purple-50 cursor-pointer" : "border-gray-300 hover:border-purple-600 hover:bg-gray-50 cursor-pointer"}`}
+                ${
+                  !canEdit
+                    ? "cursor-not-allowed opacity-60"
+                    : isDragActive
+                    ? "border-purple-600 bg-purple-50 cursor-pointer"
+                    : "border-gray-300 hover:border-purple-600 hover:bg-gray-50 cursor-pointer"
+                }`}
             >
               {canEdit && <input {...getInputProps()} />}
               <div className="mx-auto flex max-w-md flex-col items-center gap-2">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-50">
-                  <svg className="h-5 w-5 text-purple-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                  <svg
+                    className="h-5 w-5 text-purple-700"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                  >
                     <path d="M12 16V4M12 4l-4 4M12 4l4 4" />
                     <path d="M20 16v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2" />
                   </svg>
                 </div>
                 {licenseFile ? (
                   <p className="text-sm font-medium text-gray-700">
-                    {licenseFile.name} ({(licenseFile.size / 1024).toFixed(1)} KB)
+                    {licenseFile.name} ({(licenseFile.size / 1024).toFixed(1)}{" "}
+                    KB)
                   </p>
                 ) : (
                   <>
                     <p className="text-sm text-gray-700">
-                      {canEdit ? <>Kéo thả hoặc <span className="font-medium text-purple-700 underline">nhấn để chọn</span> file PDF</> : "Bạn không có quyền tải lên"}
+                      {canEdit ? (
+                        <>
+                          Kéo thả hoặc{" "}
+                          <span className="font-medium text-purple-700 underline">
+                            nhấn để chọn
+                          </span>{" "}
+                          file PDF
+                        </>
+                      ) : (
+                        "Bạn không có quyền tải lên"
+                      )}
                     </p>
-                    {canEdit && <p className="text-xs text-gray-500">Chỉ chấp nhận định dạng .pdf</p>}
+                    {canEdit && (
+                      <p className="text-xs text-gray-500">
+                        Chỉ chấp nhận định dạng .pdf
+                      </p>
+                    )}
                   </>
                 )}
               </div>
@@ -424,8 +511,22 @@ export default function CompanyPage() {
                 >
                   {uploadingLicense && (
                     <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="10" className="opacity-20" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path d="M4 12a8 8 0 018-8" className="opacity-75" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        className="opacity-20"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
+                      <path
+                        d="M4 12a8 8 0 018-8"
+                        className="opacity-75"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
                     </svg>
                   )}
                   {uploadingLicense ? "Đang tải lên..." : "Tải lên"}
@@ -438,7 +539,10 @@ export default function CompanyPage() {
               <ul className="mt-1 list-disc pl-5">
                 <li>Chứng thực tài khoản doanh nghiệp.</li>
                 <li>Tạo lòng tin với Người Tìm Việc.</li>
-                <li>GPKD hợp lệ: có dấu giáp lai cơ quan thẩm quyền; nếu là bản photo phải có dấu công chứng.</li>
+                <li>
+                  GPKD hợp lệ: có dấu giáp lai cơ quan thẩm quyền; nếu là bản
+                  photo phải có dấu công chứng.
+                </li>
               </ul>
             </div>
           </div>

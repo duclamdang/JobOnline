@@ -16,6 +16,7 @@ class CV extends Model
         'file_name',
         'file_path',
         'main_cv',
+        'cv_public_id'
     ];
 
 

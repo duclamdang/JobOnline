@@ -4,8 +4,13 @@ namespace App\Http\Services\User\Profile;
 
 use App\Models\CV;
 use App\Models\User;
+use Cloudinary\Cloudinary;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Cloudinary\Configuration\Configuration;
+
 
 class ProfileService
 {
@@ -106,18 +111,43 @@ class ProfileService
     public function updateAvatar(User $user, $fileOrPath): array
     {
         if ($fileOrPath && is_object($fileOrPath)) {
-            $originalName = pathinfo($fileOrPath->getClientOriginalName(), PATHINFO_FILENAME);
-            $extension    = $fileOrPath->getClientOriginalExtension();
-            $uniqueId     = uniqid();
-            $filename     = $originalName . '_' . $uniqueId . '.' . $extension;
+            $config = new Configuration([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key'    => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+            ]);
 
-            $path = $fileOrPath->storeAs('users/images', $filename, 'public');
+            $cloudinary = new Cloudinary($config);
+
+            try {
+                $uploaded = $cloudinary->uploadApi()->upload(
+                    $fileOrPath->getRealPath(),
+                    ['folder' => 'users/images']
+                );
+
+                $avatarUrl = $uploaded['secure_url'];
+                $publicId  = $uploaded['public_id'];
+
+                if (!empty($user->avatar_public_id)) {
+                    $cloudinary->uploadApi()->destroy($user->avatar_public_id);
+                }
+
+            } catch (\Exception $e) {
+                Log::error('Cloudinary upload error: ' . $e->getMessage());
+                $avatarUrl = $user->avatar;
+                $publicId  = $user->avatar_public_id ?? null;
+            }
+
         } else {
-            $path = $fileOrPath ?? $user->avatar;
+            $avatarUrl = $user->avatar;
+            $publicId  = $user->avatar_public_id ?? null;
         }
 
         $user->update([
-            'avatar' => $path,
+            'avatar'           => $avatarUrl,
+            'avatar_public_id' => $publicId,
         ]);
 
         return [
@@ -127,28 +157,57 @@ class ProfileService
         ];
     }
 
-    public function createCV(User $user, $fileOrPath): array
+    public function createCV(User $user, UploadedFile $fileOrPath): array
     {
-        if ($fileOrPath && is_object($fileOrPath)) {
-            $originalName = pathinfo($fileOrPath->getClientOriginalName(), PATHINFO_FILENAME);
-            $extension    = $fileOrPath->getClientOriginalExtension();
-            $uniqueId     = uniqid();
-            $filename     = $originalName . '_' . $uniqueId . '.' . $extension;
-
-            $path = $fileOrPath->storeAs('users/cvs', $filename, 'public');
-        } else {
+        if (!$fileOrPath || !is_object($fileOrPath)) {
             return [
                 'success' => false,
                 'message' => 'File CV không hợp lệ',
+            ];
+        }
+        $originalName = pathinfo($fileOrPath->getClientOriginalName(), PATHINFO_FILENAME);
+        $extension    = $fileOrPath->getClientOriginalExtension();
+        $uniqueId     = uniqid();
+        $filename     = $originalName . '_' . $uniqueId . '.' . $extension;
+        $config = new Configuration([
+            'cloud' => [
+                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                'api_key'    => env('CLOUDINARY_API_KEY'),
+                'api_secret' => env('CLOUDINARY_API_SECRET'),
+            ],
+        ]);
+
+        $cloudinary = new Cloudinary($config);
+
+        try {
+            $uploaded = $cloudinary->uploadApi()->upload(
+                $fileOrPath->getRealPath(),
+                [
+                    'folder'        => 'users/cvs',
+                    'resource_type' => 'raw',
+                    'public_id'     => $filename,
+                ]
+            );
+
+            $fileUrl  = $uploaded['secure_url'];
+            $publicId = $uploaded['public_id'];
+
+        } catch (\Exception $e) {
+            Log::error('Cloudinary upload CV error: ' . $e->getMessage());
+
+            return [
+                'success' => false,
+                'message' => 'Upload CV thất bại, vui lòng thử lại sau',
             ];
         }
 
         $hasCV = $user->cvs()->exists();
 
         $cv = $user->cvs()->create([
-            'file_name' => $filename,
-            'file_path' => $path,
+            'file_name' => $fileOrPath->getClientOriginalName(),
+            'file_path' => $fileUrl,
             'main_cv'   => !$hasCV,
+            'cv_public_id' => $publicId,
         ]);
 
         return [
@@ -160,33 +219,59 @@ class ProfileService
 
     public function deleteCV(User $user, int $id): array
     {
-        $cv = CV::find($id);
+        $cv = CV::where('id', $id)
+            ->where('user_id', $user->id)
+            ->first();
 
         if (!$cv) {
             return [
                 'success' => false,
-                'message' => 'CV không tồn tại',
+                'message' => 'CV không tồn tại hoặc bạn không có quyền xoá',
             ];
         }
 
-        if ($cv->user_id !== $user->id) {
-            return [
-                'success' => false,
-                'message' => 'Bạn không có quyền xóa CV này',
-            ];
-        }
+        $wasMain = (bool) $cv->main_cv;
 
-        if ($cv->file_path && Storage::disk('public')->exists($cv->file_path)) {
+        if (!empty($cv->cv_public_id)) {
+            try {
+                $config = new Configuration([
+                    'cloud' => [
+                        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                        'api_key'    => env('CLOUDINARY_API_KEY'),
+                        'api_secret' => env('CLOUDINARY_API_SECRET'),
+                    ],
+                ]);
+
+                $cloudinary = new Cloudinary($config);
+
+                $cloudinary->uploadApi()->destroy(
+                    $cv->cv_public_id,
+                    ['resource_type' => 'raw']
+                );
+            } catch (\Exception $e) {
+                Log::error('Cloudinary delete CV error: ' . $e->getMessage());
+            }
+        }
+        elseif ($cv->file_path
+            && !str_starts_with($cv->file_path, 'http')
+            && Storage::disk('public')->exists($cv->file_path)
+        ) {
             Storage::disk('public')->delete($cv->file_path);
         }
-
         $cv->delete();
+        if ($wasMain) {
+            $nextCv = $user->cvs()->orderByDesc('id')->first();
+            if ($nextCv) {
+                $nextCv->update(['main_cv' => true]);
+            }
+        }
 
         return [
             'success' => true,
-            'message' => 'Xóa CV thành công',
+            'message' => 'Xoá CV thành công',
         ];
     }
+
 
     public function updateMainCV(User $user, int $id): array
     {

@@ -4,7 +4,6 @@ import { FaChevronDown } from "react-icons/fa6";
 import logo24h from "../../assets/vieclam24h.png";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import config from "../../config/config";
 
 import { useAppDispatch, useAppSelector } from "@context/hooks";
 import { logoutAdmin } from "@admin/store/redux/authSlice";
@@ -77,7 +76,7 @@ export default function AdminHeader() {
                   typeof admin.avatar === "string"
                     ? admin.avatar.startsWith("http")
                       ? admin.avatar
-                      : `${config.storageUrl}/${admin.avatar}`
+                      : `${admin.avatar}`
                     : URL.createObjectURL(admin.avatar)
                 }
                 alt="Avatar"

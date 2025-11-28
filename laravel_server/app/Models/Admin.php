@@ -25,6 +25,7 @@ class Admin extends Authenticatable implements JWTSubject
         'company_id',
         'is_active',
         'points',
+        'avatar_public_id'
     ];
 
     protected $casts = [

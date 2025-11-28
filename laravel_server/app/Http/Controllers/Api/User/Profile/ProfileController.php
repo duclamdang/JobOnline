@@ -260,7 +260,7 @@ class ProfileController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'cv_file' => 'required|file|mimes:pdf|max:10240',
+                'cv_file' => 'required|file|mimes:pdf|max:10240'
             ]);
 
             if ($validator->fails()) {

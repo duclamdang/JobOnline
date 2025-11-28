@@ -1,9 +1,5 @@
 import { apiAuth } from "../../../services/api";
 
-// ====================
-// Helper Function
-// ====================
-
 const uploadFormData = async (url: string, data: FormData) => {
   const res = await apiAuth.post(url, data, {
     withCredentials: true,
@@ -11,10 +7,6 @@ const uploadFormData = async (url: string, data: FormData) => {
   });
   return res.data.data;
 };
-
-// ====================
-// ROOT ADMIN (quản trị hệ thống)
-// ====================
 
 export const getAllUsersApi = async (perPage: number = 10) => {
   const res = await apiAuth.get(`/admin/users`, {
@@ -58,10 +50,13 @@ export const updateUserAvatarByIdApi = async (id: number, file: File) => {
   return uploadFormData(`/admin/users/${id}/avatar`, formData);
 };
 
-export const changeUserPasswordByIdApi = async (id: number, data: {
-  new_password: string;
-  confirm_password: string;
-}) => {
+export const changeUserPasswordByIdApi = async (
+  id: number,
+  data: {
+    new_password: string;
+    confirm_password: string;
+  }
+) => {
   const res = await apiAuth.put(`/admin/users/${id}/password`, data, {
     withCredentials: true,
   });

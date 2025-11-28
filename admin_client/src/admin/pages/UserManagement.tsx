@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { Card, Spin } from "antd";
 import { useAppDispatch, useAppSelector } from "../../context/hooks";
 import { fetchUserById } from "../store/redux/userSlice";
-import config from "@config/config";
 import dayjs from "dayjs";
 
 const UserDetailManagement: React.FC = () => {
@@ -17,9 +16,7 @@ const UserDetailManagement: React.FC = () => {
 
   const getAvatarUrl = (avatar: string) => {
     if (!avatar) return "/default-avatar.png";
-    return avatar.startsWith("http")
-      ? avatar
-      : `${config.storageUrl}/${avatar}`;
+    return avatar.startsWith("http") ? avatar : `${avatar}`;
   };
 
   if (loading || !user) {

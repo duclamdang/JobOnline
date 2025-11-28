@@ -4,7 +4,6 @@ import { fetchAllUsers } from "../store/redux/userSlice";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, Table, Input, Spin, message, Tooltip } from "antd";
 import { ReloadOutlined, SearchOutlined, EyeOutlined } from "@ant-design/icons";
-import config from "@config/config";
 
 const UsersManagement: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -14,11 +13,11 @@ const UsersManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    dispatch(fetchAllUsers(20));
+    dispatch(fetchAllUsers(1000));
   }, [dispatch]);
 
   const handleReload = () => {
-    dispatch(fetchAllUsers(20));
+    dispatch(fetchAllUsers(1000));
     message.success("Đã tải lại danh sách người dùng");
   };
 
@@ -33,9 +32,7 @@ const UsersManagement: React.FC = () => {
   const getAvatarUrl = (avatar: any) => {
     if (!avatar) return "";
     if (typeof avatar === "string") {
-      return avatar.startsWith("http")
-        ? avatar
-        : `${config.storageUrl}/${avatar}`;
+      return avatar.startsWith("http") ? avatar : `${avatar}`;
     }
     return URL.createObjectURL(avatar);
   };

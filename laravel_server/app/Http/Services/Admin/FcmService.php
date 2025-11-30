@@ -17,9 +17,6 @@ class FcmService
         $this->credentialsPath = config('firebase.credentials');
     }
 
-    /**
-     * Lấy access token từ service-account.json (scope Firebase Cloud Messaging)
-     */
     protected function getAccessToken(): string
     {
         if (empty($this->credentialsPath) || !file_exists($this->credentialsPath)) {
@@ -40,9 +37,6 @@ class FcmService
         return $tokenArr['access_token'];
     }
 
-    /**
-     * Gửi 1 message tới 1 token
-     */
     public function sendToToken(string $token, string $title, string $body, array $data = []): void
     {
         if (empty($token)) return;
@@ -78,10 +72,6 @@ class FcmService
         }
     }
 
-    /**
-     * Gửi cho nhiều token (loop từng cái)
-     * FCM v1 không còn field registration_ids như Legacy nữa
-     */
     public function sendToTokens(array $tokens, string $title, string $body, array $data = []): void
     {
         foreach ($tokens as $token) {

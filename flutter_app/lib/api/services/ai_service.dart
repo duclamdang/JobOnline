@@ -57,7 +57,7 @@ class AiService {
     if (env.isNotEmpty) return env;
 
     // Emulator Android dùng 10.0.2.2, máy thật dùng IP LAN
-    if (Platform.isAndroid) return 'http://192.168.56.1:8000/api';
-    return 'http://192.168.56.1:8000/api';
+    if (Platform.isAndroid) return 'http://192.168.37.1:8000/api';
+    return 'http://192.168.37.1:8000/api';
   }
 }

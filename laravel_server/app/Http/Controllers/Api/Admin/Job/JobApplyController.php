@@ -5,17 +5,16 @@ namespace App\Http\Controllers\Api\Admin\Job;
 use App\Constants\HttpStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\JobApplyResource;
-use App\Http\Resources\Admin\JobResource;
 use App\Http\Resources\User\DetailApplyResource;
 use App\Http\Services\Admin\FcmService;
 use App\Http\Services\Admin\Job\JobApplyServices;
+use App\Mail\ApplicationStatusMail;
 use App\Models\JobApply;
 use App\Models\UserDevice;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class JobApplyController extends Controller
 {
@@ -79,12 +78,25 @@ class JobApplyController extends Controller
             ], HttpStatus::FORBIDDEN);
         }
         try {
-            // Giả sử $updated là model JobApply
-            $this->notifyApplicantStatusChanged($updated, $status);
+            $this->notifyApplicantStatusChanged($updated);
         } catch (\Throwable $e) {
             Log::error('Send FCM error when update job apply status', [
                 'error'    => $e->getMessage(),
                 'apply_id' => $id,
+            ]);
+        }
+        try {
+            $applicant = $updated->user ?? null;
+
+            if ($applicant && !empty($applicant->email)) {
+                Mail::to($applicant->email)->send(
+                    new ApplicationStatusMail($updated, $status)
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::error('SEND STATUS APPLICATION MAIL FAIL', [
+                'apply_id' => $updated->id ?? $id,
+                'error'    => $e->getMessage(),
             ]);
         }
         return response()->json([
@@ -112,7 +124,6 @@ class JobApplyController extends Controller
 
         $statusCode = $jobApply->status;
 
-        // 🔁 map từ mã số (0..5) sang text đẹp
         $statusText = match ($statusCode) {
             JobApply::STATUS_ACCEPTED   => 'ĐÃ ĐƯỢC CHẤP NHẬN',
             JobApply::STATUS_REJECTED   => 'BỊ TỪ CHỐI',
@@ -128,8 +139,8 @@ class JobApplyController extends Controller
 
         $this->fcm->sendToTokens($tokens, $title, $body, [
             'type'         => 'job_apply_status',
-            'status'       => (string) $statusCode,   // mã số nếu Flutter cần
-            'status_text'  => $statusText,           // text cho đẹp
+            'status'       => (string) $statusCode,
+            'status_text'  => $statusText,
             'job_id'       => (string) $jobApply->job_id,
             'job_title'    => $jobTitle,
             'job_apply_id' => (string) $jobApply->id,

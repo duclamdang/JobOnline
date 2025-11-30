@@ -29,7 +29,7 @@ class DetailApplyResource extends JsonResource
                 '0' => 'Nữ',
                 default => 'Không xác định',
             },
-            'avatar' => $user->avatar ? asset('storage/' . $user->avatar) : asset('images/default-avatar.png'),
+            'avatar' => $user->avatar ? asset($user->avatar) : asset('images/default-avatar.png'),
             'bank_info' => $user->bank_info,
             'job_search_status' => $user->job_search_status,
             'job_search_status_text' => match($user->job_search_status) {

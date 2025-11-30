@@ -55,7 +55,7 @@ class DetailJobResource extends JsonResource
             'company_id'    => $this->company->id ?? null,
             'company_slug'  => $this->company->slug ?? null,
             'company_logo'  => $this->company?->logo
-                ? asset('storage/' . $this->company->logo)
+                ? asset($this->company->logo)
                 : asset('images/default-logo.png'),
 
             'salary_range'  => $this->salary_from && $this->salary_to

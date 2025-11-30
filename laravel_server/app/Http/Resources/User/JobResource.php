@@ -23,7 +23,7 @@ class JobResource extends JsonResource
             'title'         => $this->title,
             'company_name' => $this->company?->name,
             'company_logo'  => $this->company?->logo
-                ? asset('storage/' . $this->company->logo)
+                ? asset($this->company->logo)
                 : asset('images/default-logo.png'),
             'salary_range'  => $this->salary_from && $this->salary_to
                 ? number_format($this->salary_from/1000000, 0) . " - " . number_format($this->salary_to/1000000, 0) . " triệu"

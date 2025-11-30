@@ -21,6 +21,7 @@ class ApiService {
 
   static String? _token;
   static void setToken(String? token) => _token = token;
+  static void clearToken() => _token = null;
 
   static Map<String, String> _headers({
     bool json = true,
@@ -181,7 +182,7 @@ class ApiService {
   static void dispose() => _client.close();
 
   static String get _platformBaseUrl {
-    if (Platform.isAndroid) return 'http://192.168.56.1:8000/api';
-    return 'http://192.168.56.1:8000/api';
+    if (Platform.isAndroid) return 'http://192.168.37.1:8000/api';
+    return 'http://192.168.37.1:8000/api';
   }
 }

@@ -70,7 +70,6 @@ class GroqController extends Controller
                 }
             }
 
-            // Gọi Groq
             $resp = Http::withToken(env('GROQ_API_KEY'))
                 ->timeout(30)
                 ->connectTimeout(10)
@@ -112,7 +111,7 @@ class GroqController extends Controller
         }
     }
 
-    /* =================== INTENT =================== */
+
 
     private function classify(string $text): ?array
     {

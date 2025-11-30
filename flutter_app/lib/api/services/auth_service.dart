@@ -1,5 +1,5 @@
-import 'package:mobile/api/services/api_service.dart';
 import 'package:mobile/api/models/user_model.dart';
+import 'package:mobile/api/services/api_service.dart';
 
 class AuthService {
   static Future<(String token, int expiresIn, UserModel user)> login({
@@ -11,6 +11,7 @@ class AuthService {
       body: {'account': account, 'password': password},
       parser: (json) => Map<String, dynamic>.from(json as Map),
     );
+
     final data = raw.containsKey('data')
         ? Map<String, dynamic>.from(raw['data'])
         : raw;
@@ -24,12 +25,7 @@ class AuthService {
 
     final userSrc = data['user'] ?? data['profile'] ?? {};
     final user = UserModel.fromJson({'data': userSrc});
-
     return (token, expiresIn, user);
-  }
-
-  static Future<void> logout() {
-    return ApiService.post<dynamic>('/user/logout', parser: (_) => null);
   }
 
   static Future<void> register({
@@ -52,10 +48,10 @@ class AuthService {
       body['email'] = email.trim();
     }
 
-    await ApiService.post<dynamic>(
-      '/user/register',
-      body: body,
-      parser: (_) => null,
-    );
+    await ApiService.post<dynamic>('/user/register', body: body);
+  }
+
+  static Future<void> logout() {
+    return ApiService.post<dynamic>('/user/logout', parser: (_) => null);
   }
 }

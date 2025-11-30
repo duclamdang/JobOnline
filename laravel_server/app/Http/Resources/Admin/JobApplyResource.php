@@ -13,7 +13,7 @@ class JobApplyResource extends JsonResource
             'applied_at' => $this->created_at,
             'user' => [
                 'id' => $this->user->id,
-                'avatar' =>  $this->user->avatar ? asset('storage/' .  $this->user->avatar) : null,
+                'avatar' =>  $this->user->avatar ? asset($this->user->avatar) : null,
                 'name' => $this->user->name,
                 'email' => $this->user->email,
                 'cv_id'      => $this->cv_id,

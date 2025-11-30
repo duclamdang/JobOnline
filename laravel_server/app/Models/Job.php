@@ -87,4 +87,10 @@ class Job extends Model
     {
         return $this->hasMany(JobApply::class);
     }
+    public function creator()
+    {
+        // nếu cột là create_by
+        return $this->belongsTo(Admin::class, 'create_by');
+    }
+
 }

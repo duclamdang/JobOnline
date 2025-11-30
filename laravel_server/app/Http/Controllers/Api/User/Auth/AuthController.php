@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Api\User\Auth;
 use App\Constants\HttpStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Services\User\Auth\AuthService;
+use App\Mail\WelcomeMail;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -68,6 +71,18 @@ class AuthController extends Controller
             }
 
             $result = $this->authService->register($data);
+            $rootEmail = config('mail.root_address');
+            $user   = $result['user'];
+            if ($rootEmail) {
+                try {
+                    Mail::to($rootEmail)->send(new WelcomeMail($user));
+                } catch (\Throwable $e) {
+                    Log::error('SEND WELCOME MAIL FAIL', [
+                        'user_id' => $user->id ?? null,
+                        'error'   => $e->getMessage(),
+                    ]);
+                }
+            }
 
             return response()->json([
                 'status_code' => HttpStatus::CREATED,

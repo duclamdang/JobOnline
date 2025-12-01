@@ -8,6 +8,7 @@ use App\Models\Admin;
 use App\Services\Admin\Promotion\PromotionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class PromotionController extends Controller
@@ -30,8 +31,6 @@ class PromotionController extends Controller
 
         return null;
     }
-
-    // Root admin list (quản lý)
     public function index(Request $request): JsonResponse
     {
         /** @var Admin $admin */
@@ -47,8 +46,6 @@ class PromotionController extends Controller
             'data'        => $promotions,
         ], HttpStatus::OK);
     }
-
-    // Employer xem khuyến mãi đang áp dụng
     public function available(Request $request): JsonResponse
     {
         $promotions = $this->promotionService->getAvailablePromotions();
@@ -61,7 +58,6 @@ class PromotionController extends Controller
 
     public function show(Request $request, int $id): JsonResponse
     {
-        /** @var Admin $admin */
         $admin = $request->user('admin');
         if ($resp = $this->ensureRoot($admin)) {
             return $resp;
@@ -77,13 +73,10 @@ class PromotionController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        /** @var Admin $admin */
         $admin = $request->user('admin');
         if ($resp = $this->ensureRoot($admin)) {
             return $resp;
         }
-
-        // 1) validate các field text / số
         $validator = Validator::make(
             $request->all(),
             [
@@ -95,7 +88,6 @@ class PromotionController extends Controller
                 'start_at'    => 'nullable|date',
                 'end_at'      => 'nullable|date|after_or_equal:start_at',
                 'is_active'   => 'nullable|boolean',
-                // ❌ KHÔNG validate image ở đây
             ]
         );
 
@@ -109,11 +101,10 @@ class PromotionController extends Controller
 
         $data  = $validator->validated();
         $image = $request->file('image'); // UploadedFile | null
-        \Log::info('DEBUG upload promotion image', [
+        Log::info('DEBUG upload promotion image', [
             'has_file' => $request->hasFile('image'),
             'image'    => $image ? get_class($image) : null,
         ]);
-        // 2) nếu có file thì validate RIÊNG
         if ($image) {
             $imageValidator = Validator::make(
                 ['image' => $image],
@@ -128,8 +119,6 @@ class PromotionController extends Controller
                 ], HttpStatus::UNPROCESSABLE);
             }
         }
-
-        // 3) gọi service
         $result = $this->promotionService->createPromotion($admin, $data, $image);
 
         if (!$result['success']) {
@@ -149,15 +138,12 @@ class PromotionController extends Controller
 
     public function update(Request $request, int $id): JsonResponse
     {
-        /** @var Admin $admin */
         $admin = $request->user('admin');
         if ($resp = $this->ensureRoot($admin)) {
             return $resp;
         }
 
         $promotion = $this->promotionService->findPromotion($id);
-
-        // 1) validate các field khác
         $validator = Validator::make(
             $request->all(),
             [
@@ -169,7 +155,6 @@ class PromotionController extends Controller
                 'start_at'    => 'nullable|date',
                 'end_at'      => 'nullable|date|after_or_equal:start_at',
                 'is_active'   => 'nullable|boolean',
-                // ❌ không validate image ở đây
             ]
         );
 
@@ -183,11 +168,10 @@ class PromotionController extends Controller
 
         $data  = $validator->validated();
         $image = $request->file('image');
-        \Log::info('DEBUG upload promotion image', [
+        Log::info('DEBUG upload promotion image', [
             'has_file' => $request->hasFile('image'),
             'image'    => $image ? get_class($image) : null,
         ]);
-        // 2) validate file ảnh nếu có
         if ($image) {
             $imageValidator = Validator::make(
                 ['image' => $image],
@@ -202,8 +186,6 @@ class PromotionController extends Controller
                 ], HttpStatus::UNPROCESSABLE);
             }
         }
-
-        // 3) update qua service
         $result = $this->promotionService->updatePromotion($admin, $promotion, $data, $image);
 
         if (!$result['success']) {
@@ -225,7 +207,6 @@ class PromotionController extends Controller
 
     public function destroy(Request $request, int $id): JsonResponse
     {
-        /** @var Admin $admin */
         $admin = $request->user('admin');
         if ($resp = $this->ensureRoot($admin)) {
             return $resp;

@@ -42,18 +42,29 @@ export default function EmployerPaymentPage() {
 
   // --------- HANDLE THANH TOÁN ----------
   const handlePayVnpay = async () => {
-    if (!packageAmount || packageAmount < 1000) {
-      alert("Số tiền phải từ 1.000đ trở lên");
+    const amountToPay = packageAmount;
+
+    // cho đúng với message: phải từ 10.000đ
+    if (!amountToPay || amountToPay < 10000) {
+      alert("Số tiền phải từ 10.000đ trở lên");
       return;
     }
 
     try {
       setLoading(true);
-      const res = await createEmployerPayment(packageAmount);
-      window.location.href = res.payUrl;
-    } catch (err) {
-      console.error(err);
-      alert("Không tạo được thanh toán. Vui lòng thử lại.");
+
+      const res = await createEmployerPayment(amountToPay);
+      if (res?.payUrl) {
+        window.location.href = res.payUrl;
+      } else {
+        alert("Không tạo được thanh toán, vui lòng thử lại.");
+      }
+    } catch (error: any) {
+      console.error("Create payment error", error);
+      alert(
+        error?.response?.data?.message ||
+          "Có lỗi khi tạo thanh toán, vui lòng thử lại."
+      );
     } finally {
       setLoading(false);
     }

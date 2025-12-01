@@ -151,28 +151,6 @@ export default function AdminSidebar() {
                 <FaSearch /> Tìm kiếm ứng viên
               </Link>
             </MenuWrapper>
-
-            <MenuWrapper
-              id="services"
-              label={
-                <>
-                  <FaCog className="text-base" /> Dịch vụ
-                </>
-              }
-            >
-              <Link
-                to="/admin/payment"
-                className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
-              >
-                <FaBoxOpen /> Gói dịch vụ
-              </Link>
-              <Link
-                to="/admin/promotions"
-                className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
-              >
-                <FaTags /> Khuyến mãi
-              </Link>
-            </MenuWrapper>
           </>
         )}
         <MenuWrapper
@@ -248,6 +226,46 @@ export default function AdminSidebar() {
             </MenuWrapper>
           </>
         )}
+        <MenuWrapper
+          id="services"
+          label={
+            <>
+              <FaCog className="text-base" /> Dịch vụ
+            </>
+          }
+        >
+          {isRoot ? (
+            <>
+              <Link
+                to="/admin/root-payment"
+                className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
+              >
+                <FaBoxOpen /> Gói dịch vụ
+              </Link>
+              <Link
+                to="/admin/root-promotion"
+                className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
+              >
+                <FaTags /> Khuyến mãi
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/admin/payment"
+                className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
+              >
+                <FaBoxOpen /> Gói dịch vụ
+              </Link>
+              <Link
+                to="/admin/promotion"
+                className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
+              >
+                <FaTags /> Khuyến mãi
+              </Link>
+            </>
+          )}
+        </MenuWrapper>
         <MenuWrapper
           id="support"
           label={

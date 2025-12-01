@@ -17,6 +17,7 @@ class Payment extends Model
         'status',
         'gateway_tran_id',
         'meta',
+        'promotion_id'
     ];
 
     protected $casts = [
@@ -27,5 +28,9 @@ class Payment extends Model
     public function user()
     {
         return $this->belongsTo(Admin::class, 'user_id');
+    }
+    public function promotion()
+    {
+        return $this->belongsTo(Promotion::class, 'promotion_id');
     }
 }

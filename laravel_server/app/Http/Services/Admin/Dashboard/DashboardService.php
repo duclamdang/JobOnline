@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
@@ -127,6 +128,8 @@ class DashboardService
 
     public function getPointsPerMonth(): array
     {
+        $exchangeRate = 1000;
+
         $startMonth = Carbon::now()->subMonths(11)->startOfMonth();
         $endMonth   = Carbon::now()->startOfMonth();
 
@@ -138,13 +141,16 @@ class DashboardService
         while ($cursor <= $endMonth) {
             $year  = $cursor->year;
             $month = $cursor->month;
-
-            $sumAmount = Payment::where('status', 'success')
-                ->whereYear('created_at', $year)
-                ->whereMonth('created_at', $month)
-                ->sum('amount');
-
-            $points = (int) floor($sumAmount / 1000);
+            $points = (int) Payment::where('payments.status', 'success')
+                ->whereYear('payments.created_at', $year)
+                ->whereMonth('payments.created_at', $month)
+                ->leftJoin('promotions', 'payments.promotion_id', '=', 'promotions.id')
+                ->sum(DB::raw("
+                COALESCE(
+                    promotions.points,
+                    FLOOR(payments.amount / {$exchangeRate})
+                )
+            "));
 
             $labels[] = $cursor->format('m/Y');
             $data[]   = $points;
@@ -160,6 +166,7 @@ class DashboardService
 
     public function getPaymentSummary(): array
     {
+        $exchangeRate = 1000;
         $successfulQuery = Payment::where('status', 'success');
 
         $totalAmount      = (int) $successfulQuery->sum('amount');
@@ -167,9 +174,14 @@ class DashboardService
         $lastPaymentAt    = $successfulQuery->max('created_at');
 
         $allOrders = (int) Payment::count();
-
-        $totalPoints = (int) floor($totalAmount / 1000);
-
+        $totalPoints = (int) Payment::where('payments.status', 'success')
+            ->leftJoin('promotions', 'payments.promotion_id', '=', 'promotions.id')
+            ->sum(DB::raw("
+            COALESCE(
+                promotions.points,
+                FLOOR(payments.amount / {$exchangeRate})
+            )
+        "));
         return [
             'total_amount'      => $totalAmount,
             'total_points'      => $totalPoints,
@@ -295,7 +307,8 @@ class DashboardService
 
     public function getEmployerPointsPerMonth(Request $request): array
     {
-        $employerId = (int) $request->user()->id;
+        $employerId   = (int) $request->user()->id;
+        $exchangeRate = 1000; // 1 điểm = 1.000đ
 
         $startMonth = Carbon::now()->subMonths(11)->startOfMonth();
         $endMonth   = Carbon::now()->startOfMonth();
@@ -308,15 +321,17 @@ class DashboardService
         while ($cursor <= $endMonth) {
             $year  = $cursor->year;
             $month = $cursor->month;
-
-            $sumAmount = Payment::where('user_id', $employerId)
-                ->where('status', 'success')
-                ->whereYear('created_at', $year)
-                ->whereMonth('created_at', $month)
-                ->sum('amount');
-
-            // ví dụ: 1.000đ = 1 điểm
-            $points = (int) floor($sumAmount / 1000);
+            $points = (int) Payment::where('payments.user_id', $employerId)
+                ->where('payments.status', 'success')
+                ->whereYear('payments.created_at', $year)
+                ->whereMonth('payments.created_at', $month)
+                ->leftJoin('promotions', 'payments.promotion_id', '=', 'promotions.id')
+                ->sum(DB::raw("
+                COALESCE(
+                    promotions.points,
+                    FLOOR(payments.amount / {$exchangeRate})
+                )
+            "));
 
             $labels[] = $cursor->format('m/Y');
             $data[]   = $points;
@@ -332,18 +347,24 @@ class DashboardService
 
     public function getEmployerPaymentSummary(Request $request): array
     {
-        $employerId = (int) $request->user()->id;
-
+        $employerId   = (int) $request->user()->id;
+        $exchangeRate = 1000;
         $successfulQuery = Payment::where('user_id', $employerId)
             ->where('status', 'success');
 
         $totalAmount      = (int) $successfulQuery->sum('amount');
         $successfulOrders = (int) $successfulQuery->count();
         $lastPaymentAt    = $successfulQuery->max('created_at');
-
-        $allOrders = (int) Payment::where('user_id', $employerId)->count();
-
-        $totalPoints = (int) floor($totalAmount / 1000);
+        $allOrders        = (int) Payment::where('user_id', $employerId)->count();
+        $totalPoints = (int) Payment::where('payments.user_id', $employerId)
+            ->where('payments.status', 'success')
+            ->leftJoin('promotions', 'payments.promotion_id', '=', 'promotions.id')
+            ->sum(DB::raw("
+            COALESCE(
+                promotions.points,
+                FLOOR(payments.amount / {$exchangeRate})
+            )
+        "));
 
         return [
             'total_amount'      => $totalAmount,

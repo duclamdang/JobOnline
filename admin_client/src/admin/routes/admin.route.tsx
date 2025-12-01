@@ -22,6 +22,8 @@ import ApplicantSearch from "@admin/pages/ApplicantSearch";
 import RootDashboard from "@admin/pages/AdminRootMain";
 import EmployerDashboard from "@admin/pages/AdminEmployerMain";
 import PaymentResultPage from "@admin/pages/PaymentResultPage";
+import PromotionPage from "@admin/pages/PromotionPage";
+import AdminRootPromotion from "@admin/pages/AdminRootPromotion";
 
 const adminRoutes: RouteObject[] = [
   {
@@ -56,6 +58,21 @@ const adminRoutes: RouteObject[] = [
             index: true,
             path: "payment",
             element: <PaymentResultPage />,
+          },
+          {
+            index: true,
+            path: "promotion",
+            element: <PromotionPage />,
+          },
+          {
+            index: true,
+            path: "root-payment",
+            element: <PaymentResultPage />,
+          },
+          {
+            index: true,
+            path: "root-promotion",
+            element: <AdminRootPromotion />,
           },
 
           {

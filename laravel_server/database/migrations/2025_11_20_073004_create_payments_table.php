@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->string('order_code')->unique(); // mã đơn
+            $table->string('order_code')->unique();
             $table->unsignedBigInteger('amount');
-            $table->string('method'); // momo / vnpay
-            $table->string('status')->default('pending'); // pending, success, failed
+            $table->string('method');
+            $table->string('status')->default('pending');
             $table->string('gateway_tran_id')->nullable();
-            $table->json('meta')->nullable(); // lưu raw response
+            $table->json('meta')->nullable();
             $table->timestamps();
         });
 

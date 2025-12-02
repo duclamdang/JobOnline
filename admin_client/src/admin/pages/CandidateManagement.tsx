@@ -10,27 +10,49 @@ import { updateCandidateStatusApi } from "@admin/store/services/candidateService
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const ActionButtons = ({ candidate }: { candidate: Candidate }) => {
   const [status, setStatus] = useState<number>(candidate.status);
   const [editing, setEditing] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { admin } = useAppSelector((state) => state.auth);
   const canEdit = [1, 2, 3].includes(admin?.role_id ?? 0);
 
   const statusOptions = [
-    { value: 0, label: "Chờ duyệt", color: "bg-gray-100 text-gray-600" },
-    { value: 1, label: "Chấp nhận", color: "bg-blue-100 text-blue-700" },
-    { value: 2, label: "Từ chối", color: "bg-red-100 text-red-700" },
-    { value: 3, label: "Phỏng vấn", color: "bg-purple-100 text-purple-700" },
+    {
+      value: 0,
+      label: t("candidatePage.status.pending"),
+      color: "bg-gray-100 text-gray-600",
+    },
+    {
+      value: 1,
+      label: t("candidatePage.status.accepted"),
+      color: "bg-blue-100 text-blue-700",
+    },
+    {
+      value: 2,
+      label: t("candidatePage.status.rejected"),
+      color: "bg-red-100 text-red-700",
+    },
+    {
+      value: 3,
+      label: t("candidatePage.status.interview"),
+      color: "bg-purple-100 text-purple-700",
+    },
     {
       value: 4,
-      label: "Đề nghị nhận việc",
+      label: t("candidatePage.status.offer"),
       color: "bg-yellow-100 text-yellow-700",
     },
-    { value: 5, label: "Đã nhận việc", color: "bg-green-100 text-green-700" },
+    {
+      value: 5,
+      label: t("candidatePage.status.hired"),
+      color: "bg-green-100 text-green-700",
+    },
   ];
 
   const currentOption = statusOptions.find((s) => s.value === status);
@@ -43,11 +65,11 @@ const ActionButtons = ({ candidate }: { candidate: Candidate }) => {
     setEditing(false);
     try {
       await updateCandidateStatusApi(candidate.id, newStatus);
-      toast.success("Cập nhật trạng thái thành công!");
+      toast.success(t("candidatePage.toast.updateStatusSuccess"));
       dispatch(fetchCandidates({ page: 1, perPage: 6 }));
     } catch (err) {
-      console.error("Lỗi cập nhật trạng thái:", err);
-      toast.error("Cập nhật trạng thái thất bại!");
+      console.error("Update status error:", err);
+      toast.error(t("candidatePage.toast.updateStatusFail"));
     }
   };
 
@@ -90,6 +112,8 @@ const ActionButtons = ({ candidate }: { candidate: Candidate }) => {
 
 export default function CandidateListPage() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
+
   const { candidates, loading, error, meta } = useAppSelector(
     (state) => state.candidates
   );
@@ -98,13 +122,14 @@ export default function CandidateListPage() {
   const [jobs, setJobs] = useState<{ id: number; title: string }[]>([]);
   const [selectedJob, setSelectedJob] = useState<string>("all");
   const rowsPerPage = 6;
+
   useEffect(() => {
     const loadJobs = async () => {
       try {
         const res = await fetchJobsApi();
         setJobs(res.data ?? []);
       } catch (err) {
-        console.error("Lỗi load jobs:", err);
+        console.error("Load jobs error:", err);
         setJobs([]);
       }
     };
@@ -118,32 +143,36 @@ export default function CandidateListPage() {
 
   const handleDownload = () => {
     if (!candidates || candidates.length === 0) {
-      toast.warning("Không có dữ liệu để tải!");
+      toast.warning(t("candidatePage.excel.noData"));
       return;
     }
 
-    const rows = candidates.map((c, idx) => ({
-      STT: idx + 1,
-      "Tên ứng viên": c.user?.name ?? "",
-      Email: c.user?.email ?? "",
-      "Tin đăng": c.job?.title ?? "",
-      "Trạng thái":
-        (
-          {
-            0: "Chờ duyệt",
-            1: "Chấp nhận",
-            2: "Từ chối",
-            3: "Phỏng vấn",
-            4: "Đề nghị nhận việc",
-            5: "Đã nhận việc",
-          } as Record<number, string>
-        )[c.status] ?? "Không xác định",
-      "Ngày nộp": new Date(c.applied_at),
-    }));
+    const rows = candidates.map((c, idx) => {
+      const statusKeyMap: Record<number, string> = {
+        0: "pending",
+        1: "accepted",
+        2: "rejected",
+        3: "interview",
+        4: "offer",
+        5: "hired",
+      };
+      const key = statusKeyMap[c.status] ?? "unknown";
+
+      return {
+        [t("candidatePage.excel.columns.index")]: idx + 1,
+        [t("candidatePage.excel.columns.name")]: c.user?.name ?? "",
+        [t("candidatePage.excel.columns.email")]: c.user?.email ?? "",
+        [t("candidatePage.excel.columns.jobTitle")]: c.job?.title ?? "",
+        [t("candidatePage.excel.columns.status")]: t(
+          `candidatePage.status.${key}`
+        ),
+        [t("candidatePage.excel.columns.appliedAt")]: new Date(c.applied_at),
+      };
+    });
 
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Ứng viên");
+    XLSX.utils.book_append_sheet(wb, ws, t("candidatePage.excel.sheetName"));
 
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     const blob = new Blob([excelBuffer], {
@@ -152,18 +181,20 @@ export default function CandidateListPage() {
 
     const ts = new Date();
     const pad = (n: number) => n.toString().padStart(2, "0");
-    const fileName = `Danh_sach_ung_vien_${ts.getFullYear()}${pad(
-      ts.getMonth() + 1
-    )}${pad(ts.getDate())}_${pad(ts.getHours())}${pad(ts.getMinutes())}.xlsx`;
+    const fileName = `${t(
+      "candidatePage.excel.filePrefix"
+    )}${ts.getFullYear()}${pad(ts.getMonth() + 1)}${pad(ts.getDate())}_${pad(
+      ts.getHours()
+    )}${pad(ts.getMinutes())}.xlsx`;
 
     saveAs(blob, fileName);
-    toast.success("Tải danh sách thành công!");
+    toast.success(t("candidatePage.excel.success"));
   };
 
   const columns: Column<Candidate>[] = [
     {
       key: "user",
-      title: "Tên hồ sơ",
+      title: t("candidatePage.table.profileName"),
       render: (c) => (
         <div className="flex items-center gap-3 transition-all duration-300 hover:translate-x-[2px]">
           <img
@@ -182,7 +213,7 @@ export default function CandidateListPage() {
     },
     {
       key: "job",
-      title: "Tin đăng",
+      title: t("candidatePage.table.jobTitle"),
       render: (c) => (
         <span className="hover:text-purple-500 transition-colors duration-200">
           {c.job?.title}
@@ -191,14 +222,14 @@ export default function CandidateListPage() {
     },
     {
       key: "applied_at",
-      title: "Thời gian nộp",
-      render: (c) => new Date(c.applied_at).toLocaleString("vi-VN"),
+      title: t("candidatePage.table.appliedAt"),
+      render: (c) => new Date(c.applied_at).toLocaleString(),
     },
     {
       key: "status",
-      title: "Trạng thái",
+      title: t("candidatePage.table.status"),
       render: (c) => {
-        const map: Record<number, string> = {
+        const colorMap: Record<number, string> = {
           0: "bg-gray-100 text-gray-600",
           1: "bg-blue-100 text-blue-700",
           2: "bg-red-100 text-red-700",
@@ -206,28 +237,30 @@ export default function CandidateListPage() {
           4: "bg-yellow-100 text-yellow-700",
           5: "bg-green-100 text-green-700",
         };
-        const text =
-          [
-            "Chờ duyệt",
-            "Đã duyệt",
-            "Từ chối",
-            "Phỏng vấn",
-            "Đề nghị nhận việc",
-            "Đã nhận việc",
-          ][c.status] ?? "Không xác định";
+
+        const statusKeyMap: Record<number, string> = {
+          0: "pending",
+          1: "accepted",
+          2: "rejected",
+          3: "interview",
+          4: "offer",
+          5: "hired",
+        };
+        const key = statusKeyMap[c.status] ?? "unknown";
+
         return (
           <span
             className={`px-2 py-1 rounded-full text-xs font-medium shadow-sm transition-all duration-300 ${
-              map[c.status]
+              colorMap[c.status]
             }`}
           >
-            {text}
+            {t(`candidatePage.status.${key}`)}
           </span>
         );
       },
     },
     {
-      title: "Hành động",
+      title: t("candidatePage.table.actions"),
       render: (c) => <ActionButtons candidate={c} />,
     },
   ];
@@ -238,7 +271,7 @@ export default function CandidateListPage() {
         <div className="flex items-center gap-3">
           <People className="text-purple-500" fontSize="large" />
           <h1 className="text-2xl font-bold text-gray-800">
-            Danh sách ứng viên
+            {t("candidatePage.title")}
           </h1>
         </div>
         <button
@@ -246,7 +279,7 @@ export default function CandidateListPage() {
           className="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-5 py-2 rounded-lg shadow-md transition"
         >
           <Download fontSize="small" />
-          Tải danh sách
+          {t("candidatePage.downloadButton")}
         </button>
       </div>
 
@@ -259,7 +292,7 @@ export default function CandidateListPage() {
           }}
           className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
         >
-          <option value="all">Tất cả tin đăng</option>
+          <option value="all">{t("candidatePage.filter.allJobs")}</option>
           {jobs.map((job) => (
             <option key={job.id} value={job.id}>
               {job.title}
@@ -269,7 +302,11 @@ export default function CandidateListPage() {
       </div>
 
       {loading && <Loading />}
-      {error && <p className="text-red-500">{error}</p>}
+      {error && (
+        <p className="text-red-500">
+          {t("toast.error")}: {error}
+        </p>
+      )}
 
       <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-lg">
         <ReusableTable columns={columns} data={candidates ?? []} />

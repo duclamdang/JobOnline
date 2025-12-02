@@ -12,10 +12,13 @@ import {
 } from "@mui/icons-material";
 import { toast } from "react-toastify";
 import Loading from "@components/Loading";
+import { useTranslation } from "react-i18next";
 
 export default function JobManagement() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
   const { jobs, loading, error, meta } = useAppSelector((state) => state.jobs);
 
   const [page, setPage] = useState(1);
@@ -35,20 +38,22 @@ export default function JobManagement() {
         toggleJobStatus({ id: job.id, currentStatus: job.is_active })
       ).unwrap();
 
+      const newStatusLabel = job.is_active
+        ? t("jobPage.status.inactive")
+        : t("jobPage.status.active");
+
       toast.success(
-        `Đã chuyển sang trạng thái: ${
-          job.is_active ? "Ngưng tuyển" : "Còn tuyển"
-        }`
+        t("jobPage.toast.toggleStatusSuccess", { status: newStatusLabel })
       );
     } catch {
-      toast.error("Không thể đổi trạng thái công việc!");
+      toast.error(t("jobPage.toast.toggleStatusError"));
     }
   };
 
   const columns: Column<Job>[] = [
     {
       key: "title",
-      title: "Công việc",
+      title: t("jobPage.columns.job"),
       render: (job) => (
         <div className="flex items-center gap-2">
           <img
@@ -60,22 +65,24 @@ export default function JobManagement() {
         </div>
       ),
     },
-
     {
       key: "salary_range",
-      title: "Mức lương",
+      title: t("jobPage.columns.salary"),
       render: (job) => (
         <span className="text-sm font-semibold text-sky-600">
           {job.salary_negotiable
-            ? "Thỏa thuận"
-            : job.salary_range || "Chưa cập nhật"}
+            ? t("jobPage.salary.negotiable")
+            : job.salary_range || t("jobPage.salary.notUpdated")}
         </span>
       ),
     },
-    { key: "location", title: "Tỉnh/TP" },
+    {
+      key: "location",
+      title: t("jobPage.columns.location"),
+    },
     {
       key: "is_active",
-      title: "Trạng thái",
+      title: t("jobPage.columns.status"),
       render: (job) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium shadow-sm ${
@@ -84,12 +91,14 @@ export default function JobManagement() {
               : "bg-gray-100 text-gray-600 border border-gray-300"
           }`}
         >
-          {job.is_active ? "Còn tuyển" : "Ngưng tuyển"}
+          {job.is_active
+            ? t("jobPage.status.active")
+            : t("jobPage.status.inactive")}
         </span>
       ),
     },
     {
-      title: "Hành động",
+      title: t("jobPage.columns.actions"),
       render: (job) => (
         <div className="flex gap-2">
           <button
@@ -120,7 +129,7 @@ export default function JobManagement() {
         <div className="flex items-center gap-3">
           <BusinessCenter className="text-sky-500" fontSize="large" />
           <h1 className="text-2xl font-bold text-gray-800">
-            Quản lý công việc
+            {t("jobPage.title")}
           </h1>
         </div>
         <button
@@ -128,7 +137,7 @@ export default function JobManagement() {
           className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-5 py-2 rounded-lg shadow-md transition"
         >
           <Add fontSize="small" />
-          Thêm Job
+          {t("jobPage.addJobButton")}
         </button>
       </div>
 

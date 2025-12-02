@@ -13,6 +13,7 @@ import {
 import { Bar } from "react-chartjs-2";
 import { fetchEmployerDashboardData } from "@admin/store/redux/dashboardSlice";
 import { useAppDispatch, useAppSelector } from "@context/hooks";
+import { useTranslation } from "react-i18next";
 
 ChartJS.register(
   CategoryScale,
@@ -67,6 +68,8 @@ const ChartCard = ({
 
 export default function AdminEmployerDashboard() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
+
   const {
     applicantsData,
     generalStats,
@@ -81,60 +84,70 @@ export default function AdminEmployerDashboard() {
     dispatch(fetchEmployerDashboardData());
   }, [dispatch]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p>{t("common.loading")}</p>;
 
   return (
     <main className="flex-1 p-6 bg-gray-50 min-h-screen overflow-y-auto font-sans">
+      {/* STAT: JOBS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-        <StatCard title="Tổng số công việc" value={generalStats.total_jobs} />
         <StatCard
-          title="Công việc mới trong tuần"
+          title={t("employerDashboard.totalJobs")}
+          value={generalStats.total_jobs}
+        />
+        <StatCard
+          title={t("employerDashboard.newJobsWeek")}
           value={generalStats.new_jobs_week}
         />
         <StatCard
-          title="Công việc mới trong tháng"
+          title={t("employerDashboard.newJobsMonth")}
           value={generalStats.new_jobs_month}
         />
       </div>
 
+      {/* STAT: PAYMENT */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <StatCard
-          title="Tổng tiền đã nạp (VND)"
+          title={t("employerDashboard.totalAmount")}
           value={paymentSummary?.total_amount ?? 0}
         />
         <StatCard
-          title="Tổng điểm đã mua"
+          title={t("employerDashboard.totalPointsBought")}
           value={paymentSummary?.total_points ?? 0}
         />
         <StatCard
-          title="Tổng số giao dịch nạp"
+          title={t("employerDashboard.totalOrders")}
           value={paymentSummary?.total_orders ?? 0}
         />
         <StatCard
-          title="Giao dịch thành công"
+          title={t("employerDashboard.successfulOrders")}
           value={paymentSummary?.successful_orders ?? 0}
         />
       </div>
 
+      {/* CHART: APPLICANTS & JOB STATUS */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <ChartCard
-          title="Ứng viên theo tuần"
+          title={t("employerDashboard.applicantsPerWeek")}
           data={applicantsData}
           stepSize={1}
         />
         <ChartCard
-          title="Công việc theo trạng thái"
+          title={t("employerDashboard.jobsByStatus")}
           data={jobByStatusData}
           stepSize={1}
         />
       </div>
 
+      {/* CHART: REVENUE & POINTS */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard
-          title="Doanh thu mua điểm theo tháng (VND)"
+          title={t("employerDashboard.revenuePerMonth")}
           data={revenuePerMonthData}
         />
-        <ChartCard title="Điểm đã mua theo tháng" data={pointPerMonthData} />
+        <ChartCard
+          title={t("employerDashboard.pointsPerMonth")}
+          data={pointPerMonthData}
+        />
       </div>
     </main>
   );

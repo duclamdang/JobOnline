@@ -20,13 +20,17 @@ import {
   FaSearch,
   FaPlus,
 } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 export default function AdminSidebar() {
+  const { t } = useTranslation();
   const [hoverMenu, setHoverMenu] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const admin = useAppSelector((state) => state.auth.admin);
   const isRoot = admin?.role_id === 1;
+
+  const iconCls = "w-5 h-5 flex-shrink-0";
 
   const openMenu = (key: string) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -38,11 +42,13 @@ export default function AdminSidebar() {
     closeTimer.current = setTimeout(() => setHoverMenu(null), 180);
   };
 
-  const MenuWrapper: React.FC<{
+  type MenuWrapperProps = {
     id: string;
     label: React.ReactNode;
     children: React.ReactNode;
-  }> = ({ id, label, children }) => (
+  };
+
+  const MenuWrapper: React.FC<MenuWrapperProps> = ({ id, label, children }) => (
     <div
       className="relative"
       onMouseEnter={() => openMenu(id)}
@@ -67,13 +73,14 @@ export default function AdminSidebar() {
   );
 
   return (
-    <aside className="w-40 bg-white border-r h-screen hidden md:flex flex-col py-6 px-3 font-sans">
-      <nav className="flex flex-col gap-2 text-gray-700 text-sm font-medium relative">
+    <aside className="w-56 min-w-[220px] bg-white border-r h-screen hidden md:flex flex-col py-6 px-4 font-sans">
+      <nav className="flex flex-col gap-3 text-gray-700 text-sm font-medium relative">
+        {/* DASHBOARD */}
         <MenuWrapper
           id="dashboard"
           label={
             <>
-              <FaHome className="text-base" /> Bảng tin
+              <FaHome className={iconCls} /> {t("sidebar.dashboard")}
             </>
           }
         >
@@ -83,13 +90,14 @@ export default function AdminSidebar() {
                 to="/admin/root-dashboard"
                 className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
               >
-                <FaHome /> Thống kê
+                <FaHome className={iconCls} /> {t("sidebar.dashboardStats")}
               </Link>
               <Link
                 to="/admin/reports"
                 className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
               >
-                <FaFileAlt /> Báo cáo
+                <FaFileAlt className={iconCls} />{" "}
+                {t("sidebar.dashboardReports")}
               </Link>
             </>
           ) : (
@@ -98,18 +106,21 @@ export default function AdminSidebar() {
                 to="/admin/employer-dashboard"
                 className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
               >
-                <FaHome /> Thống kê
+                <FaHome className={iconCls} /> {t("sidebar.dashboardStats")}
               </Link>
             </>
           )}
         </MenuWrapper>
+
+        {/* EMPLOYER ONLY (NOT ROOT) */}
         {!isRoot && (
           <>
+            {/* JOBS */}
             <MenuWrapper
               id="job"
               label={
                 <>
-                  <FaBriefcase className="text-base" /> Công việc
+                  <FaBriefcase className={iconCls} /> {t("sidebar.job")}
                 </>
               }
             >
@@ -117,24 +128,25 @@ export default function AdminSidebar() {
                 to="/admin/job"
                 className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
               >
-                <FaListAlt className="text-blue-600" />
-                <span>Danh sách công việc</span>
+                <FaListAlt className={`${iconCls} text-blue-600`} />
+                <span>{t("sidebar.jobList")}</span>
               </Link>
 
               <Link
                 to="/admin/job/add"
                 className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
               >
-                <FaPlus className="text-blue-600" />
-                <span>Thêm công việc</span>
+                <FaPlus className={`${iconCls} text-blue-600`} />
+                <span>{t("sidebar.jobAdd")}</span>
               </Link>
             </MenuWrapper>
 
+            {/* CANDIDATES */}
             <MenuWrapper
               id="users"
               label={
                 <>
-                  <FaUsers className="text-base" /> Ứng viên
+                  <FaUsers className={iconCls} /> {t("sidebar.candidate")}
                 </>
               }
             >
@@ -142,22 +154,24 @@ export default function AdminSidebar() {
                 to="/admin/candidates"
                 className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
               >
-                <FaIdBadge /> Danh sách ứng viên
+                <FaIdBadge className={iconCls} /> {t("sidebar.candidateList")}
               </Link>
               <Link
                 to="/admin/applicantsearch"
                 className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
               >
-                <FaSearch /> Tìm kiếm ứng viên
+                <FaSearch className={iconCls} /> {t("sidebar.candidateSearch")}
               </Link>
             </MenuWrapper>
           </>
         )}
+
+        {/* MY ACCOUNT */}
         <MenuWrapper
           id="profile"
           label={
             <>
-              <FaUser className="text-base" /> Tài khoản của tôi
+              <FaUser className={iconCls} /> {t("sidebar.myAccount")}
             </>
           }
         >
@@ -165,24 +179,27 @@ export default function AdminSidebar() {
             to="/admin/profile"
             className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
           >
-            <FaRegUser /> Hồ sơ cá nhân
+            <FaRegUser className={iconCls} /> {t("sidebar.profile")}
           </Link>
           {!isRoot && (
             <Link
               to="/admin/trademark"
               className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
             >
-              <FaUserShield /> Quản bá thương hiệu
+              <FaUserShield className={iconCls} /> {t("sidebar.branding")}
             </Link>
           )}
         </MenuWrapper>
+
+        {/* ROOT ONLY */}
         {isRoot && (
           <>
+            {/* ACCOUNT MANAGEMENT */}
             <MenuWrapper
               id="account"
               label={
                 <>
-                  <FaHome className="text-base" /> Quản lý tài khoản
+                  <FaHome className={iconCls} /> {t("sidebar.accountManage")}
                 </>
               }
             >
@@ -190,21 +207,22 @@ export default function AdminSidebar() {
                 to="/admin/users"
                 className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
               >
-                <FaHome /> Tài khoản ứng viên
+                <FaHome className={iconCls} /> {t("sidebar.candidateAccount")}
               </Link>
               <Link
                 to="/admin/recruiters"
                 className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
               >
-                <FaFileAlt /> Tài khoản nhà tuyển dụng
+                <FaFileAlt className={iconCls} /> {t("sidebar.employerAccount")}
               </Link>
             </MenuWrapper>
 
+            {/* COMPANIES */}
             <MenuWrapper
               id="companies"
               label={
                 <>
-                  <FaBriefcase className="text-base" /> Công ty
+                  <FaBriefcase className={iconCls} /> {t("sidebar.company")}
                 </>
               }
             >
@@ -212,25 +230,27 @@ export default function AdminSidebar() {
                 to="/admin/companies"
                 className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
               >
-                <FaListAlt className="text-blue-600" />
-                <span>Danh sách công ty</span>
+                <FaListAlt className={`${iconCls} text-blue-600`} />
+                <span>{t("sidebar.companyList")}</span>
               </Link>
 
               <Link
                 to="/admin/companies/create"
                 className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
               >
-                <FaPlus className="text-blue-600" />
-                <span>Thêm mới công ty</span>
+                <FaPlus className={`${iconCls} text-blue-600`} />
+                <span>{t("sidebar.companyCreate")}</span>
               </Link>
             </MenuWrapper>
           </>
         )}
+
+        {/* SERVICES */}
         <MenuWrapper
           id="services"
           label={
             <>
-              <FaCog className="text-base" /> Dịch vụ
+              <FaCog className={iconCls} /> {t("sidebar.services")}
             </>
           }
         >
@@ -240,13 +260,13 @@ export default function AdminSidebar() {
                 to="/admin/root-payment"
                 className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
               >
-                <FaBoxOpen /> Gói dịch vụ
+                <FaBoxOpen className={iconCls} /> {t("sidebar.servicePackages")}
               </Link>
               <Link
                 to="/admin/root-promotion"
                 className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
               >
-                <FaTags /> Khuyến mãi
+                <FaTags className={iconCls} /> {t("sidebar.promotions")}
               </Link>
             </>
           ) : (
@@ -255,22 +275,24 @@ export default function AdminSidebar() {
                 to="/admin/payment"
                 className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
               >
-                <FaBoxOpen /> Gói dịch vụ
+                <FaBoxOpen className={iconCls} /> {t("sidebar.servicePackages")}
               </Link>
               <Link
                 to="/admin/promotion"
                 className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
               >
-                <FaTags /> Khuyến mãi
+                <FaTags className={iconCls} /> {t("sidebar.promotions")}
               </Link>
             </>
           )}
         </MenuWrapper>
+
+        {/* SUPPORT */}
         <MenuWrapper
           id="support"
           label={
             <>
-              <FaQuestionCircle className="text-base" /> Hỗ trợ
+              <FaQuestionCircle className={iconCls} /> {t("sidebar.support")}
             </>
           }
         >
@@ -278,13 +300,13 @@ export default function AdminSidebar() {
             to="/admin/help"
             className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
           >
-            <FaHandsHelping /> Trung tâm trợ giúp
+            <FaHandsHelping className={iconCls} /> {t("sidebar.helpCenter")}
           </Link>
           <Link
             to="/admin/contact"
             className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50"
           >
-            <FaEnvelope /> Liên hệ
+            <FaEnvelope className={iconCls} /> {t("sidebar.contact")}
           </Link>
         </MenuWrapper>
       </nav>

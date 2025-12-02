@@ -11,15 +11,17 @@ import { toast } from "react-toastify";
 import Loading from "@components/Loading";
 import { useNavigate } from "react-router-dom";
 import { useDropzone } from "react-dropzone";
+import { useTranslation } from "react-i18next";
 
 export default function CompanyPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { company, loading, error } = useAppSelector((state) => state.company);
   const { provinces } = useAppSelector((state) => state.location);
   const { industries } = useAppSelector((state) => state.industry);
-  const { profile } = useAppSelector((state) => state.profile); // ⬅️ lấy role
+  const { profile } = useAppSelector((state) => state.profile);
 
   // chỉ role 1 hoặc 2 mới được chỉnh sửa
   const canEdit = [1, 2].includes(profile?.role_id ?? -1);
@@ -68,24 +70,24 @@ export default function CompanyPage() {
 
   const handleUpdateBasic = async () => {
     if (!canEdit) {
-      toast.info("Bạn không có quyền chỉnh sửa. Chỉ được xem.");
+      toast.info(t("companyPage.toast.noEditPermission"));
       return;
     }
     if (!formData.name.trim()) {
-      toast.error("Tên công ty không được để trống!");
+      toast.error(t("companyPage.toast.nameRequired"));
       return;
     }
     setSubmittingBasic(true);
     try {
       const resultAction = await dispatch(updateCompanyBasic(formData));
       if (updateCompanyBasic.fulfilled.match(resultAction)) {
-        toast.success("Cập nhật thông tin công ty thành công 🎉");
+        toast.success(t("companyPage.toast.basicUpdateSuccess"));
         await dispatch(fetchMyCompany());
       } else {
-        toast.error("Cập nhật thất bại!");
+        toast.error(t("companyPage.toast.basicUpdateFailed"));
       }
     } catch {
-      toast.error("Có lỗi xảy ra khi cập nhật!");
+      toast.error(t("companyPage.toast.basicUpdateError"));
     } finally {
       setSubmittingBasic(false);
     }
@@ -93,15 +95,15 @@ export default function CompanyPage() {
 
   const handleUploadLicense = async () => {
     if (!canEdit) {
-      toast.info("Bạn không có quyền tải lên giấy phép. Chỉ được xem.");
+      toast.info(t("companyPage.toast.noLicensePermission"));
       return;
     }
     if (!licenseFile) {
-      toast.warning("Vui lòng chọn file giấy phép kinh doanh!");
+      toast.warning(t("companyPage.toast.licenseFileRequired"));
       return;
     }
     if (!licenseFile.type.includes("pdf")) {
-      toast.error("Vui lòng chọn file PDF hợp lệ!");
+      toast.error(t("companyPage.toast.licensePdfOnly"));
       return;
     }
 
@@ -109,14 +111,14 @@ export default function CompanyPage() {
     try {
       const resultAction = await dispatch(updateCompanyLicense(licenseFile));
       if (updateCompanyLicense.fulfilled.match(resultAction)) {
-        toast.success("Cập nhật giấy phép kinh doanh thành công 🎉");
+        toast.success(t("companyPage.toast.licenseUpdateSuccess"));
         await dispatch(fetchMyCompany());
         setLicenseFile(null);
       } else {
-        toast.error("Tải lên thất bại!");
+        toast.error(t("companyPage.toast.licenseUploadFailed"));
       }
     } catch {
-      toast.error("Có lỗi xảy ra khi tải lên!");
+      toast.error(t("companyPage.toast.licenseUploadError"));
     } finally {
       setUploadingLicense(false);
     }
@@ -125,16 +127,21 @@ export default function CompanyPage() {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { "application/pdf": [".pdf"] },
     multiple: false,
-    disabled: !canEdit, // ⬅️ khóa dropzone khi không có quyền
+    disabled: !canEdit,
     onDrop: (acceptedFiles) => {
       setLicenseFile(acceptedFiles[0]);
     },
   });
 
   if (loading) return <Loading />;
-  if (error) return <div className="p-6 text-red-600">Lỗi: {error}</div>;
+  if (error)
+    return (
+      <div className="p-6 text-red-600">
+        {t("companyPage.common.error")}: {error}
+      </div>
+    );
   if (!company)
-    return <div className="p-6">Không tìm thấy thông tin công ty</div>;
+    return <div className="p-6">{t("companyPage.common.companyNotFound")}</div>;
 
   const fieldDisabled = !canEdit || submittingBasic;
 
@@ -148,21 +155,22 @@ export default function CompanyPage() {
               onClick={() => navigate("/admin/profile")}
               className="rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-purple-700"
             >
-              Thông tin tài khoản
+              {t("companyPage.tabs.account")}
             </button>
             <button
               onClick={() => navigate("/admin/company")}
               className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm"
             >
-              Thông tin công ty
+              {t("companyPage.tabs.company")}
             </button>
           </div>
         </div>
 
         {!canEdit && (
           <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-            Bạn đang ở <b>chế độ chỉ xem</b>. Vui lòng liên hệ quản trị viên nếu
-            cần quyền chỉnh sửa.
+            {t("companyPage.viewOnly.prefix")}{" "}
+            <b>{t("companyPage.viewOnly.bold")}</b>.{" "}
+            {t("companyPage.viewOnly.suffix")}
           </div>
         )}
       </div>
@@ -186,10 +194,10 @@ export default function CompanyPage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-900">
-                  Thông tin công ty
+                  {t("companyPage.basic.title")}
                 </p>
                 <p className="text-xs text-gray-500">
-                  Cập nhật tên, MST, địa chỉ, liên hệ…
+                  {t("companyPage.basic.subtitle")}
                 </p>
               </div>
             </div>
@@ -213,7 +221,7 @@ export default function CompanyPage() {
                     fill="none"
                   />
                 </svg>
-                Đang lưu…
+                {t("companyPage.common.saving")}
               </div>
             )}
           </div>
@@ -223,7 +231,7 @@ export default function CompanyPage() {
               {/* Mã số thuế */}
               <div className="flex flex-col">
                 <label className="mb-1.5 text-sm font-medium text-gray-700">
-                  Mã số thuế
+                  {t("companyPage.basic.taxCode")}
                 </label>
                 <input
                   type="text"
@@ -232,14 +240,15 @@ export default function CompanyPage() {
                   className="w-full rounded-lg border border-gray-300 bg-gray-100 px-3 py-2.5 text-gray-700 outline-none"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  MST được cấp và không thể chỉnh sửa tại đây.
+                  {t("companyPage.basic.taxNote")}
                 </p>
               </div>
 
               {/* Tên công ty */}
               <div className="flex flex-col">
                 <label className="mb-1.5 text-sm font-medium text-gray-700">
-                  Tên công ty <span className="text-red-500">*</span>
+                  {t("companyPage.basic.name")}{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -254,7 +263,7 @@ export default function CompanyPage() {
               {/* Quy mô */}
               <div className="flex flex-col">
                 <label className="mb-1.5 text-sm font-medium text-gray-700">
-                  Quy mô nhân sự
+                  {t("companyPage.basic.companySize")}
                 </label>
                 <select
                   name="company_size"
@@ -263,20 +272,28 @@ export default function CompanyPage() {
                   disabled={fieldDisabled}
                   className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-gray-900 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100 disabled:bg-gray-50 disabled:cursor-not-allowed"
                 >
-                  <option value="">Chọn quy mô</option>
-                  <option value="Dưới 10 nhân viên">Dưới 10 nhân viên</option>
-                  <option value="10 - 150 nhân viên">10 - 150 nhân viên</option>
-                  <option value="150 - 300 nhân viên">
-                    150 - 300 nhân viên
+                  <option value="">
+                    {t("companyPage.basic.sizeOptions.placeholder")}
                   </option>
-                  <option value="Trên 300 nhân viên">Trên 300 nhân viên</option>
+                  <option value="Dưới 10 nhân viên">
+                    {t("companyPage.basic.sizeOptions.lt10")}
+                  </option>
+                  <option value="10 - 150 nhân viên">
+                    {t("companyPage.basic.sizeOptions.b10_150")}
+                  </option>
+                  <option value="150 - 300 nhân viên">
+                    {t("companyPage.basic.sizeOptions.b150_300")}
+                  </option>
+                  <option value="Trên 300 nhân viên">
+                    {t("companyPage.basic.sizeOptions.gt300")}
+                  </option>
                 </select>
               </div>
 
               {/* Địa điểm */}
               <div className="flex flex-col">
                 <label className="mb-1.5 text-sm font-medium text-gray-700">
-                  Địa điểm
+                  {t("companyPage.basic.location")}
                 </label>
                 <select
                   name="location_id"
@@ -285,7 +302,9 @@ export default function CompanyPage() {
                   disabled={fieldDisabled}
                   className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-gray-900 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100 disabled:bg-gray-50 disabled:cursor-not-allowed"
                 >
-                  <option value={0}>Chọn tỉnh/thành</option>
+                  <option value={0}>
+                    {t("companyPage.basic.locationPlaceholder")}
+                  </option>
                   {provinces.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
@@ -293,14 +312,14 @@ export default function CompanyPage() {
                   ))}
                 </select>
                 <p className="mt-1 text-xs text-gray-500">
-                  Phục vụ hiển thị vị trí trên hồ sơ công ty.
+                  {t("companyPage.basic.locationHelp")}
                 </p>
               </div>
 
               {/* Địa chỉ */}
               <div className="flex flex-col">
                 <label className="mb-1.5 text-sm font-medium text-gray-700">
-                  Địa chỉ
+                  {t("companyPage.basic.address")}
                 </label>
                 <input
                   type="text"
@@ -315,7 +334,7 @@ export default function CompanyPage() {
               {/* Lĩnh vực */}
               <div className="flex flex-col">
                 <label className="mb-1.5 text-sm font-medium text-gray-700">
-                  Lĩnh vực hoạt động
+                  {t("companyPage.basic.industry")}
                 </label>
                 <select
                   name="industry_id"
@@ -324,7 +343,9 @@ export default function CompanyPage() {
                   disabled={fieldDisabled}
                   className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-gray-900 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100 disabled:bg-gray-50 disabled:cursor-not-allowed"
                 >
-                  <option value={0}>Chọn lĩnh vực</option>
+                  <option value={0}>
+                    {t("companyPage.basic.industryPlaceholder")}
+                  </option>
                   {industries.map((i) => (
                     <option key={i.id} value={i.id}>
                       {i.title}
@@ -336,7 +357,7 @@ export default function CompanyPage() {
               {/* Email */}
               <div className="flex flex-col">
                 <label className="mb-1.5 text-sm font-medium text-gray-700">
-                  Địa chỉ email liên hệ
+                  {t("companyPage.basic.email")}
                 </label>
                 <input
                   type="text"
@@ -352,14 +373,14 @@ export default function CompanyPage() {
               {/* Điện thoại */}
               <div className="flex flex-col">
                 <label className="mb-1.5 text-sm font-medium text-gray-700">
-                  Điện thoại cố định
+                  {t("companyPage.basic.phone")}
                 </label>
                 <input
                   type="text"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="VD: 028 3xxx xxx / 09xx xxx xxx"
+                  placeholder={t("companyPage.basic.phonePlaceholder")}
                   disabled={fieldDisabled}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100 disabled:bg-gray-50 disabled:cursor-not-allowed"
                 />
@@ -372,7 +393,7 @@ export default function CompanyPage() {
                   onClick={() => navigate(-1)}
                   className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
                 >
-                  Hủy
+                  {t("companyPage.common.cancel")}
                 </button>
                 <button
                   onClick={handleUpdateBasic}
@@ -399,7 +420,9 @@ export default function CompanyPage() {
                       />
                     </svg>
                   )}
-                  {submittingBasic ? "Đang cập nhật..." : "Cập nhật"}
+                  {submittingBasic
+                    ? t("companyPage.basic.updating")
+                    : t("companyPage.basic.updateButton")}
                 </button>
               </div>
             )}
@@ -410,29 +433,30 @@ export default function CompanyPage() {
         <section className="rounded-2xl border border-gray-200 bg-white shadow-sm">
           <div className="border-b border-gray-100 px-6 py-4">
             <h2 className="text-sm font-medium text-gray-900">
-              Giấy phép kinh doanh
+              {t("companyPage.license.title")}
             </h2>
             <p className="mt-1 text-xs text-gray-500">
-              Tải lên bản PDF GPKD có dấu giáp lai hoặc công chứng.
+              {t("companyPage.license.subtitle")}
             </p>
           </div>
 
           <div className="px-6 py-6">
             {company.business_license ? (
               <p className="mb-3 text-sm text-gray-600">
-                Giấy phép hiện tại:
+                {t("companyPage.license.currentFile")}
                 <a
                   href={`${company.business_license}`}
                   target="_blank"
                   rel="noreferrer"
                   className="ml-2 font-medium text-purple-700 underline"
                 >
-                  {company.business_license.split("/").pop() || "Xem giấy phép"}
+                  {company.business_license.split("/").pop() ||
+                    t("companyPage.license.viewLicense")}
                 </a>
               </p>
             ) : (
               <p className="mb-3 text-sm italic text-gray-500">
-                Chưa cập nhật giấy phép kinh doanh
+                {t("companyPage.license.noLicense")}
               </p>
             )}
 
@@ -470,21 +494,13 @@ export default function CompanyPage() {
                 ) : (
                   <>
                     <p className="text-sm text-gray-700">
-                      {canEdit ? (
-                        <>
-                          Kéo thả hoặc{" "}
-                          <span className="font-medium text-purple-700 underline">
-                            nhấn để chọn
-                          </span>{" "}
-                          file PDF
-                        </>
-                      ) : (
-                        "Bạn không có quyền tải lên"
-                      )}
+                      {canEdit
+                        ? t("companyPage.license.dropText")
+                        : t("companyPage.license.noPermissionText")}
                     </p>
                     {canEdit && (
                       <p className="text-xs text-gray-500">
-                        Chỉ chấp nhận định dạng .pdf
+                        {t("companyPage.license.extensionHint")}
                       </p>
                     )}
                   </>
@@ -501,7 +517,7 @@ export default function CompanyPage() {
                     disabled={uploadingLicense}
                     className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed"
                   >
-                    Xóa file
+                    {t("companyPage.license.removeFile")}
                   </button>
                 )}
                 <button
@@ -529,20 +545,21 @@ export default function CompanyPage() {
                       />
                     </svg>
                   )}
-                  {uploadingLicense ? "Đang tải lên..." : "Tải lên"}
+                  {uploadingLicense
+                    ? t("companyPage.license.uploadingButton")
+                    : t("companyPage.license.uploadButton")}
                 </button>
               </div>
             )}
 
             <div className="mt-6 rounded-lg bg-gray-50 p-4 text-xs text-gray-600">
-              <p className="font-medium text-gray-700">Lưu ý:</p>
+              <p className="font-medium text-gray-700">
+                {t("companyPage.license.noteTitle")}
+              </p>
               <ul className="mt-1 list-disc pl-5">
-                <li>Chứng thực tài khoản doanh nghiệp.</li>
-                <li>Tạo lòng tin với Người Tìm Việc.</li>
-                <li>
-                  GPKD hợp lệ: có dấu giáp lai cơ quan thẩm quyền; nếu là bản
-                  photo phải có dấu công chứng.
-                </li>
+                <li>{t("companyPage.license.notes.0")}</li>
+                <li>{t("companyPage.license.notes.1")}</li>
+                <li>{t("companyPage.license.notes.2")}</li>
               </ul>
             </div>
           </div>

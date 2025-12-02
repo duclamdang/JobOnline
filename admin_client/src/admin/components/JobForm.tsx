@@ -1,4 +1,5 @@
 import { Job } from "@admin/store/redux/jobSlice";
+import { useTranslation } from "react-i18next";
 
 interface JobFormProps {
   job: Job | null;
@@ -9,7 +10,6 @@ interface JobFormProps {
   educations: { id: number; title: string }[];
   positions: { id: number; title: string }[];
   workFields: { id: number; title: string }[];
-  /** NEW: danh mục hình thức làm việc (Onsite/Hybrid/Remote/Full-time/Part-time...) */
   workingForms: { id: number; title: string }[];
   onSubmit: () => void;
   onCancel?: () => void;
@@ -30,6 +30,8 @@ export default function JobForm({
   onCancel,
   fetchDistricts,
 }: JobFormProps) {
+  const { t } = useTranslation();
+
   if (!job) return null;
 
   const handleChange = <K extends keyof Job>(field: K, value: Job[K]) =>
@@ -61,17 +63,16 @@ export default function JobForm({
 
   return (
     <form className="space-y-12">
-      <Section title="Thông tin cơ bản">
+      <Section title={t("jobForm.sections.basicInfo")}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input
-            label="Tiêu đề"
+            label={t("jobForm.fields.title")}
             value={job.title}
             onChange={(e) => handleChange("title", e.target.value)}
           />
 
-          {/* ĐÃ ĐỔI: type=date + min=todayStr (không quá khứ), bỏ time */}
           <Input
-            label="Ngày hết hạn"
+            label={t("jobForm.fields.expiredAt")}
             type="date"
             required
             min={todayStr}
@@ -95,14 +96,14 @@ export default function JobForm({
               htmlFor="salary_negotiable"
               className="text-base font-semibold text-gray-700"
             >
-              Lương thỏa thuận
+              {t("jobForm.fields.salaryNegotiable")}
             </label>
           </div>
 
           {!job.salary_negotiable && (
             <>
               <Input
-                label="Lương từ"
+                label={t("jobForm.fields.salaryFrom")}
                 value={job.salary_from ? formatVND(job.salary_from) : ""}
                 onChange={(e) =>
                   handleChange(
@@ -112,7 +113,7 @@ export default function JobForm({
                 }
               />
               <Input
-                label="Lương đến"
+                label={t("jobForm.fields.salaryTo")}
                 value={job.salary_to ? formatVND(job.salary_to) : ""}
                 onChange={(e) =>
                   handleChange(
@@ -127,12 +128,13 @@ export default function JobForm({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Select
-            label="Tỉnh/TP"
+            label={t("jobForm.fields.province")}
             value={job.province_id?.toString() || ""}
             options={provinces.map((p) => ({
               value: p.id.toString(),
               label: p.name,
             }))}
+            placeholder={t("jobForm.select.placeholder")}
             onChange={(e) => {
               const provinceId = Number(e.target.value);
               handleChange("province_id", provinceId);
@@ -141,125 +143,136 @@ export default function JobForm({
           />
 
           <Select
-            label="Quận/Huyện"
+            label={t("jobForm.fields.district")}
             value={job.district_id?.toString() || ""}
             options={districts.map((d) => ({
               value: d.id.toString(),
               label: d.name,
             }))}
+            placeholder={t("jobForm.select.placeholder")}
             onChange={(e) =>
               handleChange("district_id", Number(e.target.value))
             }
           />
 
           <Input
-            label="Địa chỉ chi tiết"
-            placeholder="VD: 23 Trần Cao Vân, phường Đa Kao"
+            label={t("jobForm.fields.address")}
+            placeholder={t("jobForm.placeholders.address")}
             value={job.address || ""}
             onChange={(e) => handleChange("address", e.target.value)}
           />
         </div>
       </Section>
 
-      <Section title="Thông tin tuyển dụng">
+      <Section title={t("jobForm.sections.recruitmentInfo")}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Input
-            label="Số lượng tuyển"
+            label={t("jobForm.fields.quantity")}
             type="number"
             value={job.quantity?.toString() || ""}
             onChange={(e) => handleChange("quantity", Number(e.target.value))}
           />
 
-          {/* NEW: Hình thức làm việc = working_form_id (đúng trường) */}
           <Select
-            label="Hình thức làm việc"
+            label={t("jobForm.fields.workingForm")}
             value={job.working_form_id?.toString() || ""}
             options={workingForms.map((wf) => ({
               value: wf.id.toString(),
               label: wf.title,
             }))}
+            placeholder={t("jobForm.select.placeholder")}
             onChange={(e) =>
               handleChange("working_form_id", Number(e.target.value))
             }
           />
 
           <Select
-            label="Kinh nghiệm"
+            label={t("jobForm.fields.experience")}
             value={job.work_experience_id?.toString() || ""}
             options={experiences.map((ex) => ({
               value: ex.id.toString(),
               label: ex.title,
             }))}
+            placeholder={t("jobForm.select.placeholder")}
             onChange={(e) =>
               handleChange("work_experience_id", Number(e.target.value))
             }
           />
 
           <Select
-            label="Trình độ"
+            label={t("jobForm.fields.education")}
             value={job.education_id?.toString() || ""}
             options={educations.map((ed) => ({
               value: ed.id.toString(),
               label: ed.title,
             }))}
+            placeholder={t("jobForm.select.placeholder")}
             onChange={(e) =>
               handleChange("education_id", Number(e.target.value))
             }
           />
+
           <Select
-            label="Vị trí"
+            label={t("jobForm.fields.position")}
             value={job.position_id?.toString() || ""}
             options={positions.map((po) => ({
               value: po.id.toString(),
               label: po.title,
             }))}
+            placeholder={t("jobForm.select.placeholder")}
             onChange={(e) =>
               handleChange("position_id", Number(e.target.value))
             }
           />
+
           <Select
-            label="Lĩnh vực"
+            label={t("jobForm.fields.workField")}
             value={job.work_field_id?.[0]?.toString() || ""}
             options={workFields.map((wf) => ({
               value: wf.id.toString(),
               label: wf.title,
             }))}
+            placeholder={t("jobForm.select.placeholder")}
             onChange={(e) =>
               handleChange("work_field_id", [Number(e.target.value)])
             }
           />
 
-          {/* ĐÃ GỠ select is_fulltime */}
           <Select
-            label="Trạng thái"
+            label={t("jobForm.fields.status")}
             value={job.is_active ? "true" : "false"}
             options={[
-              { value: "true", label: "Còn tuyển" },
-              { value: "false", label: "Ngưng tuyển" },
+              { value: "true", label: t("jobForm.options.statusActive") },
+              { value: "false", label: t("jobForm.options.statusInactive") },
             ]}
+            placeholder={t("jobForm.select.placeholder")}
             onChange={(e) =>
               handleChange("is_active", e.target.value === "true")
             }
           />
+
           <Select
-            label="Mức độ ưu tiên"
+            label={t("jobForm.fields.priority")}
             value={job.is_urgent ? "true" : "false"}
             options={[
-              { value: "true", label: "Gấp" },
-              { value: "false", label: "Không gấp" },
+              { value: "true", label: t("jobForm.options.priorityUrgent") },
+              { value: "false", label: t("jobForm.options.priorityNormal") },
             ]}
+            placeholder={t("jobForm.select.placeholder")}
             onChange={(e) =>
               handleChange("is_urgent", e.target.value === "true")
             }
           />
+
           <Select
-            label="Giới tính"
+            label={t("jobForm.fields.gender")}
             value={job.gender?.toString() || "0"}
             options={[
-              { value: "0", label: "Không yêu cầu" },
-              { value: "1", label: "Nam" },
-              { value: "2", label: "Nữ" },
+              { value: "0", label: t("jobForm.options.genderAny") },
+              { value: "1", label: t("jobForm.options.genderMale") },
+              { value: "2", label: t("jobForm.options.genderFemale") },
             ]}
+            placeholder={t("jobForm.select.placeholder")}
             onChange={(e) =>
               handleChange("gender", Number(e.target.value) as Job["gender"])
             }
@@ -267,9 +280,9 @@ export default function JobForm({
         </div>
       </Section>
 
-      <Section title="Kỹ năng">
+      <Section title={t("jobForm.sections.skills")}>
         <Input
-          label="Kỹ năng (ngăn cách bằng dấu ,)"
+          label={t("jobForm.fields.skillsWithHint")}
           value={job.skills || ""}
           onChange={(e) => handleChange("skills", e.target.value)}
         />
@@ -291,20 +304,20 @@ export default function JobForm({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Textarea
-          label="Mô tả công việc"
+          label={t("jobForm.fields.description")}
           value={job.description || ""}
           onChange={(e) => handleChange("description", e.target.value)}
         />
         <Textarea
-          label="Yêu cầu"
+          label={t("jobForm.fields.requirements")}
           value={job.requirements || ""}
           onChange={(e) => handleChange("requirements", e.target.value)}
         />
       </div>
 
-      <Section title="Phúc lợi">
+      <Section title={t("jobForm.sections.benefits")}>
         <Textarea
-          label="Phúc lợi"
+          label={t("jobForm.fields.benefits")}
           value={job.benefit || ""}
           onChange={(e) => handleChange("benefit", e.target.value)}
         />
@@ -317,7 +330,7 @@ export default function JobForm({
             onClick={onCancel}
             className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg"
           >
-            Đóng
+            {t("jobForm.buttons.close")}
           </button>
         )}
         <button
@@ -325,7 +338,7 @@ export default function JobForm({
           onClick={onSubmit}
           className="ml-3 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
         >
-          Lưu
+          {t("jobForm.buttons.save")}
         </button>
       </div>
     </form>
@@ -374,15 +387,16 @@ interface SelectOption {
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
   options: SelectOption[];
+  placeholder?: string;
 }
-function Select({ label, options, ...props }: SelectProps) {
+function Select({ label, options, placeholder, ...props }: SelectProps) {
   return (
     <div className="w-full">
       <label className="block text-sm font-semibold text-gray-700 mb-1">
         {label}
       </label>
       <select {...props} className="w-full border rounded-md px-3 py-2.5">
-        <option value="">-- Chọn --</option>
+        <option value="">{placeholder ?? "-- Chọn --"}</option>
         {options.map((o) => (
           <option key={o.value} value={o.value}>
             {o.label}

@@ -4,8 +4,10 @@ import { fetchAllUsers } from "../store/redux/userSlice";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, Table, Input, Spin, message, Tooltip } from "antd";
 import { ReloadOutlined, SearchOutlined, EyeOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const UsersManagement: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -18,13 +20,13 @@ const UsersManagement: React.FC = () => {
 
   const handleReload = () => {
     dispatch(fetchAllUsers(1000));
-    message.success("Đã tải lại danh sách người dùng");
+    message.success(t("usersManagement.toast.reloadSuccess"));
   };
 
   const userList = Array.isArray(users) ? users : users?.data ?? [];
 
   const filteredUsers = userList.filter(
-    (u) =>
+    (u: any) =>
       u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -39,7 +41,7 @@ const UsersManagement: React.FC = () => {
 
   const columns = [
     {
-      title: "Tên người dùng",
+      title: t("usersManagement.columns.name"),
       dataIndex: "name",
       key: "name",
       render: (_: string, record: any) => {
@@ -57,28 +59,29 @@ const UsersManagement: React.FC = () => {
       },
     },
     {
-      title: "Email",
+      title: t("usersManagement.columns.email"),
       dataIndex: "email",
       key: "email",
     },
     {
-      title: "Số điện thoại",
+      title: t("usersManagement.columns.phone"),
       dataIndex: "phone",
       key: "phone",
-      render: (text: string | null) => text || "—",
+      render: (text: string | null) =>
+        text || t("usersManagement.columns.phoneEmpty"),
     },
     {
-      title: "Ngày tạo",
+      title: t("usersManagement.columns.createdAt"),
       dataIndex: "created_at",
       key: "created_at",
       render: (date: string) => new Date(date).toLocaleDateString("vi-VN"),
     },
     {
-      title: "Hành động",
+      title: t("usersManagement.columns.actions"),
       key: "actions",
       align: "center" as const,
       render: (_: any, record: any) => (
-        <Tooltip title="Xem chi ti">
+        <Tooltip title={t("usersManagement.tooltip.viewDetail")}>
           <Button
             type="link"
             icon={<EyeOutlined />}
@@ -94,11 +97,11 @@ const UsersManagement: React.FC = () => {
       {/* Header */}
       <div className="mx-auto mb-6 flex max-w-6xl items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900">
-          Danh sách người dùng
+          {t("usersManagement.title")}
         </h2>
         <div className="flex items-center gap-3">
           <Input
-            placeholder="Tìm kiếm người dùng..."
+            placeholder={t("usersManagement.searchPlaceholder")}
             allowClear
             prefix={<SearchOutlined className="text-gray-400" />}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -111,7 +114,7 @@ const UsersManagement: React.FC = () => {
             onClick={handleReload}
             className="rounded-lg border border-gray-300 bg-white px-4 shadow-sm hover:border-purple-500 hover:text-purple-600"
           >
-            Tải lại
+            {t("usersManagement.buttons.reload")}
           </Button>
         </div>
       </div>

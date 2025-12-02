@@ -5,9 +5,11 @@ import { Button, Card, Table, Input, Spin, Tooltip, Tag } from "antd";
 import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const AdminsManagement: React.FC = () => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
 
   const { admins, loading } = useAppSelector((state) => state.admin);
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,19 +20,19 @@ const AdminsManagement: React.FC = () => {
 
   const handleReload = () => {
     dispatch(fetchAllAdmins(20));
-    toast.success("Đã tải lại danh sách admin");
+    toast.success(t("adminsManagement.toast.reloadSuccess"));
   };
 
   const handleToggleActive = async (id: number) => {
     try {
       const result = await dispatch(toggleAdminActive(id)).unwrap();
-      toast.success(result.toast || "Cập nhật trạng thái thành công");
+      toast.success(result.toast || t("adminsManagement.toast.toggleSuccess"));
     } catch (err) {
-      toast.error("Cập nhật trạng thái thất bại");
+      toast.error(t("adminsManagement.toast.toggleError"));
     }
   };
 
-  const adminList = admins;
+  const adminList = admins || [];
 
   const filteredAdmins = adminList.filter(
     (a) =>
@@ -40,7 +42,7 @@ const AdminsManagement: React.FC = () => {
 
   const columns = [
     {
-      title: "Tên Nhà tuyển dụng",
+      title: t("adminsManagement.table.name"),
       dataIndex: "name",
       key: "name",
       render: (text: string) => (
@@ -48,52 +50,52 @@ const AdminsManagement: React.FC = () => {
       ),
     },
     {
-      title: "Email",
+      title: t("adminsManagement.table.email"),
       dataIndex: "email",
       key: "email",
     },
     {
-      title: "Số điện thoại",
+      title: t("adminsManagement.table.phone"),
       dataIndex: "phone",
       key: "phone",
       render: (text: string | null) => text || "—",
     },
     {
-      title: "Công ty",
+      title: t("adminsManagement.table.company"),
       dataIndex: "company_name",
       key: "company_name",
       render: (company_name: string | null) => company_name || "—",
     },
     {
-      title: "Vai trò",
+      title: t("adminsManagement.table.role"),
       dataIndex: "role_name",
       key: "role_name",
       render: (role_name: string | null) => role_name || "—",
     },
     {
-      title: "Trạng thái",
+      title: t("adminsManagement.table.status"),
       dataIndex: "is_active",
       key: "is_active",
       align: "center" as const,
       render: (active: boolean) =>
         active ? (
-          <Tag color="green">Hoạt động</Tag>
+          <Tag color="green">{t("adminsManagement.table.active")}</Tag>
         ) : (
-          <Tag color="red">Khoá</Tag>
+          <Tag color="red">{t("adminsManagement.table.inactive")}</Tag>
         ),
     },
     {
-      title: "Ngày tạo",
+      title: t("adminsManagement.table.createdAt"),
       dataIndex: "created_at",
       key: "created_at",
       render: (date: string) => new Date(date).toLocaleDateString("vi-VN"),
     },
     {
-      title: "Hành động",
+      title: t("adminsManagement.table.actions"),
       key: "actions",
       align: "center" as const,
       render: (_: any, record: any) => (
-        <Tooltip title="Chỉnh sửa trạng thái">
+        <Tooltip title={t("adminsManagement.table.toggleTooltip")}>
           <button
             className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600 transition"
             onClick={() => handleToggleActive(record.id)}
@@ -114,11 +116,11 @@ const AdminsManagement: React.FC = () => {
       {/* Header */}
       <div className="mx-auto mb-6 flex max-w-6xl items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900">
-          Danh sách Nhà tuyển dụng
+          {t("adminsManagement.title")}
         </h2>
         <div className="flex items-center gap-3">
           <Input
-            placeholder="Tìm kiếm admin..."
+            placeholder={t("adminsManagement.searchPlaceholder")}
             allowClear
             prefix={<SearchOutlined className="text-gray-400" />}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -131,7 +133,7 @@ const AdminsManagement: React.FC = () => {
               onClick={handleReload}
               className="rounded-lg border border-gray-300 bg-white px-4 shadow-sm hover:border-purple-500 hover:text-purple-600"
             >
-              Tải lại
+              {t("adminsManagement.reload")}
             </Button>
           </div>
         </div>

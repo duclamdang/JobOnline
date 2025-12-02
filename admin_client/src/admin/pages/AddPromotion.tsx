@@ -1,5 +1,6 @@
 import { Promotion, PromotionPayload } from "@admin/store/redux/promotionSlice";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   open: boolean;
@@ -27,6 +28,8 @@ export default function AddPromotion({
   onClose,
   onSubmit,
 }: Props) {
+  const { t } = useTranslation();
+
   const [form, setForm] = useState<PromotionPayload>(emptyForm);
   const [loading, setLoading] = useState(false);
 
@@ -93,10 +96,16 @@ export default function AddPromotion({
       await onSubmit(form, imageFile);
       onClose();
     } catch (err: any) {
-      console.error("Promotion error:", err.response?.data || err);
+      console.error("Promotion error:", err?.response?.data || err);
+      const details = JSON.stringify(
+        err?.response?.data?.error_messages ?? {},
+        null,
+        2
+      );
       alert(
-        "Có lỗi khi lưu khuyến mãi: " +
-          JSON.stringify(err.response?.data?.error_messages ?? {}, null, 2)
+        t("promotionModal.error.save", {
+          details,
+        })
       );
     } finally {
       setLoading(false);
@@ -106,189 +115,201 @@ export default function AddPromotion({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30">
-      <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b px-6 py-4">
-          <h2 className="text-lg font-semibold">
-            {mode === "create" ? "Tạo khuyến mãi" : "Chỉnh sửa khuyến mãi"}
-          </h2>
-          <button
-            type="button"
-            className="text-gray-500 hover:text-gray-700"
-            onClick={onClose}
-          >
-            ✕
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4 px-6 py-4">
-          {/* Tên */}
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Tên khuyến mãi *
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              className="w-full rounded-lg border px-3 py-2 text-sm"
-              required
-            />
+    <div className="fixed inset-0 z-40 overflow-y-auto bg-black/30">
+      <div className="flex min-h-full items-center justify-center p-4">
+        <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-xl">
+          <div className="flex items-center justify-between border-b px-6 py-4">
+            <h2 className="text-lg font-semibold">
+              {mode === "create" ? "Tạo khuyến mãi" : "Chỉnh sửa khuyến mãi"}
+            </h2>
+            <button
+              type="button"
+              className="text-gray-500 hover:text-gray-700"
+              onClick={onClose}
+            >
+              ✕
+            </button>
           </div>
 
-          {/* Ảnh banner */}
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Ảnh khuyến mãi (banner)
-            </label>
-            <div className="flex items-center gap-3">
-              {previewImage ? (
-                <img
-                  src={previewImage}
-                  alt="Preview"
-                  className="h-16 w-28 rounded-lg border border-gray-200 object-cover"
-                />
-              ) : (
-                <div className="flex h-16 w-28 items-center justify-center rounded-lg border border-dashed border-gray-300 text-xs text-gray-400">
-                  Chưa có ảnh
-                </div>
-              )}
-
-              <label className="inline-flex cursor-pointer items-center rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">
-                Chọn ảnh
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageChange}
-                />
-              </label>
-            </div>
-            <p className="mt-1 text-xs text-gray-400">
-              Nên dùng ảnh ngang, khoảng 800×300px, dung lượng &lt; 1MB.
-            </p>
-          </div>
-
-          {/* Mã + trạng thái */}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <form onSubmit={handleSubmit} className="space-y-4 px-6 py-4">
+            {/* Tên */}
             <div>
               <label className="mb-1 block text-sm font-medium">
-                Mã khuyến mãi (tuỳ chọn)
+                {t("promotionModal.fields.name.label")}{" "}
+                <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                name="code"
-                value={form.code || ""}
+                name="name"
+                value={form.name}
                 onChange={handleChange}
                 className="w-full rounded-lg border px-3 py-2 text-sm"
-              />
-            </div>
-            <div className="mt-6 flex items-center gap-2 md:mt-0">
-              <input
-                type="checkbox"
-                id="is_active"
-                name="is_active"
-                checked={!!form.is_active}
-                onChange={handleCheckboxChange}
-                className="h-4 w-4"
-              />
-              <label htmlFor="is_active" className="text-sm">
-                Đang kích hoạt
-              </label>
-            </div>
-          </div>
-
-          {/* Mô tả */}
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Mô tả (hiển thị cho nhà tuyển dụng)
-            </label>
-            <textarea
-              name="description"
-              value={form.description || ""}
-              onChange={handleChange}
-              className="min-h-[80px] w-full rounded-lg border px-3 py-2 text-sm"
-            />
-          </div>
-
-          {/* Giá & điểm */}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-sm font-medium">
-                Giá tiền (VND) *
-              </label>
-              <input
-                type="number"
-                min={1000}
-                step={1000}
-                name="price"
-                value={form.price}
-                onChange={handleChange}
-                className="w-full rounded-lg border px-3 py-2 text-sm"
+                placeholder={t("promotionModal.fields.name.placeholder")}
                 required
               />
             </div>
+
+            {/* Ảnh banner */}
             <div>
               <label className="mb-1 block text-sm font-medium">
-                Điểm nhận được *
+                {t("promotionModal.fields.image.label")}
               </label>
-              <input
-                type="number"
-                min={1}
-                name="points"
-                value={form.points}
-                onChange={handleChange}
-                className="w-full rounded-lg border px-3 py-2 text-sm"
-                required
-              />
-            </div>
-          </div>
+              <div className="flex items-center gap-3">
+                {previewImage ? (
+                  <img
+                    src={previewImage}
+                    alt="Preview"
+                    className="h-16 w-28 rounded-lg border border-gray-200 object-cover"
+                  />
+                ) : (
+                  <div className="flex h-16 w-28 items-center justify-center rounded-lg border border-dashed border-gray-300 text-xs text-gray-400">
+                    {t("promotionModal.fields.image.empty")}
+                  </div>
+                )}
 
-          {/* Ngày hiệu lực */}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <label className="inline-flex cursor-pointer items-center rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">
+                  {t("promotionModal.fields.image.button")}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageChange}
+                  />
+                </label>
+              </div>
+              <p className="mt-1 text-xs text-gray-400">
+                {t("promotionModal.fields.image.helper")}
+              </p>
+            </div>
+
+            {/* Mã + trạng thái */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-sm font-medium">
+                  {t("promotionModal.fields.code.label")}
+                </label>
+                <input
+                  type="text"
+                  name="code"
+                  value={form.code || ""}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border px-3 py-2 text-sm"
+                  placeholder={t("promotionModal.fields.code.placeholder")}
+                />
+              </div>
+              <div className="mt-6 flex items-center gap-2 md:mt-0">
+                <input
+                  type="checkbox"
+                  id="is_active"
+                  name="is_active"
+                  checked={!!form.is_active}
+                  onChange={handleCheckboxChange}
+                  className="h-4 w-4"
+                />
+                <label htmlFor="is_active" className="text-sm">
+                  {t("promotionModal.fields.isActive.label")}
+                </label>
+              </div>
+            </div>
+
+            {/* Mô tả */}
             <div>
               <label className="mb-1 block text-sm font-medium">
-                Bắt đầu từ
+                {t("promotionModal.fields.description.label")}
               </label>
-              <input
-                type="date"
-                name="start_at"
-                value={form.start_at || ""}
+              <textarea
+                name="description"
+                value={form.description || ""}
                 onChange={handleChange}
-                className="w-full rounded-lg border px-3 py-2 text-sm"
+                className="min-h-[80px] w-full rounded-lg border px-3 py-2 text-sm"
+                placeholder={t("promotionModal.fields.description.placeholder")}
               />
             </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">Kết thúc</label>
-              <input
-                type="date"
-                name="end_at"
-                value={form.end_at || ""}
-                onChange={handleChange}
-                className="w-full rounded-lg border px-3 py-2 text-sm"
-              />
-            </div>
-          </div>
 
-          {/* Action */}
-          <div className="flex justify-end gap-2 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
-            >
-              Huỷ
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-60"
-            >
-              {loading ? "Đang lưu..." : "Lưu"}
-            </button>
-          </div>
-        </form>
+            {/* Giá & điểm */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-sm font-medium">
+                  {t("promotionModal.fields.price.label")}{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min={1000}
+                  step={1000}
+                  name="price"
+                  value={form.price}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border px-3 py-2 text-sm"
+                  required
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium">
+                  {t("promotionModal.fields.points.label")}{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  name="points"
+                  value={form.points}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border px-3 py-2 text-sm"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Ngày hiệu lực */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-sm font-medium">
+                  {t("promotionModal.fields.startAt.label")}
+                </label>
+                <input
+                  type="date"
+                  name="start_at"
+                  value={form.start_at || ""}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium">
+                  {t("promotionModal.fields.endAt.label")}
+                </label>
+                <input
+                  type="date"
+                  name="end_at"
+                  value={form.end_at || ""}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border px-3 py-2 text-sm"
+                />
+              </div>
+            </div>
+
+            {/* Action */}
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
+              >
+                {t("promotionModal.actions.cancel")}
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-60"
+              >
+                {loading
+                  ? t("promotionModal.actions.saving")
+                  : t("promotionModal.actions.save")}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

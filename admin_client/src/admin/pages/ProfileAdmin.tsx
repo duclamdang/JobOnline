@@ -9,8 +9,10 @@ import { toast } from "react-toastify";
 import ChangePasswordModal from "../components/ChangePasswordModal";
 import Loading from "@components/Loading";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function ProfilePage() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -58,9 +60,8 @@ export default function ProfilePage() {
   const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // optional: giới hạn ~5MB
       if (file.size > 5 * 1024 * 1024) {
-        toast.error("Ảnh quá lớn (tối đa 5MB)");
+        toast.error(t("toast.avatarTooLarge"));
         return;
       }
       setFormData((p) => ({ ...p, avatar: file }));
@@ -69,10 +70,8 @@ export default function ProfilePage() {
 
   const validate = () => {
     const next: typeof errors = {};
-    if (!formData.name.trim()) next.name = "Vui lòng nhập họ và tên.";
-    // VN: 10 số, bắt đầu bằng 0
-    if (!/^0\d{9}$/.test(formData.phone))
-      next.phone = "Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0).";
+    if (!formData.name.trim()) next.name = t("toast.missingName");
+    if (!/^0\d{9}$/.test(formData.phone)) next.phone = t("toast.invalidPhone");
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -93,13 +92,13 @@ export default function ProfilePage() {
 
       const resultAction = await dispatch(updateProfile(payload));
       if (updateProfile.fulfilled.match(resultAction)) {
-        toast.success("Cập nhật thành công! 🎉");
+        toast.success(t("toast.updateSuccess"));
         await dispatch(fetchProfile());
       } else {
-        toast.error("Cập nhật thất bại!");
+        toast.error(t("toast.updateFail"));
       }
     } catch {
-      toast.error("Có lỗi xảy ra khi cập nhật!");
+      toast.error(t("toast.updateError"));
     } finally {
       setSubmitting(false);
     }
@@ -113,18 +112,25 @@ export default function ProfilePage() {
     try {
       const resultAction = await dispatch(changePassword(data));
       if (changePassword.fulfilled.match(resultAction)) {
-        toast.success("Đổi mật khẩu thành công 🎉");
+        toast.success(t("toast.passwordSuccess"));
         setIsOpen(false);
       } else {
-        toast.error("Đổi mật khẩu thất bại!");
+        toast.error(t("toast.passwordFail"));
       }
     } catch {
-      toast.error("Có lỗi xảy ra khi đổi mật khẩu!");
+      toast.error(t("toast.passwordError"));
     }
   };
 
   if (loading) return <Loading />;
-  if (error) return <div className="p-6 text-red-600">Lỗi: {error}</div>;
+
+  if (error)
+    return (
+      <div className="p-6 text-red-600">
+        {t("toast.error")}: {error}
+      </div>
+    );
+
   if (!profile)
     return <div className="p-6">Không tìm thấy thông tin người dùng</div>;
 
@@ -150,7 +156,7 @@ export default function ProfilePage() {
               onClick={() => navigate("/admin/profile")}
               className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm"
             >
-              Thông tin tài khoản
+              {t("profilePage.tabs.accountInfo")}
             </button>
 
             {!isRestrictedRole && (
@@ -158,7 +164,7 @@ export default function ProfilePage() {
                 onClick={() => navigate("/admin/company")}
                 className="rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-purple-700"
               >
-                Thông tin công ty
+                {t("profilePage.tabs.companyInfo")}
               </button>
             )}
           </div>
@@ -171,10 +177,10 @@ export default function ProfilePage() {
           <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
             <div>
               <h2 className="text-sm font-medium text-gray-900">
-                Thông tin tài khoản
+                {t("profilePage.tabs.accountInfo")}
               </h2>
               <p className="text-xs text-gray-500">
-                Cập nhật thông tin liên hệ và bảo mật.
+                {t("profilePage.feature")}
               </p>
             </div>
           </div>
@@ -183,10 +189,11 @@ export default function ProfilePage() {
             {/* Đăng nhập */}
             <div>
               <h3 className="mb-3 text-sm font-semibold text-gray-700">
-                Thông tin đăng nhập
+                {t("profilePage.sections.loginInfo")}
               </h3>
               <label className="mb-1.5 block text-sm font-medium text-gray-600">
-                Địa chỉ email <span className="text-red-500">*</span>
+                {t("profilePage.labels.email")}{" "}
+                <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -196,7 +203,7 @@ export default function ProfilePage() {
               />
 
               <label className="mt-4 mb-1.5 block text-sm font-medium text-gray-600">
-                Mật khẩu
+                {t("profilePage.labels.password")}
               </label>
               <input
                 type="password"
@@ -208,25 +215,26 @@ export default function ProfilePage() {
                 onClick={() => setIsOpen(true)}
                 className="mt-1 inline-block text-sm font-medium text-purple-700 underline underline-offset-2 hover:opacity-90"
               >
-                Thay đổi mật khẩu
+                {t("profilePage.buttons.changePassword")}
               </button>
             </div>
 
             {/* Liên hệ */}
             <div>
               <h3 className="mb-3 text-sm font-semibold text-gray-700">
-                Thông tin liên hệ
+                {t("profilePage.sections.contactInfo")}
               </h3>
 
               <label className="mb-1.5 block text-sm font-medium text-gray-600">
-                Họ và tên <span className="text-red-500">*</span>
+                {t("profilePage.labels.fullName")}{" "}
+                <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="VD: Nguyễn Văn A"
+                placeholder={t("profilePage.placeholders.fullName")}
                 className={`w-full rounded-lg border px-3 py-2.5 text-gray-900 outline-none transition
                 ${
                   errors.name
@@ -239,14 +247,15 @@ export default function ProfilePage() {
               )}
 
               <label className="mt-4 mb-1.5 block text-sm font-medium text-gray-600">
-                Số điện thoại <span className="text-red-500">*</span>
+                {t("profilePage.labels.phone")}{" "}
+                <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="VD: 0912345678"
+                placeholder={t("profilePage.placeholders.phone")}
                 className={`w-full rounded-lg border px-3 py-2.5 text-gray-900 outline-none transition
                 ${
                   errors.phone
@@ -259,7 +268,7 @@ export default function ProfilePage() {
               )}
 
               <label className="mt-4 mb-1.5 block text-sm font-medium text-gray-600">
-                Email liên hệ
+                {t("profilePage.labels.contactEmail")}
               </label>
               <input
                 type="text"
@@ -269,18 +278,18 @@ export default function ProfilePage() {
               />
 
               <label className="mt-4 mb-1.5 block text-sm font-medium text-gray-600">
-                Địa chỉ liên hệ (không bắt buộc)
+                {t("profilePage.labels.address")}
               </label>
               <input
                 type="text"
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
-                placeholder="Nhập địa chỉ…"
+                placeholder={t("profilePage.placeholders.address")}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
               />
               <p className="mt-1 text-xs text-gray-500">
-                Giúp nhà tuyển dụng liên hệ khi cần.
+                {t("profilePage.notes.addressNote")}
               </p>
             </div>
 
@@ -292,7 +301,7 @@ export default function ProfilePage() {
                 disabled={submitting}
                 className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Hủy
+                {t("profilePage.buttons.cancel")}
               </button>
               <button
                 onClick={handleUpdate}
@@ -319,7 +328,9 @@ export default function ProfilePage() {
                     />
                   </svg>
                 )}
-                {submitting ? "Đang cập nhật..." : "Cập nhật"}
+                {submitting
+                  ? t("profilePage.buttons.updating")
+                  : t("profilePage.buttons.update")}
               </button>
             </div>
           </div>
@@ -328,9 +339,11 @@ export default function ProfilePage() {
         {/* Card: Avatar */}
         <aside className="rounded-2xl border border-gray-200 bg-white shadow-sm self-start">
           <div className="border-b border-gray-100 px-6 py-4">
-            <h2 className="text-sm font-medium text-gray-900">Ảnh đại diện</h2>
+            <h2 className="text-sm font-medium text-gray-900">
+              {t("profilePage.sections.avatar")}
+            </h2>
             <p className="text-xs text-gray-500">
-              Tải ảnh rõ nét, tỉ lệ 1:1 (PNG/JPG, &lt;= 5MB).
+              {t("profilePage.notes.avatarNote")}
             </p>
           </div>
 
@@ -359,7 +372,7 @@ export default function ProfilePage() {
                   <path d="M12 16v-6M9 13h6" />
                   <path d="M20 7h-3l-2-2H9L7 7H4v12h16z" />
                 </svg>
-                Thay đổi ảnh
+                {t("profilePage.buttons.changeAvatar")}
                 <input
                   type="file"
                   accept="image/*"
@@ -374,7 +387,7 @@ export default function ProfilePage() {
                   onClick={() => setFormData((p) => ({ ...p, avatar: "" }))}
                   className="mt-2 text-xs text-gray-600 underline hover:text-gray-800"
                 >
-                  Bỏ chọn ảnh
+                  {t("profilePage.buttons.removeAvatar")}
                 </button>
               )}
             </div>

@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import Loading from "@components/Loading";
 import JobForm from "@admin/components/JobForm";
 import { toDateOnly, validateAndSanitizeJob } from "@utils/jobValidation";
+import { useTranslation } from "react-i18next";
 
 type JobEditorProps =
   | { mode: "create"; jobId?: never }
@@ -22,6 +23,8 @@ type JobEditorProps =
 export default function JobEditor(props: JobEditorProps) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
+
   const { admin } = useAppSelector((s) => s.auth);
   const { selectedJob, loading, error } = useAppSelector((s) => s.jobs);
 
@@ -56,7 +59,6 @@ export default function JobEditor(props: JobEditorProps) {
   const isLoading =
     loading || loadingCatalogs || loadingDistricts || (isEdit && !job);
 
-  // 1) Load job (edit)
   useEffect(() => {
     if (isEdit && props.jobId) {
       dispatch(getJobById(props.jobId));
@@ -71,8 +73,6 @@ export default function JobEditor(props: JobEditorProps) {
       }
     }
   }, [isEdit, selectedJob]);
-
-  // 2) Init job (create)
   useEffect(() => {
     if (!isEdit) {
       setJob({
@@ -94,7 +94,7 @@ export default function JobEditor(props: JobEditorProps) {
         position_id: null,
         requirements: "",
         end_date: "",
-        is_fulltime: true, // giữ tương thích type
+        is_fulltime: true,
         slug: "",
         skills: "",
         is_active: true,
@@ -108,7 +108,6 @@ export default function JobEditor(props: JobEditorProps) {
     }
   }, [admin, isEdit]);
 
-  // 3) Catalogs
   useEffect(() => {
     const fetchCatalogs = async () => {
       try {
@@ -128,28 +127,26 @@ export default function JobEditor(props: JobEditorProps) {
         setWorkFields(wfRes.data.data);
         setWorkingForms(wformRes.data.data);
       } catch {
-        toast.error("Không thể tải dữ liệu danh mục!");
+        toast.error(t("jobEditor.catalogError"));
       } finally {
         setLoadingCatalogs(false);
       }
     };
     fetchCatalogs();
-  }, []);
+  }, [t]);
 
-  // 4) Districts
   const fetchDistricts = async (provinceId: number) => {
     setLoadingDistricts(true);
     try {
       const res = await apiAuth.get(`/locations/districts/${provinceId}`);
       setDistricts(res.data.data);
     } catch {
-      toast.error("Không thể tải danh sách quận/huyện!");
+      toast.error(t("jobEditor.districtError"));
     } finally {
       setLoadingDistricts(false);
     }
   };
 
-  // 5) Submit create/update (chung)
   const handleSubmit = async () => {
     if (!job) return;
 
@@ -157,7 +154,7 @@ export default function JobEditor(props: JobEditorProps) {
     if (!ok) {
       toast.error(
         <div>
-          <b>Vui lòng kiểm tra:</b>
+          <b>{t("jobEditor.validationTitle")}</b>
           <ul className="list-disc ml-5 mt-2">
             {errors.map((e, i) => (
               <li key={i}>{e}</li>
@@ -209,7 +206,7 @@ export default function JobEditor(props: JobEditorProps) {
         };
 
         await dispatch(updateJob({ id: job.id, data: payload })).unwrap();
-        toast.success("Cập nhật công việc thành công!");
+        toast.success(t("jobEditor.updateSuccess"));
       } else {
         const payload: CreateJobPayload = {
           ...job,
@@ -233,19 +230,26 @@ export default function JobEditor(props: JobEditorProps) {
         };
 
         await dispatch(createJob(payload)).unwrap();
-        toast.success("Tạo công việc thành công!");
+        toast.success(t("jobEditor.createSuccess"));
         navigate("/admin/job");
       }
     } catch {
       toast.error(
-        isEdit ? "Cập nhật công việc thất bại!" : "Tạo công việc thất bại!"
+        isEdit ? t("jobEditor.updateFail") : t("jobEditor.createFail")
       );
     }
   };
 
   if (isLoading) return <Loading />;
-  if (error && isEdit) return <div className="p-6 text-red-500">{error}</div>;
-  if (!job) return <div className="p-6">Không tìm thấy dữ liệu.</div>;
+
+  if (error && isEdit)
+    return (
+      <div className="p-6 text-red-500">
+        {t("jobEditor.errorPrefix")}: {error}
+      </div>
+    );
+
+  if (!job) return <div className="p-6">{t("jobEditor.notFound")}</div>;
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -253,7 +257,9 @@ export default function JobEditor(props: JobEditorProps) {
         {isEdit && (
           <div className="flex items-center gap-6 border-b pb-6 mb-8 bg-gray-50 rounded-lg p-4">
             <div className="w-20 h-20 rounded-md bg-gray-100 flex items-center justify-center shadow-inner">
-              <span className="text-gray-400 text-xs">No Logo</span>
+              <span className="text-gray-400 text-xs">
+                {t("jobEditor.noLogo")}
+              </span>
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-800">{job.title}</h1>

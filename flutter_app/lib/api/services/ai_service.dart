@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'dart:io';
 
+import 'package:mobile/api/models/chat_message.dart';
+
 class AiService {
   final Dio _dio;
 
@@ -17,25 +19,14 @@ class AiService {
     print('[AiService] baseUrl=${_dio.options.baseUrl}');
   }
 
-  Future<String> ask(List<Map<String, String>> messages) async {
-    try {
-      final r = await _dio.post('/ai/chat', data: {'messages': messages});
-      // ignore: avoid_print
-      print('[AiService] POST /ai/chat -> ${r.statusCode}');
-      if (r.statusCode == 200) {
-        final text = (r.data?['text'] as String?) ?? '';
-        // ignore: avoid_print
-        print(
-          '[AiService] text="${text.substring(0, text.length.clamp(0, 80))}"',
-        );
-        return text;
-      }
-      throw Exception('HTTP ${r.statusCode}: ${r.data}');
-    } catch (e) {
-      // ignore: avoid_print
-      print('[AiService] ERROR $e');
-      rethrow;
-    }
+  Future<ChatMessage> ask(List<Map<String, String>> messages) async {
+    final r = await _dio.post('/ai/chat', data: {'messages': messages});
+
+    return ChatMessage(
+      role: 'assistant',
+      content: r.data['text'],
+      metadata: r.data['metadata'],
+    );
   }
 
   /// GET /api/ping để kiểm tra kết nối/network_security_config/BASE_URL

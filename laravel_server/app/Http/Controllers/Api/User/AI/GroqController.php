@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -27,6 +28,33 @@ class GroqController extends Controller
 
             $noLlm = empty(env('GROQ_API_KEY'));
 
+            /**
+             * 1) Chào trước: nếu là câu chào hoặc chưa có message => trả lời chào luôn
+             */
+            if (empty($messages) || $this->isGreeting($userText)) {
+                $greetText =
+                    "Xin chào 👋 Mình là trợ lý tuyển dụng JobOnline.\n\n" .
+                    "Bạn có thể nhờ mình:\n" .
+                    "- Tìm việc theo vị trí, thành phố, mức lương (vd: \"dev Flutter ở HCM lương 15–25tr\").\n" .
+                    "- Xem chi tiết tin: gửi mã tin, ví dụ: \"#123\" hoặc \"xem tin 123\".\n" .
+                    "- Lọc theo loại hình (fulltime/parttime/intern), remote/onsite...\n\n" .
+                    "Bạn đang muốn tìm công việc gì vậy?";
+
+                return response()->json([
+                    'text'     => $greetText,
+                    'metadata' => [
+                        'intent' => 'greeting',
+                        'page'   => 1,
+                        'total'  => 0,
+                        'pages'  => 1,
+                    ],
+                    'debug'    => [
+                        'greeting' => true,
+                        'llm'      => $noLlm ? 'disabled' : 'enabled',
+                    ],
+                ], 200);
+            }
+
             // #123 -> xem chi tiết
             if (preg_match('/(#|\bid\s*[:\-]?\s*)(\d{1,10})/iu', $userText, $m)) {
                 $intent = [
@@ -41,12 +69,23 @@ class GroqController extends Controller
             }
 
             // Lấy dữ liệu từ DB
-            [$context, $debug, $meta] = $this->resolveContext($intent);
+            [$context, $debug, $meta] = $this->resolveContext($intent, $messages);
 
-            // Nếu không có KEY -> trả luôn context
+            /**
+             * 2) Nếu không có KEY -> trả luôn, nhưng xử lý search_jobs thông minh hơn
+             */
             if ($noLlm) {
+                if (($intent['intent'] ?? '') === 'chitchat') {
+                    $text = $this->fallbackChitchat();
+                } elseif (($intent['intent'] ?? '') === 'search_jobs' && empty($context)) {
+                    // search_jobs nhưng không có kết quả -> dùng short-term memory
+                    $text = $this->buildNoResultText($req, $intent, $meta);
+                } else {
+                    $text = $this->fallbackFromContext($context);
+                }
+
                 return response()->json([
-                    'text'     => $this->fallbackFromContext($context),
+                    'text'     => $text,
                     'metadata' => $meta,
                     'debug'    => $debug + ['llm' => 'disabled'],
                 ], 200);
@@ -55,9 +94,15 @@ class GroqController extends Controller
             // System + CONTEXT
             $system =
                 "Bạn là trợ lý tuyển dụng JobOnline. Trả lời TIẾNG VIỆT, ngắn gọn, chỉ dựa vào CONTEXT.\n" .
-                "- Nếu CONTEXT rỗng: nói rõ 'không tìm thấy tin phù hợp' và gợi ý người dùng cung cấp thêm tiêu chí (vị trí, thành phố, mức lương...).\n" .
+                "- Nếu CONTEXT rỗng: nói rõ 'không tìm thấy tin phù hợp' và gợi ý người dùng cung cấp thêm tiêu chí.\n" .
                 "- Không tự bịa công ty/lương/vị trí nếu không có trong CONTEXT.\n" .
-                "- Chỉ nhắc đến mã tin (#id) khi NGƯỜI DÙNG đã nhắc đến #id hoặc khi bạn đang nói về một tin cụ thể có trong CONTEXT.\n";
+                "- KHÔNG được hiển thị ID, KHÔNG được hiển thị mã tin (#...).\n" .
+                "- Khi có metadata.job_url → KHÔNG được tạo nội dung.
+                    Backend sẽ tự trả nội dung phù hợp..\n" .
+
+                "  KHÔNG hiển thị URL.\n" .
+                "  KHÔNG hiển thị ID.\n" .
+                "  KHÔNG thêm nội dung dư thừa.\n";
 
             if ($context) {
                 $system .= "\n=== CONTEXT (từ CSDL) ===\n{$context}\n=== HẾT CONTEXT ===\n";
@@ -81,14 +126,23 @@ class GroqController extends Controller
                 ]);
 
             if ($resp->failed()) {
-                \Log::error('Groq error', [
+                Log::error('Groq error', [
                     'status' => $resp->status(),
                     'body'   => $resp->body(),
                     'intent' => $intent,
                 ]);
 
+                // LLM lỗi -> fallback
+                if (($intent['intent'] ?? '') === 'chitchat') {
+                    $fallbackText = $this->fallbackChitchat();
+                } elseif (($intent['intent'] ?? '') === 'search_jobs' && empty($context)) {
+                    $fallbackText = $this->buildNoResultText($req, $intent, $meta);
+                } else {
+                    $fallbackText = $this->fallbackFromContext($context);
+                }
+
                 return response()->json([
-                    'text'     => $this->fallbackFromContext($context),
+                    'text'     => $fallbackText,
                     'metadata' => $meta,
                     'debug'    => $debug + ['llm_error_status' => $resp->status()],
                 ], 200);
@@ -96,13 +150,18 @@ class GroqController extends Controller
 
             $text = (string) data_get($resp->json(), 'choices.0.message.content', '');
 
+            // Nếu LLM trả rỗng và đang search_jobs không có kết quả -> dùng no-result text thông minh
+            if ($text === '' && ($intent['intent'] ?? '') === 'search_jobs' && empty($context)) {
+                $text = $this->buildNoResultText($req, $intent, $meta);
+            }
+
             return response()->json([
                 'text'     => $text ?: $this->fallbackFromContext($context),
                 'metadata' => $meta,
                 'debug'    => $debug,
             ], 200);
         } catch (\Throwable $e) {
-            \Log::error('chat-fatal', ['e' => $e->getMessage()]);
+            Log::error('chat-fatal', ['e' => $e->getMessage()]);
 
             return response()->json([
                 'text'  => "Xin lỗi, có trục trặc tạm thời. Bạn thử lại sau nhé.",
@@ -111,14 +170,24 @@ class GroqController extends Controller
         }
     }
 
-
+    /* =================== CLASSIFIER =================== */
 
     private function classify(string $text): ?array
     {
+        $text2 = Str::lower($text);
+
+// ƯU TIÊN: nếu user gõ "link", "xem link", "cho link"
+        if (preg_match('/^(link|xem link|cho link|lấy link|link đâu|đưa link)/iu', trim($text2))) {
+            return [
+                'intent' => 'job_link',
+                'page' => 1
+            ];
+        }
+
         try {
             $sys = "Bạn là bộ phân loại. Trả về JSON *hợp lệ* duy nhất theo schema:
 {
-  \"intent\": \"search_jobs\"|\"job_detail\"|\"chitchat\",
+  \"intent\": \"search_jobs\"|\"job_detail\"|\"chitchat\"|\"job_link\",
   \"query\":   string|null,
   \"city\":    string|null,
   \"company\": string|null,
@@ -163,10 +232,16 @@ Chỉ JSON, không thêm chữ nào khác.";
             if (isset($json['fields']) && !is_array($json['fields'])) {
                 $json['fields'] = [$json['fields']];
             }
+            if (preg_match('/\blink\b|\bliên kết\b|\blink job\b/i', $text)) {
+                return [
+                    'intent' => 'job_link',
+                    'page'   => 1,
+                ];
+            }
 
             return $json;
         } catch (\Throwable $e) {
-            \Log::warning('classify-fallback', ['e' => $e->getMessage()]);
+            Log::warning('classify-fallback', ['e' => $e->getMessage()]);
             return null;
         }
     }
@@ -183,6 +258,15 @@ Chỉ JSON, không thêm chữ nào khác.";
                 'page'   => 1,
             ];
         }
+        // Link job
+        if (preg_match('/(link|liên kết|đg link|cho xin link|link công việc|link job|xem link)/iu', $t)) {
+            // lấy id cuối cùng user đang xem
+            return [
+                'intent' => 'job_link',
+                'page'   => 1,
+            ];
+        }
+
 
         $searchKw = [
             'tìm', 'việc', 'job', 'tuyển', 'lập trình', 'kế toán', 'nhân viên',
@@ -202,7 +286,7 @@ Chỉ JSON, không thêm chữ nào khác.";
             ])->first(fn($c) => Str::contains($t, $c));
 
             $company = null;
-            if (preg_match('/(công ty|cty)\s+([a-zA-Z0-9\p{L}\s\.\-]+)/u', $text, $m)) {
+            if (preg_match('/(công ty|cty)\s+([a-zA-Z0-9\p{L}\s.\-]+)/u', $text, $m)) {
                 $company = trim($m[2]);
             }
 
@@ -234,7 +318,7 @@ Chỉ JSON, không thêm chữ nào khác.";
 
     /* ============== CONTEXT & DB SEARCH ============== */
 
-    private function resolveContext(array $intent): array
+    private function resolveContext(array $intent, array $messages = []): array
     {
         $debug = ['intent' => $intent];
         $ctx   = '';
@@ -247,22 +331,51 @@ Chỉ JSON, không thêm chữ nào khác.";
 
         switch ($intent['intent'] ?? 'chitchat') {
             case 'job_detail':
-                $id  = (int) ($intent['id'] ?? 0);
+                $id = (int) ($intent['id'] ?? 0);
                 $job = $this->jobById($id);
                 if ($job) {
                     $ctx = $this->formatJobDetail($job);
+                    $meta['last_job_id'] = $job->id;
                 }
                 break;
 
             case 'search_jobs':
-                $page               = max(1, (int) ($intent['page'] ?? 1));
-                [$jobs, $total]     = $this->searchJobsFromNL($intent, $page, self::PAGE_SIZE);
-                $ctx                = $this->formatJobList($jobs, $total, $page, self::PAGE_SIZE);
-                $debug['page']      = $page;
-                $debug['total']     = $total;
-                $meta['page']       = $page;
-                $meta['total']      = $total;
-                $meta['pages']      = (int) ceil(max(1, $total) / self::PAGE_SIZE);
+                $page = max(1, (int) ($intent['page'] ?? 1));
+                [$jobs, $total] = $this->searchJobsFromNL($intent, $page, self::PAGE_SIZE);
+
+                $ctx = $this->formatJobList($jobs, $total, $page, self::PAGE_SIZE);
+
+                // lưu ID đầu tiên trong danh sách để dùng cho "link"
+                if (!empty($jobs) && isset($jobs[0])) {
+                    $meta['last_job_id'] = $jobs[0]->id;
+                }
+
+                $meta['total'] = $total;
+                $meta['page'] = $page;
+                $meta['pages'] = ceil(max(1, $total) / self::PAGE_SIZE);
+                break;
+
+
+            case 'job_link':
+                $lastId = $this->getLastJobIdFromMessages($messages);
+                if ($lastId) {
+                    $job = $this->jobById($lastId);
+                    if ($job) {
+                        $url = url("/job/{$job->id}");
+                        $meta['job_url'] = $url;
+
+                        // ❌ Không đưa JOB_LINK vào context (LLM sẽ bịa)
+                        // $ctx = "JOB_LINK";
+
+                        // ✔ Để rỗng để LLM không sinh bậy
+                        $ctx = "";
+
+                    } else {
+                        $ctx = "NO_RESULT";
+                    }
+                } else {
+                    $ctx = "NO_RESULT";
+                }
                 break;
 
             default:
@@ -271,6 +384,21 @@ Chỉ JSON, không thêm chữ nào khác.";
 
         return [$ctx, $debug, $meta];
     }
+    private function getLastJobIdFromMessages($messages): ?int
+    {
+        for ($i = count($messages) - 1; $i >= 0; $i--) {
+            if (preg_match('/#(\d{1,10})/', $messages[$i]['content'] ?? '', $m)) {
+                return (int)$m[1];
+            }
+        }
+        return null;
+    }
+    private function formatJobLink($job)
+    {
+        return "Đây là liên kết của công việc #{$job->id}:\n"
+            . url("/job/{$job->id}");
+    }
+
 
     private function jobById(int $id)
     {
@@ -280,6 +408,7 @@ Chỉ JSON, không thêm chữ nào khác.";
             ->first();
     }
 
+
     /**
      * Tìm trực tiếp trong DB (PostgreSQL)
      * - work_field_id: JSON/JSONB mảng ID -> match ANY
@@ -287,37 +416,41 @@ Chỉ JSON, không thêm chữ nào khác.";
      */
     private function searchJobsFromNL(array $intent, int $page = 1, int $per = 10): array
     {
-        $q = DB::table('jobs')->where('is_active', 1);
+        $q = DB::table('jobs')
+            ->where('jobs.is_active', 1)
+            ->leftJoin('companies', 'companies.id', '=', 'jobs.company_id')
+            ->leftJoin('provinces', 'provinces.id', '=', 'jobs.province_id')
+            ->leftJoin('districts', 'districts.id', '=', 'jobs.district_id')
+            ->leftJoin('working_forms', 'working_forms.id', '=', 'jobs.working_form_id')
+            ->leftJoin('work_experiences', 'work_experiences.id', '=', 'jobs.work_experience_id')
+            ->leftJoin('educations', 'educations.id', '=', 'jobs.education_id')
+            ->leftJoin('positions', 'positions.id', '=', 'jobs.position_id');
 
-        // keyword chung
+        /* ===================== KEYWORD ===================== */
         if ($kw = ($intent['query'] ?? null)) {
+            $kw = trim($kw);
             $q->where(function ($w) use ($kw) {
-                $w->where('title', 'like', '%' . $kw . '%')
-                    ->orWhere('description', 'like', '%' . $kw . '%')
-                    ->orWhere('company_name', 'like', '%' . $kw . '%');
+                $w->where('jobs.title', 'ILIKE', "%{$kw}%")
+                    ->orWhere('jobs.description', 'ILIKE', "%{$kw}%")
+                    ->orWhere('companies.name', 'ILIKE', "%{$kw}%");
             });
         }
 
+        /* =============== FILTER: TÊN CÔNG TY =============== */
         if ($comp = ($intent['company'] ?? null)) {
-            $q->where('company_name', 'like', '%' . $comp . '%');
+            $q->where('companies.name', 'ILIKE', "%{$comp}%");
         }
 
-        // location -> province_id
-        if (Schema::hasColumn('jobs', 'province_id')) {
-            if ($pid = $this->resolveProvinceId($intent['city'] ?? null)) {
-                $q->where('province_id', $pid);
-            }
-        } elseif ($city = ($intent['city'] ?? null)) {
-            if (Schema::hasColumn('jobs', 'location')) {
-                $q->where('location', 'like', '%' . $city . '%');
-            }
+        /* =============== FILTER: TỈNH/THÀNH =============== */
+        if ($pid = $this->resolveProvinceId($intent['city'] ?? null)) {
+            $q->where('jobs.province_id', $pid);
         }
 
-        // work_field_id JSON/JSONB
+        /* =============== FILTER: NGÀNH NGHỀ (JSONB) =============== */
         if (Schema::hasColumn('jobs', 'work_field_id')) {
             $fieldIds = [];
 
-            // 1) Nếu LLM trả về danh sách fields (theo tên)
+            // map theo fields từ LLM
             if (!empty($intent['fields'] ?? null)) {
                 $fieldIds = array_merge(
                     $fieldIds,
@@ -325,7 +458,7 @@ Chỉ JSON, không thêm chữ nào khác.";
                 );
             }
 
-            // 2) Fallback: đoán từ query text
+            // map theo keyword
             $fieldIds = array_merge(
                 $fieldIds,
                 $this->resolveWorkFieldIdsFromKeyword($intent['query'] ?? null)
@@ -334,72 +467,70 @@ Chỉ JSON, không thêm chữ nào khác.";
             $fieldIds = array_values(array_unique(array_map('intval', $fieldIds)));
 
             if (!empty($fieldIds)) {
-                $arr = implode(',', $fieldIds); // "1,7"
+                $arr = implode(",", $fieldIds);
+
                 $q->whereRaw("
-                    EXISTS (
-                      SELECT 1
-                      FROM jsonb_array_elements_text(CASE
-                          WHEN jobs.work_field_id IS NULL THEN '[]'::jsonb
-                          WHEN jsonb_typeof(jobs.work_field_id::jsonb) = 'array' THEN jobs.work_field_id::jsonb
-                          ELSE '[]'::jsonb
-                      END) AS e(val)
-                      WHERE (e.val)::int = ANY (ARRAY[$arr])
-                    )
-                ");
+                EXISTS (
+                    SELECT 1
+                    FROM jsonb_array_elements_text(CASE
+                        WHEN jobs.work_field_id IS NULL THEN '[]'::jsonb
+                        ELSE jobs.work_field_id::jsonb
+                    END) AS e(val)
+                    WHERE (e.val)::int = ANY (ARRAY[$arr])
+                )
+            ");
             }
         }
 
-        // remote/type
-        if (!is_null($intent['remote'] ?? null) && Schema::hasColumn('jobs', 'is_remote')) {
-            $q->where('is_remote', (bool) $intent['remote']);
+        /* =============== FILTER: FULLTIME / PARTTIME =============== */
+        if (!empty($intent['type'])) {
+            if ($intent['type'] === 'fulltime') {
+                $q->where('jobs.is_fulltime', 1);
+            } elseif ($intent['type'] === 'parttime') {
+                $q->where('jobs.is_fulltime', 0);
+            }
         }
 
-        if (!empty($intent['type']) && Schema::hasColumn('jobs', 'job_type')) {
-            $q->where('job_type', $intent['type']);
-        }
-
-        // lương
-        if (!is_null($intent['salaryMin'] ?? null) && Schema::hasColumn('jobs', 'salary_min')) {
-            $min = (int) $intent['salaryMin'];
+        /* =============== FILTER: LƯƠNG =============== */
+        if (!is_null($intent['salaryMin'] ?? null)) {
+            $min = (int)$intent['salaryMin'];
             $q->where(function ($w) use ($min) {
-                $w->where('salary_min', '>=', $min)
-                    ->orWhere('salary_max', '>=', $min);
+                $w->where('jobs.salary_from', '>=', $min)
+                    ->orWhere('jobs.salary_to', '>=', $min);
             });
         }
 
-        if (!is_null($intent['salaryMax'] ?? null) && Schema::hasColumn('jobs', 'salary_max')) {
-            $max = (int) $intent['salaryMax'];
-            $q->where('salary_max', '<=', $max);
+        if (!is_null($intent['salaryMax'] ?? null)) {
+            $max = (int)$intent['salaryMax'];
+            $q->where('jobs.salary_to', '<=', $max);
         }
 
-        // kinh nghiệm
-        if (!is_null($intent['expMin'] ?? null) && Schema::hasColumn('jobs', 'years_experience_min')) {
-            $q->where('years_experience_min', '>=', (int) $intent['expMin']);
+        /* =============== FILTER: ĐĂNG TRONG N NGÀY =============== */
+        if (!is_null($intent['postedWithinDays'] ?? null)) {
+            $q->where('jobs.created_at', '>=', now()->subDays((int)$intent['postedWithinDays']));
         }
 
-        if (!is_null($intent['expMax'] ?? null) && Schema::hasColumn('jobs', 'years_experience_max')) {
-            $q->where('years_experience_max', '<=', (int) $intent['expMax']);
-        }
-
-        // đăng trong N ngày
-        if (!is_null($intent['postedWithinDays'] ?? null) && Schema::hasColumn('jobs', 'created_at')) {
-            $q->where('created_at', '>=', now()->subDays((int) $intent['postedWithinDays']));
-        }
-
+        /* =============== TOTAL =============== */
         $total = (clone $q)->count();
 
-        $items = $q->orderByDesc('created_at')
+        /* =============== SELECT =============== */
+        $items = $q->orderByDesc('jobs.created_at')
             ->forPage(max(1, $page), max(1, $per))
             ->get([
-                'id',
-                'title',
-                'company_name',
-                'location',
-                'salary_min',
-                'salary_max',
-                'deadline',
-                'job_type',
-                'is_remote',
+                'jobs.id',
+                'jobs.title',
+                'companies.name AS company_name',
+                'provinces.name AS province_name',
+                'districts.name AS district_name',
+                'jobs.address',
+                'jobs.salary_from',
+                'jobs.salary_to',
+                'jobs.salary_negotiable',
+                'jobs.end_date',
+                'working_forms.title AS working_form',
+                'positions.title AS position_title',
+                'work_experiences.title AS experience_title',
+                'educations.title AS education_title',
             ]);
 
         return [$items, $total];
@@ -415,48 +546,130 @@ Chỉ JSON, không thêm chữ nào khác.";
     private function formatJobList($jobs, int $total, int $page, int $per): string
     {
         if ($jobs->isEmpty()) {
-            return "Không có kết quả.\nGợi ý: thử thay từ khoá, thêm thành phố, hoặc đặt khoảng lương/kinh nghiệm.\nVí dụ: \"dev Flutter ở HCM lương 15–25tr đăng 7 ngày\".\n";
+            return "Không tìm thấy tin phù hợp.\nBạn có thể thêm:\n- Thành phố (VD: HCM, Hà Nội...)\n- Mức lương mong muốn\n- Hình thức làm việc (fulltime/parttime)\n- Ngành nghề\nVí dụ: \"thu ký HCM lương 8–12tr\".\n";
         }
 
         $lines = [];
         foreach ($jobs as $j) {
+            $salary = $j->salary_negotiable
+                ? 'Thỏa thuận'
+                : $this->money($j->salary_from) . '–' . $this->money($j->salary_to);
+
+            $location = trim(($j->address ? $j->address . ', ' : '') .
+                ($j->district_name ? $j->district_name . ', ' : '') .
+                ($j->province_name ?? ''), ", ");
+
             $lines[] = sprintf(
-                "- #%d | %s — %s | %s | Lương: %s–%s | Hạn: %s | Loại: %s | %s",
+                "- #%d | %s — %s | %s | Lương: %s | Hình thức: %s | Hạn: %s",
                 $j->id,
                 $j->title,
-                $j->company_name,
-                $j->location,
-                $this->money($j->salary_min),
-                $this->money($j->salary_max),
-                $j->deadline ? date('d/m/Y', strtotime($j->deadline)) : '-',
-                $j->job_type ?? '-',
-                ($j->is_remote ? 'Remote' : 'Onsite')
+                $j->company_name ?? '-',
+                $location ?: '-',
+                $salary,
+                $j->working_form ?? '-',
+                $j->end_date ? date('d/m/Y', strtotime($j->end_date)) : '-'
             );
         }
 
         $pages = (int) ceil(max(1, $total) / max(1, $per));
 
-        return "Kết quả ($total) — trang $page/$pages (mỗi trang $per dòng):\n"
+        return "Kết quả ($total) — trang $page/$pages:\n"
             . implode("\n", $lines)
-            . "\n\nGợi ý: 'trang N' để chuyển trang • 'Ứng tuyển #ID' để nộp.";
+            . "\n\nGợi ý: • 'trang N' để chuyển trang • 'xem #ID' để xem chi tiết.";
     }
 
     private function formatJobDetail($j): string
     {
+        $salary = $j->salary_negotiable
+            ? 'Thỏa thuận'
+            : $this->money($j->salary_from) . '–' . $this->money($j->salary_to);
+
+        $location = trim(($j->address ? $j->address . ', ' : '') .
+            ($j->district_name ? $j->district_name . ', ' : '') .
+            ($j->province_name ?? ''), ", ");
+
         return "CHI TIẾT TIN TUYỂN DỤNG #{$j->id}\n"
             . "Vị trí: {$j->title}\n"
             . "Công ty: {$j->company_name}\n"
-            . "Địa điểm: {$j->location}\n"
-            . "Lương: {$this->money($j->salary_min)}–{$this->money($j->salary_max)} VND/tháng\n"
-            . "Hạn nộp: " . ($j->deadline ? date('d/m/Y', strtotime($j->deadline)) : '-') . "\n"
-            . "Loại hình: " . ($j->job_type ?? '-') . "\n"
-            . "Hình thức: " . (($j->is_remote ?? false) ? 'Remote' : 'Onsite') . "\n"
-            . "Hướng dẫn: Nói 'Ứng tuyển #{$j->id}' để nộp.";
+            . "Địa điểm: " . ($location ?: '-') . "\n"
+            . "Lương: {$salary} VND/tháng\n"
+            . "Hạn nộp: " . ($j->end_date ? date('d/m/Y', strtotime($j->end_date)) : '-') . "\n"
+            . "Hình thức: " . ($j->working_form ?? '-') . "\n"
+            . "Kinh nghiệm: " . ($j->experience_title ?? '-') . "\n"
+            . "Trình độ: " . ($j->education_title ?? '-') . "\n"
+            . "Chức danh: " . ($j->position_title ?? '-') . "\n"
+            . "Hướng dẫn: Nói \"Ứng tuyển #{$j->id}\" để nộp hồ sơ.";
     }
+
 
     private function fallbackFromContext(string $ctx): string
     {
-        return $ctx ?: "Xin lỗi, hiện chưa lấy được dữ liệu. Bạn có thể thử lại hoặc lọc tiêu chí khác.";
+        // Nếu context báo link job
+        if ($ctx === "JOB_LINK") {
+            return "Bạn có thể xem chi tiết công việc tại đây: Link truy cập";
+        }
+        return $ctx ?: "Xin lỗi, hiện chưa lấy được dữ liệu.";
+    }
+
+
+
+    private function fallbackChitchat(): string
+    {
+        return "Xin chào 👋 Mình là trợ lý JobOnline. Hiện tại mình chưa truy cập được mô hình AI để trò chuyện tự do, " .
+            "nhưng mình vẫn có thể giúp bạn tìm tin tuyển dụng dựa trên các tiêu chí như vị trí, thành phố, mức lương.\n\n" .
+            "Bạn thử gõ: \"tìm việc kế toán ở Bình Dương lương 10–15tr\" nhé.";
+    }
+
+    /**
+     * Text khi search_jobs không có kết quả, có nhớ ngắn hạn 3–5 lượt
+     */
+    private function buildNoResultText(Request $req, array $intent, array $meta): string
+    {
+        $key = $this->shortMemoryKey($req);
+
+        $state = Cache::get($key, [
+            'last_intent'       => null,
+            'last_query'        => null,
+            'no_result_count'   => 0,
+        ]);
+
+        $currentQuery = $intent['query'] ?? null;
+        $sameQuery = $state['last_intent'] === 'search_jobs'
+            && ($state['last_query'] ?? null) === $currentQuery;
+
+        if ($sameQuery) {
+            $state['no_result_count'] = (int) ($state['no_result_count'] ?? 0) + 1;
+        } else {
+            $state['no_result_count'] = 1;
+            $state['last_intent']     = 'search_jobs';
+            $state['last_query']      = $currentQuery;
+        }
+
+        // Lưu lại, sống 10 phút
+        Cache::put($key, $state, now()->addMinutes(10));
+
+        $count = (int) $state['no_result_count'];
+        $queryLabel = $currentQuery ? "'" . $currentQuery . "'" : 'yêu cầu này';
+
+        if ($count === 1) {
+            return "Không tìm thấy tin phù hợp cho {$queryLabel}.\n" .
+                "Bạn có thể nói rõ thêm:\n" .
+                "- Thành phố (vd: HCM, Hà Nội, Đà Nẵng...)\n" .
+                "- Mức lương mong muốn\n" .
+                "- Loại hình (fulltime, parttime, intern...)\n\n" .
+                "Bạn thử gửi lại kèm địa điểm và lương nhé.";
+        } elseif ($count === 2) {
+            return "Mình vẫn chưa thấy tin phù hợp cho {$queryLabel}.\n" .
+                "Bạn đang muốn tìm việc ở khu vực nào (HCM, Hà Nội, Bình Dương, Đà Nẵng...)?\n" .
+                "Bạn có thể trả lời kiểu: \"thu ký ở HCM lương 8–12tr\".";
+        }
+
+        // Từ lần 3 trở đi: đổi giọng, đừng hỏi đi hỏi lại
+        return "Có vẻ hiện tại chưa có tin tuyển dụng phù hợp với {$queryLabel}.\n" .
+            "Bạn có muốn:\n" .
+            "- Đổi sang khu vực khác, hoặc\n" .
+            "- Thử vị trí lân cận (vd: hành chính nhân sự, trợ lý...) không?\n\n" .
+            "Bạn cứ mô tả lại, mình sẽ thử gợi ý hướng khác cho bạn.";
     }
 
     /* =================== RESOLVERS =================== */
@@ -662,4 +875,60 @@ Chỉ JSON, không thêm chữ nào khác.";
             ? substr($raw, $s, $e - $s + 1)
             : '{}';
     }
+
+    /**
+     * Nhận diện câu chào đơn giản: hi, hello, xin chào, chào bạn,...
+     */
+    private function isGreeting(string $text): bool
+    {
+        $t = Str::lower(trim($text));
+        if ($t === '') {
+            return false;
+        }
+
+        $greetings = [
+            'hi',
+            'hello',
+            'helo',
+            'xin chào',
+            'xin chao',
+            'chào',
+            'chao',
+            'chào bạn',
+            'chao ban',
+            'hey',
+            'alo',
+        ];
+
+        foreach ($greetings as $g) {
+            if ($t === $g || Str::startsWith($t, $g)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Key cho short-term memory: ưu tiên user id, fallback IP
+     */
+    private function shortMemoryKey(Request $req): string
+    {
+        // Nếu có guard 'user' thì dùng, không thì dùng default
+        $user = null;
+
+        try {
+            $user = auth('user')->user();
+        } catch (\Throwable $e) {
+            $user = auth()->user();
+        }
+
+        if ($user && isset($user->id)) {
+            return 'ai:short:u:' . $user->id;
+        }
+
+        return 'ai:short:ip:' . $req->ip();
+    }
+
 }
+

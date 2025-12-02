@@ -40,7 +40,11 @@
     "loginRegister": "Login / Register",
     "forEmployer": "For",
     "employer": "Employer",
-    "goTo": "Go to"
+    "goTo": "Go to",
+    "loading": "Loading...",
+    "notLoggedIn": "Not logged in",
+    "viewProfile": "View profile",
+    "logout": "Log out"
   },
   "footer": {
     "jobSeekerHotline": "Hotline for Job Seekers",
@@ -75,7 +79,7 @@
     "downloadApp": "Download our App",
 
     "member": "Member of SieuViet",
-    "copyright": "© 2025 - Copyright belongs to SieuViet Group"
+    "copyright": "© 2025 - Copyright belongs to Job Online"
   },
   "login": {
     "title": "Employer Login",
@@ -87,6 +91,895 @@
     "forgotPassword": "Forgot password?",
     "newEmployer": "Are you a new employer?",
     "register": "Register an account",
-    "adminTitle": "Admin Login"
+    "adminTitle": "Admin Login",
+    "description": "Manage job postings, candidates and employers centrally, intuitively and efficiently.",
+    "feature1": "Track recruitment performance in real time",
+    "feature2": "Manage points, service packages & payments",
+    "feature3": "Integrated intelligent recruitment chatbot"
+  },
+  "register": {
+    "title": "Employer account registration",
+    "employerRegistration": "Employer Registration",
+    "accountInformation":"Account Information",
+    "name": "Full name",
+    "enterName": "Enter full name",
+    "email": "Email address",
+    "enterEmail": "Enter email",
+    "password": "Password",
+    "enterPassword": "Enter password",
+    "confirmPassword": "Confirm password",
+    "enterconfirmPassword": "Re-enter password",
+    "newEmployer": "New employer?",
+    "register": "Create account",
+    "adminTitle": "Administrator login",
+    "companyInformation": "Company information",
+    "companyName": "Company name",
+    "entercompanyName": "Enter company name",
+    "businessLicense": "As on business license",
+    "taxCode": "Tax code",
+    "entertaxCode": "Enter tax code (10 or 13 characters)",
+    "loading":"Loading...",
+    "location": "Location",
+    "enterLocation": "Select province / city",
+    "fieldOfOperation": "Field of operation",
+    "enterfieldOfOperation": "Select field",
+    "login":"Login",
+    "haveAccount": "You already have an account",
+    "completeRegistration":"Complete registration",
+    "processing":"Processing ...",
+    "termsOfUse": "terms of use",
+    "feature1": "Attract high-quality candidates on JobOnline",
+    "feature2": "Create an employer account to post jobs, manage candidates, and use JobOnline service packages professionally.",
+    "feature3": "Please fill in all required information to start using the JobOnline system.",
+    "feature4": "Post job listings quickly and easily",
+    "feature5": "Centralized candidate profile management",
+    "feature6": "Track recruitment performance in real time",
+    "feature7": "By clicking the register button, you agree to"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "dashboardStats": "Statistics",
+    "dashboardReports": "Reports",
+
+    "job": "Jobs",
+    "jobList": "Job list",
+    "jobAdd": "Post a job",
+
+    "candidate": "Candidates",
+    "candidateList": "Candidate list",
+    "candidateSearch": "Search candidates",
+
+    "myAccount": "My account",
+    "profile": "Profile",
+    "branding": "Employer branding",
+
+    "accountManage": "Account management",
+    "candidateAccount": "Candidate accounts",
+    "employerAccount": "Employer accounts",
+
+    "company": "Companies",
+    "companyList": "Company list",
+    "companyCreate": "Add new company",
+
+    "services": "Services",
+    "servicePackages": "Service packages",
+    "promotions": "Promotions",
+
+    "support": "Support",
+    "helpCenter": "Help center",
+    "contact": "Contact"
+  },
+  "common": {
+    "loading": "Loading..."
+  },
+  "rootDashboard": {
+    "systemOverview": "System overview",
+    "pointsOverview": "Points top-up overview",
+
+    "totalJobs": "Total jobs",
+    "newJobsWeek": "New jobs (week)",
+    "totalApplicants": "Total applicants",
+    "totalCompanies": "Total companies",
+
+    "totalAmount": "Total top-up amount (VND)",
+    "totalPointsBought": "Total points purchased",
+    "totalOrders": "Total top-up transactions",
+    "successfulOrders": "Successful transactions",
+
+    "jobsPerMonth": "Jobs per month",
+    "applicantsPerWeek": "Applicants per week",
+    "revenuePerMonth": "Top-up revenue per month (VND)",
+    "pointsPerMonth": "Points purchased per month",
+
+    "topCompaniesTitle": "Top companies by number of jobs posted",
+    "colCompany": "Company",
+    "colJobsCount": "Number of jobs",
+    "colApplicantsCount": "Number of applicants",
+    "rankLabel": "Rank {{rank}}",
+    "dataset": {
+      "jobsCount": "Number of jobs",
+      "applicantsCount": "Number of applicants",
+      "revenueTopup": "Top-up revenue (VND)",
+      "pointsBought": "Points purchased"
+    }
+  },
+  "employerDashboard": {
+    "dataset": {
+      "applicantsCount": "Number of applicants",
+      "jobsByStatus": "Jobs by status",
+      "revenueBuyPoints": "Revenue from buying points (VND)",
+      "pointsBought": "Points purchased"
+    },
+    "totalJobs": "Total jobs",
+    "newJobsWeek": "New jobs this week",
+    "newJobsMonth": "New jobs this month",
+
+    "totalAmount": "Total top-up amount (VND)",
+    "totalPointsBought": "Total points purchased",
+    "totalOrders": "Total top-up transactions",
+    "successfulOrders": "Successful transactions",
+
+    "applicantsPerWeek": "Applicants per week",
+    "jobsByStatus": "Jobs by status",
+    "revenuePerMonth": "Revenue from buying points per month (VND)",
+    "pointsPerMonth": "Points purchased per month"
+  },
+  "profilePage": {
+    "tabs": {
+      "accountInfo": "Account Information",
+      "companyInfo": "Company Information"
+    },
+    "sections": {
+      "loginInfo": "Login Information",
+      "contactInfo": "Contact Information",
+      "avatar": "Profile Picture"
+    },
+    "labels": {
+      "email": "Email Address",
+      "password": "Password",
+      "fullName": "Full Name",
+      "phone": "Phone Number",
+      "contactEmail": "Contact Email",
+      "address": "Contact Address (optional)"
+    },
+    "placeholders": {
+      "fullName": "E.g: John Doe",
+      "phone": "E.g: 0912345678",
+      "address": "Enter address…"
+    },
+    "notes": {
+      "addressNote": "Helps employers contact you when needed.",
+      "avatarNote": "Upload a clear, square image (PNG/JPG, <= 5MB)."
+    },
+    "buttons": {
+      "changePassword": "Change Password",
+      "cancel": "Cancel",
+      "update": "Update",
+      "updating": "Updating...",
+      "changeAvatar": "Change Avatar",
+      "removeAvatar": "Remove"
+    },
+    "toast": {
+      "error":"Error",
+      "updateSuccess": "Profile updated successfully!",
+      "updateFail": "Update failed!",
+      "updateError": "An error occurred while updating!",
+      "passwordSuccess": "Password changed successfully",
+      "passwordFail": "Password change failed!",
+      "passwordError": "An error occurred while changing password!",
+      "invalidPhone": "Invalid phone number (10 digits, starts with 0).",
+      "missingName": "Please enter your full name.",
+      "avatarTooLarge": "Image too large (max 5MB)"
+    },
+    "feature":"Update contact and security information."
+  },
+  "jobPage": {
+    "title": "Job management",
+    "addJobButton": "Add job",
+    "columns": {
+      "job": "Job",
+      "salary": "Salary",
+      "location": "Province/City",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "salary": {
+      "negotiable": "Negotiable",
+      "notUpdated": "Not updated"
+    },
+    "status": {
+      "active": "Open",
+      "inactive": "Closed"
+    },
+    "toast": {
+      "toggleStatusSuccess": "Switched to status: {{status}}",
+      "toggleStatusError": "Unable to change job status!"
+    }
+  },
+  "jobEditor": {
+    "catalogError": "Unable to load catalog data!",
+    "districtError": "Unable to load district list!",
+    "validationTitle": "Please check:",
+    "updateSuccess": "Job updated successfully!",
+    "updateFail": "Failed to update job!",
+    "createSuccess": "Job created successfully!",
+    "createFail": "Failed to create job!",
+    "notFound": "No data found.",
+    "noLogo": "No logo",
+    "errorPrefix": "Error"
+  },
+  "jobForm": {
+    "sections": {
+      "basicInfo": "Basic information",
+      "recruitmentInfo": "Recruitment information",
+      "skills": "Skills",
+      "benefits": "Benefits"
+    },
+    "fields": {
+      "title": "Job title",
+      "expiredAt": "Expiration date",
+      "salaryNegotiable": "Negotiable salary",
+      "salaryFrom": "Salary from",
+      "salaryTo": "Salary to",
+      "province": "Province/City",
+      "district": "District",
+      "address": "Detailed address",
+      "quantity": "Number of vacancies",
+      "workingForm": "Working form",
+      "experience": "Experience",
+      "education": "Education level",
+      "position": "Position",
+      "workField": "Field of work",
+      "status": "Status",
+      "priority": "Priority level",
+      "gender": "Gender",
+      "skillsWithHint": "Skills (separated by commas)",
+      "description": "Job description",
+      "requirements": "Requirements",
+      "benefits": "Benefits"
+    },
+    "placeholders": {
+      "address": "E.g.: 23 Tran Cao Van, Da Kao ward"
+    },
+    "select": {
+      "placeholder": "-- Select --"
+    },
+    "options": {
+      "statusActive": "Open",
+      "statusInactive": "Closed",
+      "priorityUrgent": "Urgent",
+      "priorityNormal": "Normal",
+      "genderAny": "Any",
+      "genderMale": "Male",
+      "genderFemale": "Female"
+    },
+    "buttons": {
+      "close": "Close",
+      "save": "Save"
+    }
+  },
+  "candidatePage": {
+    "title": "Candidate list",
+    "downloadButton": "Download list",
+    "filter": {
+      "allJobs": "All job posts"
+    },
+    "table": {
+      "profileName": "Profile name",
+      "jobTitle": "Job post",
+      "appliedAt": "Applied at",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "interview": "Interview",
+      "offer": "Offer made",
+      "hired": "Hired",
+      "unknown": "Unknown"
+    },
+    "toast": {
+      "updateStatusSuccess": "Status updated successfully!",
+      "updateStatusFail": "Failed to update status!"
+    },
+    "excel": {
+      "sheetName": "Candidates",
+      "filePrefix": "candidate_list_",
+      "noData": "No data to download!",
+      "success": "Downloaded list successfully!",
+      "columns": {
+        "index": "No.",
+        "name": "Candidate name",
+        "email": "Email",
+        "jobTitle": "Job post",
+        "status": "Status",
+        "appliedAt": "Applied at"
+      }
+    }
+  },
+  "trademarkPage": {
+    "banner": {
+      "viewOnly": "You are in view-only mode. Please contact the administrator if you need edit permissions."
+    },
+    "messages": {
+      "companyNotFound": "Company information not found."
+    },
+    "sections": {
+      "intro": {
+        "title": "Company introduction",
+        "subtitle": "Description, website and year of establishment.",
+        "descriptionLabel": "Company introduction",
+        "websiteLabel": "Website",
+        "websitePlaceholder": "https://example.com",
+        "websiteHint": "Enter the full link so candidates can visit your website.",
+        "foundedYearLabel": "Year of establishment",
+        "foundedYearPlaceholder": "E.g.: {{year}}"
+      },
+      "images": {
+        "title": "Company images",
+        "subtitle": "Cover image and brand logo (PNG/JPG, ≤ 5MB).",
+        "noCover": "No cover image yet",
+        "changeCover": "Change cover image",
+        "coverFilePrefix": "Cover:",
+        "logoFilePrefix": "Logo:",
+        "removeCoverTitle": "Remove cover selection",
+        "removeLogoTitle": "Remove logo selection",
+        "tipsTitle": "Tips:",
+        "tip1": "Use a horizontal cover image, at least 1200×400 for best quality.",
+        "tip2": "Logo should be square or PNG with transparent background.",
+        "tip3": "Maximum size for each image is 5MB."
+      }
+    },
+    "buttons": {
+      "savingLabel": "Saving…",
+      "savingInfo": "Saving...",
+      "saveInfo": "Update information",
+      "savingImages": "Updating...",
+      "saveImages": "Update images"
+    },
+    "toast": {
+      "invalidWebsite": "Invalid website (e.g.: https://example.com)",
+      "invalidFoundedYear": "Year of establishment must be between 1800 and {{year}}",
+      "updateInfoSuccess": "Additional information updated successfully ",
+      "updateInfoFail": "Update failed!",
+      "updateInfoError": "An error occurred while updating additional information!",
+      "coverTooLarge": "Cover image is too large (maximum 5MB)",
+      "logoTooLarge": "Logo is too large (maximum 5MB)",
+      "noImageSelected": "Please select a logo or cover image to update",
+      "updateImageSuccess": "Company images updated successfully ",
+      "updateImageFail": "Update failed!",
+      "updateImageError": "An error occurred while updating images!"
+    }
+  },
+  "employerPaymentPage": {
+    "result": {
+      "successTitle": "Points purchase successful",
+      "failTitle": "Points purchase failed",
+      "successBadge": "Payment completed",
+      "failBadge": "Payment failed",
+      "orderCode": "Order code",
+      "amount": "Amount",
+      "points": "Points",
+      "successDescription": "Points have been added to your employer account. You can now use them to post jobs and upgrade services.",
+      "failDescription": "An error occurred during payment. Points have not been added to your account. Please try again or contact support if needed.",
+      "buyMore": "Buy more points",
+      "backToDashboard": "Back to dashboard"
+    },
+    "form": {
+      "title": "Buy service points",
+      "packages": {
+        "smallTitle": "Package 100,000₫",
+        "smallDesc": "~ 100 points",
+        "mediumTitle": "Package 300,000₫",
+        "mediumDesc": "~ 300 points",
+        "largeTitle": "Package 500,000₫",
+        "largeDesc": "~ 500 points"
+      },
+      "customLabel": "Or enter another amount (VND)",
+      "rateText": "1,000₫ ≈ 1 point. Estimated points:",
+      "summaryAmount": "Payment amount",
+      "summaryPoints": "Points received",
+      "pointsUnit": "points",
+      "submit": "Pay with VNPAY",
+      "submitLoading": "Creating payment...",
+      "note": "After successful payment, points will be added directly to your employer account."
+    },
+    "validation": {
+      "minAmount": "Amount must be at least 10,000₫"
+    },
+    "toast": {
+      "createFail": "Cannot create payment, please try again.",
+      "createError": "An error occurred while creating payment, please try again."
+    }
+  },
+  "promotionPage": {
+    "title": "Promotions",
+    "loading": "Loading promotions...",
+    "overlayRedirect": "Redirecting to payment gateway...",
+    "tag": "Promotion",
+    "labels": {
+      "price": "Price",
+      "points": "Points received"
+    },
+    "button": {
+      "pay": "Pay for this promotion"
+    }
+  },
+  "usersManagement": {
+    "title": "User list",
+    "searchPlaceholder": "Search users...",
+    "buttons": {
+      "reload": "Reload"
+    },
+    "columns": {
+      "name": "User name",
+      "email": "Email",
+      "phone": "Phone number",
+      "phoneEmpty": "—",
+      "createdAt": "Created at",
+      "actions": "Actions"
+    },
+    "tooltip": {
+      "viewDetail": "View details"
+    },
+    "toast": {
+      "reloadSuccess": "User list reloaded"
+    }
+  },
+  "userDetail": {
+    "title": "User details",
+    "fields": {
+      "phone": "Phone number",
+      "address": "Address",
+      "birthday": "Date of birth",
+      "gender": "Gender",
+      "workField": "Industry",
+      "province": "Province / City",
+      "workingForm": "Working form",
+      "experience": "Experience",
+      "education": "Education level",
+      "position": "Current position",
+      "desiredPosition": "Desired position",
+      "desiredSalary": "Expected salary",
+      "jobSearchStatus": "Job search status"
+    }
+  },
+  "adminsManagement": {
+    "title": "Employer admin list",
+    "searchPlaceholder": "Search admin...",
+    "reload": "Reload",
+    "toast": {
+      "reloadSuccess": "Admin list reloaded",
+      "toggleSuccess": "Status updated successfully",
+      "toggleError": "Failed to update status"
+    },
+    "table": {
+      "name": "Employer name",
+      "email": "Email",
+      "phone": "Phone number",
+      "company": "Company",
+      "role": "Role",
+      "status": "Status",
+      "createdAt": "Created at",
+      "actions": "Actions",
+      "active": "Active",
+      "inactive": "Locked",
+      "toggleTooltip": "Change status"
+    }
+  },
+  "companyManagement": {
+    "header": {
+      "title": "Manage company:",
+      "back": "← Back"
+    },
+    "tabs": {
+      "basic": "Basic info",
+      "license": "License",
+      "additional": "Introduction",
+      "images": "Images"
+    },
+    "common": {
+      "saving": "Saving…",
+      "uploading": "Uploading…",
+      "cancel": "Cancel",
+      "errorLabel": "Error",
+      "notFound": "Company not found"
+    },
+    "toast": {
+      "basicNameRequired": "Company name is required!",
+      "basicUpdateSuccess": "Basic information updated successfully 🎉",
+      "basicUpdateError": "Failed to update basic information!",
+      "licenseSelectWarning": "Please select a valid PDF file!",
+      "licenseUpdateSuccess": "Business license updated successfully 🎉",
+      "licenseUpdateError": "Failed to upload license!",
+      "additionalUpdateSuccess": "Additional information updated successfully 🎉",
+      "additionalUpdateError": "Failed to update additional information!",
+      "imagesUpdateSuccess": "Images updated successfully 🎉",
+      "imagesUpdateError": "Failed to update images!"
+    },
+    "sections": {
+      "basic": {
+        "title": "Basic information",
+        "subtitle": "Name, tax code, scale, address, contacts…"
+      }
+    },
+    "basic": {
+      "taxCode": "Tax code",
+      "taxNote": "Tax code cannot be edited here.",
+      "name": "Company name ",
+      "companySize": "Company size",
+      "sizeOptions": {
+        "placeholder": "Select company size",
+        "lt10": "Under 10 employees",
+        "b10_150": "10 - 150 employees",
+        "b150_300": "150 - 300 employees",
+        "gt300": "Over 300 employees"
+      },
+      "location": "Province/City",
+      "locationPlaceholder": "Select province/city",
+      "address": "Address",
+      "industry": "Industry",
+      "industryPlaceholder": "Select industry",
+      "email": "Contact email",
+      "phone": "Phone number",
+      "phonePlaceholder": "Ex: 028 3xxx xxx / 09xx xxx xxx",
+      "updateButton": "Update information",
+      "updating": "Updating..."
+    },
+    "license": {
+      "title": "Business license",
+      "subtitle": "Upload your business license PDF with stamp or notarized copy.",
+      "currentFile": "Current license:",
+      "viewLicense": "View license",
+      "noLicense": "Business license not updated yet",
+      "dropText": "Drag & drop or click to select PDF file",
+      "extensionHint": "Only .pdf files are accepted",
+      "removeFile": "Remove file",
+      "uploadButton": "Upload",
+      "uploadingButton": "Uploading...",
+      "noteTitle": "Notes:",
+      "notes": {
+        "0": "Verify company account.",
+        "1": "Build trust with candidates.",
+        "2": "Valid license: with company stamp; photocopy must be notarized."
+      }
+    },
+    "additional": {
+      "title": "Company introduction",
+      "subtitle": "Description, website and founded year.",
+      "descriptionLabel": "Company introduction",
+      "websiteLabel": "Website",
+      "websitePlaceholder": "https://example.com",
+      "foundedYearLabel": "Founded year",
+      "foundedYearPlaceholder": "Ex: 2015",
+      "updateButton": "Update information",
+      "updating": "Saving..."
+    },
+    "images": {
+      "title": "Company images",
+      "subtitle": "Cover and logo (PNG/JPG, ≤ 5MB).",
+      "noCover": "No cover image",
+      "changeCover": "Change cover image",
+      "coverChip": "Cover:",
+      "removeCoverTitle": "Remove cover",
+      "logoChip": "Logo:",
+      "removeLogoTitle": "Remove logo",
+      "updateButton": "Update images",
+      "updating": "Updating...",
+      "hintTitle": "Tips:",
+      "hints": {
+        "0": "Use wide cover image, at least 1200×400 for best display.",
+        "1": "Logo should be square or PNG with transparent background.",
+        "2": "Maximum size for each image is 5MB."
+      }
+    }
+  },
+  "companyPage": {
+    "tabs": {
+      "account": "Account info",
+      "company": "Company info"
+    },
+    "viewOnly": {
+      "prefix": "You are in",
+      "bold": "view-only mode",
+      "suffix": "Please contact administrator if you need edit permission."
+    },
+    "common": {
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "error": "Error",
+      "companyNotFound": "Company information not found"
+    },
+    "toast": {
+      "noEditPermission": "You do not have permission to edit. View only.",
+      "nameRequired": "Company name is required!",
+      "basicUpdateSuccess": "Company information updated successfully 🎉",
+      "basicUpdateFailed": "Update failed!",
+      "basicUpdateError": "An error occurred while updating!",
+      "noLicensePermission": "You do not have permission to upload license. View only.",
+      "licenseFileRequired": "Please select a business license file!",
+      "licensePdfOnly": "Please select a valid PDF file!",
+      "licenseUpdateSuccess": "Business license updated successfully 🎉",
+      "licenseUploadFailed": "Upload failed!",
+      "licenseUploadError": "An error occurred while uploading!"
+    },
+    "basic": {
+      "title": "Company information",
+      "subtitle": "Update name, tax code, address, contacts…",
+      "taxCode": "Tax code",
+      "taxNote": "Tax code is assigned and cannot be edited here.",
+      "name": "Company name",
+      "companySize": "Company size",
+      "sizeOptions": {
+        "placeholder": "Select company size",
+        "lt10": "Under 10 employees",
+        "b10_150": "10 - 150 employees",
+        "b150_300": "150 - 300 employees",
+        "gt300": "Over 300 employees"
+      },
+      "location": "Location",
+      "locationPlaceholder": "Select province/city",
+      "locationHelp": "Used to display company location on profile.",
+      "address": "Address",
+      "industry": "Industry",
+      "industryPlaceholder": "Select industry",
+      "email": "Contact email",
+      "phone": "Phone number",
+      "phonePlaceholder": "Ex: 028 3xxx xxx / 09xx xxx xxx",
+      "updateButton": "Update",
+      "updating": "Updating..."
+    },
+    "license": {
+      "title": "Business license",
+      "subtitle": "Upload your business license PDF with stamp or notarized copy.",
+      "currentFile": "Current license:",
+      "viewLicense": "View license",
+      "noLicense": "Business license has not been uploaded yet",
+      "dropText": "Drag & drop or click to select PDF file",
+      "noPermissionText": "You do not have permission to upload",
+      "extensionHint": "Only .pdf files are accepted",
+      "removeFile": "Remove file",
+      "uploadButton": "Upload",
+      "uploadingButton": "Uploading...",
+      "noteTitle": "Notes:",
+      "notes": {
+        "0": "Verify employer account.",
+        "1": "Build trust with job seekers.",
+        "2": "Valid license: with authority stamp; photocopy must be notarized."
+      }
+    }
+  },
+  "companiesManagement": {
+    "title": "Company list",
+    "search": {
+      "placeholder": "Search companies..."
+    },
+    "toast": {
+      "reloadSuccess": "Company list reloaded"
+    },
+    "table": {
+      "name": "Company name",
+      "taxCode": "Tax code",
+      "email": "Email",
+      "phone": "Phone number",
+      "size": "Size",
+      "createdAt": "Created at",
+      "actions": "Actions"
+    },
+    "actions": {
+      "reload": "Reload",
+      "create": "Create new company",
+      "editTooltip": "Edit"
+    }
+  },
+  "companyCreate": {
+    "header": {
+      "chip": "Create employer profile",
+      "title": "Create new company",
+      "subtitle": "Fill in the basic information of the company. Fields marked * are required."
+    },
+    "card": {
+      "title": "Company information",
+      "subtitle": "Configure name, tax code, address, contact details…",
+      "loading": "Loading data…"
+    },
+    "fields": {
+      "name": {
+        "label": "Company name",
+        "placeholder": "E.g: ABC Co., Ltd."
+      },
+      "taxCode": {
+        "label": "Tax code",
+        "placeholder": "E.g: 0312xxxxxx"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "contact@company.com"
+      },
+      "phone": {
+        "label": "Phone number",
+        "placeholder": "E.g: 028 3xxx xxx / 09xx xxx xxx"
+      },
+      "location": {
+        "label": "Province / City",
+        "placeholder": "-- Select province/city --",
+        "helper": "Used to suggest suitable job locations."
+      },
+      "industry": {
+        "label": "Industry",
+        "placeholder": "-- Select industry --",
+        "helper": "Shown to candidates as your business field."
+      },
+      "companySize": {
+        "label": "Company size",
+        "placeholder": "-- Select size --",
+        "options": {
+          "lt10": "Less than 10 employees",
+          "10_150": "10 - 150 employees",
+          "150_300": "150 - 300 employees",
+          "gt300": "More than 300 employees"
+        }
+      },
+      "address": {
+        "label": "Address",
+        "placeholder": "E.g: 123 Le Loi, Ben Thanh Ward, District 1, Ho Chi Minh City"
+      }
+    },
+    "validation": {
+      "nameRequired": "Please enter company name.",
+      "taxCodeRequired": "Please enter tax code.",
+      "emailInvalid": "Invalid email format.",
+      "phoneInvalid": "Invalid phone number."
+    },
+    "toast": {
+      "loadMetaError": "Unable to load location/industry data",
+      "createSuccess": "Company created successfully ",
+      "createErrorDefault": "Error while creating company"
+    },
+    "footer": {
+      "notice": "By creating a company, you agree to the system's terms of use.",
+      "cancel": "Cancel",
+      "submit": "Create company",
+      "submitting": "Creating..."
+    },
+    "helper": {
+      "tip": "Tip: Filling in full information increases trust with candidates."
+    }
+  },
+  "promotionModal": {
+    "title": {
+      "create": "Create promotion",
+      "edit": "Edit promotion"
+    },
+    "fields": {
+      "name": {
+        "label": "Promotion name",
+        "placeholder": "E.g: Bonus 50% points"
+      },
+      "image": {
+        "label": "Promotion image (banner)",
+        "empty": "No image",
+        "button": "Choose image",
+        "helper": "Use a horizontal image, around 800×300px, size < 1MB."
+      },
+      "code": {
+        "label": "Promotion code (optional)",
+        "placeholder": "E.g: PROMO50"
+      },
+      "isActive": {
+        "label": "Active"
+      },
+      "description": {
+        "label": "Description (visible to employers)",
+        "placeholder": "Enter a short description about this promotion…"
+      },
+      "price": {
+        "label": "Price (VND)"
+      },
+      "points": {
+        "label": "Points received"
+      },
+      "startAt": {
+        "label": "Start date"
+      },
+      "endAt": {
+        "label": "End date"
+      }
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "close": "Close"
+    },
+    "error": {
+      "save": "Error while saving promotion: {{details}}"
+    }
+  },
+  "promotion": {
+    "pageTitle": "Promotion Management",
+    "createButton": "Create promotion",
+    "fetchError": "Unable to load promotion list",
+    "confirmDelete": "Delete this promotion?",
+    "deleteError": "Unable to delete promotion",
+    "loading": "Loading data...",
+    "empty": "No promotions yet.",
+    "noLimit": "No limit",
+
+    "table": {
+      "headers": {
+        "name": "Name",
+        "price": "Price",
+        "points": "Points",
+        "validity": "Validity",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "codePrefix": "Code:",
+      "status": {
+        "active": "Active",
+        "inactive": "Disabled"
+      },
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete",
+        "deleting": "Deleting..."
+      }
+    },
+
+    "modal": {
+      "titleCreate": "Create promotion",
+      "titleEdit": "Edit promotion",
+      "close": "Close",
+
+      "fields": {
+        "name": {
+          "label": "Promotion name",
+          "required": "Please enter a promotion name."
+        },
+        "banner": {
+          "label": "Promotion image (banner)",
+          "noImage": "No image",
+          "choose": "Choose image",
+          "hint": "Use a horizontal image, around 800×300px, size < 1MB."
+        },
+        "code": {
+          "label": "Promotion code (optional)"
+        },
+        "isActive": {
+          "label": "Active"
+        },
+        "description": {
+          "label": "Description (visible to employers)"
+        },
+        "price": {
+          "label": "Price (VND)",
+          "minError": "Price must be at least 1,000 VND."
+        },
+        "points": {
+          "label": "Points received",
+          "minError": "Points must be greater than 0."
+        },
+        "startAt": {
+          "label": "Start date"
+        },
+        "endAt": {
+          "label": "End date"
+        }
+      },
+
+      "actions": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving..."
+      },
+
+      "errors": {
+        "savePrefix": "Error while saving promotion: ",
+        "unknown": "An unknown error occurred."
+      }
+    }
   }
 }

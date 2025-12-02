@@ -38,19 +38,16 @@ class ChatProvider extends ChangeNotifier {
 
   Future<void> send(String text) async {
     if (text.trim().isEmpty || _loading) return;
+
     _error = null;
     _all.add(ChatMessage(role: 'user', content: text));
+
     _loading = true;
     notifyListeners();
 
     try {
       final reply = await _service.ask(_all.map((m) => m.toJson()).toList());
-      _all.add(
-        ChatMessage(
-          role: 'assistant',
-          content: reply.isEmpty ? '(Không có nội dung)' : reply,
-        ),
-      );
+      _all.add(reply);
     } catch (e) {
       _error = 'Lỗi gọi AI: $e';
     } finally {

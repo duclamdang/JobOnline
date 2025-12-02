@@ -9,10 +9,12 @@ import {
   EditOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const CompaniesManagement: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { companies, loading } = useAppSelector((state) => state.company);
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,7 +25,7 @@ const CompaniesManagement: React.FC = () => {
 
   const handleReload = () => {
     dispatch(fetchAllCompanies(20));
-    message.success("Đã tải lại danh sách công ty");
+    message.success(t("companiesManagement.toast.reloadSuccess"));
   };
 
   const companyList = Array.isArray(companies)
@@ -35,6 +37,7 @@ const CompaniesManagement: React.FC = () => {
       c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
   const getLogoUrl = (logo: any) => {
     if (!logo) return "";
     if (typeof logo === "string") {
@@ -45,7 +48,7 @@ const CompaniesManagement: React.FC = () => {
 
   const columns = [
     {
-      title: "Tên công ty",
+      title: t("companiesManagement.table.name"),
       dataIndex: "name",
       key: "name",
       render: (_: string, record: any) => {
@@ -63,39 +66,39 @@ const CompaniesManagement: React.FC = () => {
       },
     },
     {
-      title: "Mã số thuế",
+      title: t("companiesManagement.table.taxCode"),
       dataIndex: "tax_code",
       key: "tax_code",
     },
     {
-      title: "Email",
+      title: t("companiesManagement.table.email"),
       dataIndex: "email",
       key: "email",
     },
     {
-      title: "Số điện thoại",
+      title: t("companiesManagement.table.phone"),
       dataIndex: "phone",
       key: "phone",
       render: (text: string | null) => text || "—",
     },
     {
-      title: "Quy mô",
+      title: t("companiesManagement.table.size"),
       dataIndex: "company_size",
       key: "company_size",
       render: (size: string | null) => size || "—",
     },
     {
-      title: "Ngày tạo",
+      title: t("companiesManagement.table.createdAt"),
       dataIndex: "created_at",
       key: "created_at",
       render: (date: string) => new Date(date).toLocaleDateString("vi-VN"),
     },
     {
-      title: "Hành động",
+      title: t("companiesManagement.table.actions"),
       key: "actions",
       align: "center" as const,
       render: (_: any, record: any) => (
-        <Tooltip title="Chỉnh sửa">
+        <Tooltip title={t("companiesManagement.actions.editTooltip")}>
           <Button
             type="link"
             icon={<EditOutlined />}
@@ -111,11 +114,11 @@ const CompaniesManagement: React.FC = () => {
       {/* Header */}
       <div className="mx-auto mb-6 flex max-w-6xl items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900">
-          Danh sách công ty
+          {t("companiesManagement.title")}
         </h2>
         <div className="flex items-center gap-3">
           <Input
-            placeholder="Tìm kiếm công ty..."
+            placeholder={t("companiesManagement.search.placeholder")}
             allowClear
             prefix={<SearchOutlined className="text-gray-400" />}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -129,7 +132,7 @@ const CompaniesManagement: React.FC = () => {
               onClick={handleReload}
               className="rounded-lg border border-gray-300 bg-white px-4 shadow-sm hover:border-purple-500 hover:text-purple-600"
             >
-              Tải lại
+              {t("companiesManagement.actions.reload")}
             </Button>
             <Button
               type="primary"
@@ -137,7 +140,7 @@ const CompaniesManagement: React.FC = () => {
               className="rounded-lg bg-purple-700 px-4 shadow-sm hover:bg-purple-800"
               onClick={() => navigate("/admin/companies/create")}
             >
-              Tạo công ty mới
+              {t("companiesManagement.actions.create")}
             </Button>
           </div>
         </div>

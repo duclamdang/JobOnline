@@ -9,7 +9,7 @@ class UserService
 {
     public function getAll(int $perPage = 10): array
     {
-        $users = User::paginate($perPage);
+        $users = User::orderBy('created_at', 'asc')->paginate($perPage);
 
         return [
             'success'   => true,
@@ -40,9 +40,9 @@ class UserService
 
     public function getUsers()
     {
-        $users = User::all()
-            ->where('is_active', true);
-        return $users;
+        return User::where('is_active', true)
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
 
     public function getPoints($admin)

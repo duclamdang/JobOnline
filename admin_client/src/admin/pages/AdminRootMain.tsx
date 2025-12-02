@@ -13,6 +13,7 @@ import {
 import { Line, Bar } from "react-chartjs-2";
 import { fetchDashboardData } from "@admin/store/redux/dashboardSlice";
 import { useAppDispatch, useAppSelector } from "@context/hooks";
+import { useTranslation } from "react-i18next";
 
 ChartJS.register(
   CategoryScale,
@@ -76,6 +77,7 @@ const medal = (rank: number) => {
 };
 
 const TopCompaniesTable = ({ companies }: { companies: Company[] }) => {
+  const { t } = useTranslation();
   const sorted = [...companies].sort((a, b) => b.jobs_count - a.jobs_count);
   const maxJobs = Math.max(1, ...sorted.map((c) => c.jobs_count));
 
@@ -83,7 +85,7 @@ const TopCompaniesTable = ({ companies }: { companies: Company[] }) => {
     <section className="bg-white rounded-lg shadow border border-gray-100">
       <header className="px-4 sm:px-6 py-4 border-b border-gray-100 flex items-center justify-between">
         <h4 className="text-lg font-semibold text-gray-800">
-          Xếp hạng công ty đăng nhiều việc nhất
+          {t("rootDashboard.topCompaniesTitle")}
         </h4>
       </header>
 
@@ -92,11 +94,15 @@ const TopCompaniesTable = ({ companies }: { companies: Company[] }) => {
           <thead>
             <tr className="bg-gray-50 text-gray-600">
               <th className="w-16 px-4 py-3 text-left font-medium"></th>
-              <th className="px-4 py-3 text-left font-medium">Công ty</th>
-              <th className="px-4 py-3 text-right font-medium">
-                Số lượng công việc
+              <th className="px-4 py-3 text-left font-medium">
+                {t("rootDashboard.colCompany")}
               </th>
-              <th className="px-4 py-3 text-right font-medium">Số ứng viên</th>
+              <th className="px-4 py-3 text-right font-medium">
+                {t("rootDashboard.colJobsCount")}
+              </th>
+              <th className="px-4 py-3 text-right font-medium">
+                {t("rootDashboard.colApplicantsCount")}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -108,9 +114,7 @@ const TopCompaniesTable = ({ companies }: { companies: Company[] }) => {
               return (
                 <tr
                   key={c.id}
-                  className={
-                    "group transition-colors border-t border-gray-100 hover:bg-gray-50"
-                  }
+                  className="group transition-colors border-t border-gray-100 hover:bg-gray-50"
                 >
                   <td className="px-4 py-3 align-middle">
                     <div
@@ -119,8 +123,8 @@ const TopCompaniesTable = ({ companies }: { companies: Company[] }) => {
                           ? "bg-amber-50 text-blue-700 ring-1 ring-blue-200"
                           : "bg-blue-100 text-blue-700"
                       }`}
-                      aria-label={`Hạng ${rank}`}
-                      title={`Hạng ${rank}`}
+                      aria-label={t("rootDashboard.rankLabel", { rank })}
+                      title={t("rootDashboard.rankLabel", { rank })}
                     >
                       {medal(rank)}
                     </div>
@@ -128,11 +132,9 @@ const TopCompaniesTable = ({ companies }: { companies: Company[] }) => {
 
                   <td className="px-4 py-3 align-middle">
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-3">
-                        <span className="text-gray-800 font-medium">
-                          {c.name}
-                        </span>
-                      </div>
+                      <span className="text-gray-800 font-medium">
+                        {c.name}
+                      </span>
                     </div>
                   </td>
 
@@ -168,6 +170,8 @@ const TopCompaniesTable = ({ companies }: { companies: Company[] }) => {
 
 export default function AdminRootDashboard() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
+
   const {
     jobsData,
     applicantsData,
@@ -183,77 +187,90 @@ export default function AdminRootDashboard() {
     dispatch(fetchDashboardData());
   }, [dispatch]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p>{t("common.loading")}</p>;
 
   return (
     <main className="flex-1 bg-gray-50 min-h-screen overflow-y-auto font-sans">
       <div className="max-w-6xl mx-auto p-6 space-y-8">
+        {/* SYSTEM OVERVIEW */}
         <section>
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
-            Tổng quan hệ thống
+            {t("rootDashboard.systemOverview")}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
-              title="Tổng số công việc"
+              title={t("rootDashboard.totalJobs")}
               value={generalStats.total_jobs}
             />
             <StatCard
-              title="Công việc mới (tuần)"
+              title={t("rootDashboard.newJobsWeek")}
               value={generalStats.new_jobs}
             />
             <StatCard
-              title="Tổng ứng viên"
+              title={t("rootDashboard.totalApplicants")}
               value={generalStats.new_applicants}
             />
-            <StatCard title="Tổng công ty" value={generalStats.new_companies} />
+            <StatCard
+              title={t("rootDashboard.totalCompanies")}
+              value={generalStats.new_companies}
+            />
           </div>
         </section>
+
+        {/* POINTS OVERVIEW */}
         <section>
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
-            Tổng quan nạp điểm
+            {t("rootDashboard.pointsOverview")}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
-              title="Tổng tiền đã nạp (VND)"
+              title={t("rootDashboard.totalAmount")}
               value={paymentSummary?.total_amount ?? 0}
             />
             <StatCard
-              title="Tổng điểm đã mua"
+              title={t("rootDashboard.totalPointsBought")}
               value={paymentSummary?.total_points ?? 0}
             />
             <StatCard
-              title="Tổng giao dịch nạp"
+              title={t("rootDashboard.totalOrders")}
               value={paymentSummary?.total_orders ?? 0}
             />
             <StatCard
-              title="Giao dịch thành công"
+              title={t("rootDashboard.successfulOrders")}
               value={paymentSummary?.successful_orders ?? 0}
             />
           </div>
         </section>
 
+        {/* JOB / APPLICANT CHARTS */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ChartCard title="Công việc theo tháng" type="line" data={jobsData} />
           <ChartCard
-            title="Ứng viên theo tuần"
+            title={t("rootDashboard.jobsPerMonth")}
+            type="line"
+            data={jobsData}
+          />
+          <ChartCard
+            title={t("rootDashboard.applicantsPerWeek")}
             type="bar"
             data={applicantsData}
           />
         </section>
 
+        {/* REVENUE / POINTS CHARTS */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ChartCard
-            title="Doanh thu nạp điểm theo tháng (VND)"
+            title={t("rootDashboard.revenuePerMonth")}
             type="line"
             data={revenuePerMonthData}
           />
           <ChartCard
-            title="Điểm đã mua theo tháng"
+            title={t("rootDashboard.pointsPerMonth")}
             type="line"
             data={pointPerMonthData}
           />
         </section>
 
+        {/* TOP COMPANIES */}
         <TopCompaniesTable companies={topCompanies} />
       </div>
     </main>

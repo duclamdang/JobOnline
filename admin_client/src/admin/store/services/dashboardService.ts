@@ -1,5 +1,5 @@
 import { apiAuth } from "../../../services/api";
-
+import i18n from "../../../i18n";
 export const dashboardService = {
   fetchRootDashboardData: async () => {
     const [
@@ -20,12 +20,13 @@ export const dashboardService = {
       }),
       apiAuth.get("/admin/dashboard/top-companies", { withCredentials: true }),
       apiAuth.get("/admin/dashboard/total-jobs", { withCredentials: true }),
-      apiAuth.get("/admin/dashboard/new-jobs-week", { withCredentials: true }),
+      apiAuth.get("/admin/dashboard/new-jobs-week", {
+        withCredentials: true,
+      }),
       apiAuth.get("/admin/dashboard/total-companies", {
         withCredentials: true,
       }),
       apiAuth.get("/admin/dashboard/total-users", { withCredentials: true }),
-
       apiAuth.get("/admin/dashboard/revenue-per-month", {
         withCredentials: true,
       }),
@@ -42,7 +43,7 @@ export const dashboardService = {
         labels: jobsRes.data.labels ?? [],
         datasets: [
           {
-            label: "Số lượng công việc",
+            label: i18n.t("rootDashboard.dataset.jobsCount"),
             data: jobsRes.data.data ?? [],
             borderColor: "#3b82f6",
             backgroundColor: "rgba(59,130,246,0.3)",
@@ -54,7 +55,7 @@ export const dashboardService = {
         labels: applicantsRes.data.labels ?? [],
         datasets: [
           {
-            label: "Số lượng ứng viên",
+            label: i18n.t("rootDashboard.dataset.applicantsCount"),
             data: applicantsRes.data.data ?? [],
             backgroundColor: "#3b82f6",
           },
@@ -74,7 +75,7 @@ export const dashboardService = {
         labels: revenuePerMonthRes.data.labels ?? [],
         datasets: [
           {
-            label: "Doanh thu nạp điểm (VND)",
+            label: i18n.t("rootDashboard.dataset.revenueTopup"),
             data: revenuePerMonthRes.data.data ?? [],
             borderColor: "#22c55e",
             backgroundColor: "rgba(34,197,94,0.3)",
@@ -86,7 +87,7 @@ export const dashboardService = {
         labels: pointsPerMonthRes.data.labels ?? [],
         datasets: [
           {
-            label: "Điểm đã mua",
+            label: i18n.t("rootDashboard.dataset.pointsBought"),
             data: pointsPerMonthRes.data.data ?? [],
             borderColor: "#f97316",
             backgroundColor: "rgba(249,115,22,0.3)",
@@ -145,7 +146,7 @@ export const dashboardService = {
       labels: applicantsPerWeekRes.data.labels ?? [],
       datasets: [
         {
-          label: "Số lượng ứng viên",
+          label: i18n.t("employerDashboard.dataset.applicantsCount"),
           data: applicantsPerWeekRes.data.data ?? [],
           borderColor: "#3b82f6",
           backgroundColor: "rgba(59,130,246,0.3)",
@@ -164,7 +165,7 @@ export const dashboardService = {
       labels: jobsByStatusRes.data.labels ?? [],
       datasets: [
         {
-          label: "Công việc theo trạng thái",
+          label: i18n.t("employerDashboard.dataset.jobsByStatus"),
           data: jobsByStatusRes.data.data ?? [],
           backgroundColor: [
             "rgba(59,130,246,0.6)",
@@ -176,12 +177,11 @@ export const dashboardService = {
       ],
     };
 
-    // chart doanh thu theo tháng
     const revenuePerMonthData = {
       labels: revenuePerMonthRes.data.labels ?? [],
       datasets: [
         {
-          label: "Doanh thu mua điểm (VND)",
+          label: i18n.t("employerDashboard.dataset.revenueBuyPoints"),
           data: revenuePerMonthRes.data.data ?? [],
           borderColor: "#22c55e",
           backgroundColor: "rgba(34,197,94,0.3)",
@@ -194,7 +194,7 @@ export const dashboardService = {
       labels: pointPerMonthRes.data.labels ?? [],
       datasets: [
         {
-          label: "Số điểm đã mua",
+          label: i18n.t("employerDashboard.dataset.pointsBought"),
           data: pointPerMonthRes.data.data ?? [],
           borderColor: "#a855f7",
           backgroundColor: "rgba(168,85,247,0.3)",

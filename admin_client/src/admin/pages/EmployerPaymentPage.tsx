@@ -10,7 +10,7 @@ export default function EmployerPaymentPage() {
       setLoading(true);
       const { payUrl } = await createEmployerPayment(amount, method);
       if (payUrl) {
-        window.location.href = payUrl; // redirect sang Momo/VNPAY
+        window.location.href = payUrl;
       } else {
         alert("Không tạo được link thanh toán");
       }

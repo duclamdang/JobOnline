@@ -40,7 +40,11 @@
     "loginRegister": "Đăng ký/Đăng nhập",
     "forEmployer": "Dành cho",
     "employer": "Nhà Tuyển Dụng",
-    "goTo": "Đi tới trang của"
+    "goTo": "Đi tới trang của",
+    "loading": "Đang tải...",
+    "notLoggedIn": "Chưa đăng nhập",
+    "viewProfile": "Xem thông tin",
+    "logout": "Đăng xuất"
   },
   "footer": {
     "jobSeekerHotline": "Hotline cho Người tìm việc",
@@ -75,7 +79,7 @@
     "downloadApp": "Tải ứng dụng trên điện thoại",
 
     "member": "Member of SieuViet",
-    "copyright": "© 2025 - Bản quyền thuộc về SieuViet Group"
+    "copyright": "© 2025 - Bản quyền thuộc về Job Online"
   },
   "login": {
     "title": "Nhà tuyển dụng đăng nhập",
@@ -87,6 +91,888 @@
     "forgotPassword": "Quên mật khẩu?",
     "newEmployer": "Bạn là nhà tuyển dụng mới?",
     "register": "Đăng ký tài khoản",
-    "adminTitle": "Nhà quản trị đăng nhập"
+    "adminTitle": "Nhà quản trị đăng nhập",
+    "description": "Quản lý các bài đăng tuyển dụng, ứng viên và nhà tuyển dụng một cách tập trung, trực quan và hiệu quả.",
+    "feature1": "Theo dõi hiệu quả tuyển dụng theo thời gian thực",
+    "feature2": "Quản lý điểm, gói dịch vụ & thanh toán",
+    "feature3": "Tích hợp chatbot hỗ trợ tuyển dụng thông minh"
+  },
+
+  "register":{
+    "title": "Đăng ký tài khoản nhà tuyển dụng",
+    "employerRegistration": "Đăng ký nhà tuyển dụng",
+    "accountInformation":"Thông tin công ty",
+    "name": "Họ và tên",
+    "enterName":"Điền họ và tên",
+    "email": "Email",
+    "enterEmail": "Nhập email",
+    "password": "Mật khẩu",
+    "enterPassword": "Nhập mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "enterconfirmPassword": "Nhập lại mật khẩu",
+    "register": "Đăng ký tài khoản",
+    "adminTitle": "Nhà quản trị đăng nhập",
+    "companyInformation": "Thông tin công ty",
+    "companyName": "Tên công ty",
+    "entercompanyName": "Nhập tên công ty",
+    "businessLicense":"Theo giấy phép kinh doanh",
+    "taxCode":"Mã số thuế",
+    "entertaxCode":"Nhập mã số thuế (10 hoặc 13 ký tự)",
+    "loading":"Đang tải...",
+    "location": "Địa điểm",
+    "enterLocation": "Chọn tỉnh, thành phố",
+    "fieldOfOperation": "Lĩnh vực hoạt động",
+    "enterfieldOfOperation": "Chọn lĩnh vực",
+    "login":"Đăng nhập",
+    "haveAccount": "Bạn đã có tài khoản",
+    "completeRegistration":"Hoàn thành đăng ký",
+    "processing":"Đang xử lý ...",
+    "termsOfUse": "Điều khoản sử dụng",
+    "feature1": "Thu hút ứng viên chất lượng trên JobOnline",
+    "feature2": "Tạo tài khoản nhà tuyển dụng để đăng tin tuyển dụng, quản lý ứng viên và sử dụng các gói dịch vụ của JobOnline một cách chuyên nghiệp.",
+    "feature3": "Vui lòng điền đầy đủ thông tin để bắt đầu sử dụng hệ thống JobOnline.",
+    "feature4": "Đăng tin tuyển dụng nhanh chóng, dễ dàng",
+    "feature5": "Quản lý hồ sơ ứng viên tập trung",
+    "feature6": "Theo dõi hiệu quả tuyển dụng theo thời gian thực",
+    "feature7": "Bằng việc nhấn nút đăng ký, bạn đồng ý với"
+  },
+  "sidebar": {
+    "dashboard": "Bảng tin",
+    "dashboardStats": "Thống kê",
+    "dashboardReports": "Báo cáo",
+    "job": "Công việc",
+    "jobList": "Danh sách công việc",
+    "jobAdd": "Thêm công việc",
+    "candidate": "Ứng viên",
+    "candidateList": "Danh sách ứng viên",
+    "candidateSearch": "Tìm kiếm ứng viên",
+    "myAccount": "Tài khoản của tôi",
+    "profile": "Hồ sơ cá nhân",
+    "branding": "Quản bá thương hiệu",
+    "accountManage": "Quản lý tài khoản",
+    "candidateAccount": "Tài khoản ứng viên",
+    "employerAccount": "Tài khoản nhà tuyển dụng",
+    "company": "Công ty",
+    "companyList": "Danh sách công ty",
+    "companyCreate": "Thêm mới công ty",
+    "services": "Dịch vụ",
+    "servicePackages": "Gói dịch vụ",
+    "promotions": "Khuyến mãi",
+    "support": "Hỗ trợ",
+    "helpCenter": "Trung tâm trợ giúp",
+    "contact": "Liên hệ"
+  },
+  "common": {
+    "loading": "Đang tải..."
+  },
+  "rootDashboard": {
+    "systemOverview": "Tổng quan hệ thống",
+    "pointsOverview": "Tổng quan nạp điểm",
+
+    "totalJobs": "Tổng số công việc",
+    "newJobsWeek": "Công việc mới (tuần)",
+    "totalApplicants": "Tổng ứng viên",
+    "totalCompanies": "Tổng công ty",
+
+    "totalAmount": "Tổng tiền đã nạp (VND)",
+    "totalPointsBought": "Tổng điểm đã mua",
+    "totalOrders": "Tổng giao dịch nạp",
+    "successfulOrders": "Giao dịch thành công",
+
+    "jobsPerMonth": "Công việc theo tháng",
+    "applicantsPerWeek": "Ứng viên theo tuần",
+    "revenuePerMonth": "Doanh thu nạp điểm theo tháng (VND)",
+    "pointsPerMonth": "Điểm đã mua theo tháng",
+
+    "topCompaniesTitle": "Xếp hạng công ty đăng nhiều việc nhất",
+    "colCompany": "Công ty",
+    "colJobsCount": "Số lượng công việc",
+    "colApplicantsCount": "Số ứng viên",
+    "rankLabel": "Hạng {{rank}}",
+    "dataset": {
+      "jobsCount": "Số lượng công việc",
+      "applicantsCount": "Số lượng ứng viên",
+      "revenueTopup": "Doanh thu nạp điểm (VND)",
+      "pointsBought": "Điểm đã mua"
+    }
+  },
+  "employerDashboard": {
+    "dataset": {
+      "applicantsCount": "Số lượng ứng viên",
+      "jobsByStatus": "Công việc theo trạng thái",
+      "revenueBuyPoints": "Doanh thu mua điểm (VND)",
+      "pointsBought": "Số điểm đã mua"
+    },
+    "totalJobs": "Tổng số công việc",
+    "newJobsWeek": "Công việc mới trong tuần",
+    "newJobsMonth": "Công việc mới trong tháng",
+
+    "totalAmount": "Tổng tiền đã nạp (VND)",
+    "totalPointsBought": "Tổng điểm đã mua",
+    "totalOrders": "Tổng số giao dịch nạp",
+    "successfulOrders": "Giao dịch thành công",
+
+    "applicantsPerWeek": "Ứng viên theo tuần",
+    "jobsByStatus": "Công việc theo trạng thái",
+    "revenuePerMonth": "Doanh thu mua điểm theo tháng (VND)",
+    "pointsPerMonth": "Điểm đã mua theo tháng"
+  },
+  "profilePage": {
+    "tabs": {
+      "accountInfo": "Thông tin tài khoản",
+      "companyInfo": "Thông tin công ty"
+    },
+    "sections": {
+      "loginInfo": "Thông tin đăng nhập",
+      "contactInfo": "Thông tin liên hệ",
+      "avatar": "Ảnh đại diện"
+    },
+    "labels": {
+      "email": "Địa chỉ email",
+      "password": "Mật khẩu",
+      "fullName": "Họ và tên",
+      "phone": "Số điện thoại",
+      "contactEmail": "Email liên hệ",
+      "address": "Địa chỉ liên hệ (không bắt buộc)"
+    },
+    "placeholders": {
+      "fullName": "VD: Nguyễn Văn A",
+      "phone": "VD: 0912345678",
+      "address": "Nhập địa chỉ…"
+    },
+    "notes": {
+      "addressNote": "Giúp nhà tuyển dụng liên hệ khi cần.",
+      "avatarNote": "Tải ảnh rõ nét, tỉ lệ 1:1 (PNG/JPG, <= 5MB)."
+    },
+    "buttons": {
+      "changePassword": "Thay đổi mật khẩu",
+      "cancel": "Hủy",
+      "update": "Cập nhật",
+      "updating": "Đang cập nhật...",
+      "changeAvatar": "Thay đổi ảnh",
+      "removeAvatar": "Bỏ chọn ảnh"
+    },
+    "toast": {
+      "error":"Lỗi",
+      "updateSuccess": "Cập nhật thành công! ",
+      "updateFail": "Cập nhật thất bại!",
+      "updateError": "Có lỗi xảy ra khi cập nhật!",
+      "passwordSuccess": "Đổi mật khẩu thành công ",
+      "passwordFail": "Đổi mật khẩu thất bại!",
+      "passwordError": "Có lỗi xảy ra khi đổi mật khẩu!",
+      "invalidPhone": "Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0).",
+      "missingName": "Vui lòng nhập họ và tên.",
+      "avatarTooLarge": "Ảnh quá lớn (tối đa 5MB)"
+    },
+    "feature":"Cập nhật thông tin liên hệ và bảo mật."
+  },
+  "jobPage": {
+    "title": "Quản lý công việc",
+    "addJobButton": "Thêm công việc",
+    "columns": {
+      "job": "Công việc",
+      "salary": "Mức lương",
+      "location": "Tỉnh/TP",
+      "status": "Trạng thái",
+      "actions": "Hành động"
+    },
+    "salary": {
+      "negotiable": "Thỏa thuận",
+      "notUpdated": "Chưa cập nhật"
+    },
+    "status": {
+      "active": "Còn tuyển",
+      "inactive": "Ngưng tuyển"
+    },
+    "toast": {
+      "toggleStatusSuccess": "Đã chuyển sang trạng thái: {{status}}",
+      "toggleStatusError": "Không thể đổi trạng thái công việc!"
+    }
+  },
+  "jobEditor": {
+    "catalogError": "Không thể tải dữ liệu danh mục!",
+    "districtError": "Không thể tải danh sách quận/huyện!",
+    "validationTitle": "Vui lòng kiểm tra:",
+    "updateSuccess": "Cập nhật công việc thành công!",
+    "updateFail": "Cập nhật công việc thất bại!",
+    "createSuccess": "Tạo công việc thành công!",
+    "createFail": "Tạo công việc thất bại!",
+    "notFound": "Không tìm thấy dữ liệu.",
+    "noLogo": "Không có logo",
+    "errorPrefix": "Lỗi"
+  },
+   "jobForm": {
+    "sections": {
+      "basicInfo": "Thông tin cơ bản",
+      "recruitmentInfo": "Thông tin tuyển dụng",
+      "skills": "Kỹ năng",
+      "benefits": "Phúc lợi"
+    },
+    "fields": {
+      "title": "Tiêu đề công việc",
+      "expiredAt": "Ngày hết hạn",
+      "salaryNegotiable": "Lương thỏa thuận",
+      "salaryFrom": "Lương từ",
+      "salaryTo": "Lương đến",
+      "province": "Tỉnh/TP",
+      "district": "Quận/Huyện",
+      "address": "Địa chỉ chi tiết",
+      "quantity": "Số lượng tuyển",
+      "workingForm": "Hình thức làm việc",
+      "experience": "Kinh nghiệm",
+      "education": "Trình độ",
+      "position": "Vị trí",
+      "workField": "Lĩnh vực",
+      "status": "Trạng thái",
+      "priority": "Mức độ ưu tiên",
+      "gender": "Giới tính",
+      "skillsWithHint": "Kỹ năng (ngăn cách bằng dấu ,)",
+      "description": "Mô tả công việc",
+      "requirements": "Yêu cầu",
+      "benefits": "Phúc lợi"
+    },
+    "placeholders": {
+      "address": "VD: 23 Trần Cao Vân, phường Đa Kao"
+    },
+    "select": {
+      "placeholder": "-- Chọn --"
+    },
+    "options": {
+      "statusActive": "Còn tuyển",
+      "statusInactive": "Ngưng tuyển",
+      "priorityUrgent": "Gấp",
+      "priorityNormal": "Không gấp",
+      "genderAny": "Không yêu cầu",
+      "genderMale": "Nam",
+      "genderFemale": "Nữ"
+    },
+    "buttons": {
+      "close": "Đóng",
+      "save": "Lưu"
+    }
+  },
+  "candidatePage": {
+    "title": "Danh sách ứng viên",
+    "downloadButton": "Tải danh sách",
+    "filter": {
+      "allJobs": "Tất cả tin đăng"
+    },
+    "table": {
+      "profileName": "Tên hồ sơ",
+      "jobTitle": "Tin đăng",
+      "appliedAt": "Thời gian nộp",
+      "status": "Trạng thái",
+      "actions": "Hành động"
+    },
+    "status": {
+      "pending": "Chờ duyệt",
+      "accepted": "Chấp nhận",
+      "rejected": "Từ chối",
+      "interview": "Phỏng vấn",
+      "offer": "Đề nghị nhận việc",
+      "hired": "Đã nhận việc",
+      "unknown": "Không xác định"
+    },
+    "toast": {
+      "updateStatusSuccess": "Cập nhật trạng thái thành công!",
+      "updateStatusFail": "Cập nhật trạng thái thất bại!"
+    },
+    "excel": {
+      "sheetName": "Ứng viên",
+      "filePrefix": "Danh_sach_ung_vien_",
+      "noData": "Không có dữ liệu để tải!",
+      "success": "Tải danh sách thành công!",
+      "columns": {
+        "index": "STT",
+        "name": "Tên ứng viên",
+        "email": "Email",
+        "jobTitle": "Tin đăng",
+        "status": "Trạng thái",
+        "appliedAt": "Ngày nộp"
+      }
+    }
+  },
+  "trademarkPage": {
+    "banner": {
+      "viewOnly": "Bạn đang ở chế độ chỉ xem. Vui lòng liên hệ quản trị viên nếu cần quyền chỉnh sửa."
+    },
+    "messages": {
+      "companyNotFound": "Không tìm thấy thông tin công ty"
+    },
+    "sections": {
+      "intro": {
+        "title": "Giới thiệu công ty",
+        "subtitle": "Mô tả, website và năm thành lập.",
+        "descriptionLabel": "Giới thiệu doanh nghiệp",
+        "websiteLabel": "Website",
+        "websitePlaceholder": "https://example.com",
+        "websiteHint": "Nhập link đầy đủ để ứng viên có thể truy cập.",
+        "foundedYearLabel": "Năm thành lập",
+        "foundedYearPlaceholder": "VD: {{year}}"
+      },
+      "images": {
+        "title": "Ảnh công ty",
+        "subtitle": "Ảnh bìa và logo thương hiệu (PNG/JPG, ≤ 5MB).",
+        "noCover": "Chưa có ảnh bìa",
+        "changeCover": "Đổi ảnh bìa",
+        "coverFilePrefix": "Cover:",
+        "logoFilePrefix": "Logo:",
+        "removeCoverTitle": "Bỏ chọn cover",
+        "removeLogoTitle": "Bỏ chọn logo",
+        "tipsTitle": "Gợi ý:",
+        "tip1": "Ảnh bìa ngang, tối thiểu 1200×400 để hiển thị sắc nét.",
+        "tip2": "Logo nên là hình vuông hoặc PNG nền trong suốt.",
+        "tip3": "Kích thước tối đa mỗi ảnh 5MB."
+      }
+    },
+    "buttons": {
+      "savingLabel": "Đang lưu…",
+      "savingInfo": "Đang lưu...",
+      "saveInfo": "Cập nhật thông tin",
+      "savingImages": "Đang cập nhật...",
+      "saveImages": "Cập nhật hình ảnh"
+    },
+    "toast": {
+      "invalidWebsite": "Website không hợp lệ (ví dụ: https://example.com)",
+      "invalidFoundedYear": "Năm thành lập phải là số từ 1800 đến {{year}}",
+      "updateInfoSuccess": "Cập nhật thông tin bổ sung thành công ",
+      "updateInfoFail": "Cập nhật thất bại!",
+      "updateInfoError": "Có lỗi xảy ra khi cập nhật thông tin bổ sung!",
+      "coverTooLarge": "Ảnh bìa quá lớn (tối đa 5MB)",
+      "logoTooLarge": "Logo quá lớn (tối đa 5MB)",
+      "noImageSelected": "Vui lòng chọn logo hoặc ảnh bìa cần cập nhật",
+      "updateImageSuccess": "Cập nhật hình ảnh công ty thành công ",
+      "updateImageFail": "Cập nhật thất bại!",
+      "updateImageError": "Có lỗi xảy ra khi cập nhật hình ảnh!"
+    }
+  },
+  "employerPaymentPage": {
+    "result": {
+      "successTitle": "Mua điểm thành công",
+      "failTitle": "Mua điểm không thành công",
+      "successBadge": "Thanh toán hoàn tất",
+      "failBadge": "Thanh toán thất bại",
+      "orderCode": "Mã đơn hàng",
+      "amount": "Số tiền",
+      "points": "Số điểm",
+      "successDescription": "Điểm đã được cộng vào tài khoản tuyển dụng của bạn. Bạn có thể sử dụng để đăng tin và nâng cấp dịch vụ ngay.",
+      "failDescription": "Có lỗi xảy ra trong quá trình thanh toán. Điểm chưa được cộng vào tài khoản. Vui lòng thử lại hoặc liên hệ hỗ trợ nếu cần.",
+      "buyMore": "Mua thêm điểm",
+      "backToDashboard": "Quay về trang quản trị"
+    },
+    "form": {
+      "title": "Mua điểm dịch vụ",
+      "packages": {
+        "smallTitle": "Gói 100.000đ",
+        "smallDesc": "~ 100 điểm",
+        "mediumTitle": "Gói 300.000đ",
+        "mediumDesc": "~ 300 điểm",
+        "largeTitle": "Gói 500.000đ",
+        "largeDesc": "~ 500 điểm"
+      },
+      "customLabel": "Hoặc nhập số tiền khác (VND)",
+      "rateText": "1.000đ ≈ 1 điểm. Số điểm dự kiến:",
+      "summaryAmount": "Số tiền thanh toán",
+      "summaryPoints": "Số điểm nhận được",
+      "pointsUnit": "điểm",
+      "submit": "Thanh toán qua VNPAY",
+      "submitLoading": "Đang tạo thanh toán...",
+      "note": "Sau khi thanh toán thành công, điểm sẽ được cộng trực tiếp vào tài khoản tuyển dụng của bạn."
+    },
+    "validation": {
+      "minAmount": "Số tiền phải từ 10.000đ trở lên"
+    },
+    "toast": {
+      "createFail": "Không tạo được thanh toán, vui lòng thử lại.",
+      "createError": "Có lỗi khi tạo thanh toán, vui lòng thử lại."
+    }
+  },
+  "promotionPage": {
+    "title": "Khuyến mãi",
+    "loading": "Đang tải khuyến mãi...",
+    "overlayRedirect": "Đang chuyển đến cổng thanh toán...",
+    "tag": "Khuyến mãi",
+    "labels": {
+      "price": "Giá",
+      "points": "Điểm nhận được"
+    },
+    "button": {
+      "pay": "Thanh toán khuyến mãi này"
+    }
+  },
+  "usersManagement": {
+    "title": "Danh sách người dùng",
+    "searchPlaceholder": "Tìm kiếm người dùng...",
+    "buttons": {
+      "reload": "Tải lại"
+    },
+    "columns": {
+      "name": "Tên người dùng",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "phoneEmpty": "—",
+      "createdAt": "Ngày tạo",
+      "actions": "Hành động"
+    },
+    "tooltip": {
+      "viewDetail": "Xem chi tiết"
+    },
+    "toast": {
+      "reloadSuccess": "Đã tải lại danh sách người dùng"
+    }
+  },
+   "userDetail": {
+    "title": "Thông tin chi tiết người dùng",
+    "fields": {
+      "phone": "Số điện thoại",
+      "address": "Địa chỉ",
+      "birthday": "Ngày sinh",
+      "gender": "Giới tính",
+      "workField": "Ngành nghề",
+      "province": "Tỉnh / Thành phố",
+      "workingForm": "Hình thức làm việc",
+      "experience": "Kinh nghiệm",
+      "education": "Trình độ học vấn",
+      "position": "Chức vụ hiện tại",
+      "desiredPosition": "Vị trí mong muốn",
+      "desiredSalary": "Mức lương mong muốn",
+      "jobSearchStatus": "Trạng thái tìm việc"
+    }
+  },
+  "adminsManagement": {
+    "title": "Danh sách Nhà tuyển dụng",
+    "searchPlaceholder": "Tìm kiếm admin...",
+    "reload": "Tải lại",
+    "toast": {
+      "reloadSuccess": "Đã tải lại danh sách admin",
+      "toggleSuccess": "Cập nhật trạng thái thành công",
+      "toggleError": "Cập nhật trạng thái thất bại"
+    },
+    "table": {
+      "name": "Tên Nhà tuyển dụng",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "company": "Công ty",
+      "role": "Vai trò",
+      "status": "Trạng thái",
+      "createdAt": "Ngày tạo",
+      "actions": "Hành động",
+      "active": "Hoạt động",
+      "inactive": "Khoá",
+      "toggleTooltip": "Chỉnh sửa trạng thái"
+    }
+  },
+  "companyManagement": {
+    "header": {
+      "title": "Quản lý công ty:",
+      "back": "← Quay lại"
+    },
+    "tabs": {
+      "basic": "Thông tin cơ bản",
+      "license": "Giấy phép",
+      "additional": "Giới thiệu",
+      "images": "Hình ảnh"
+    },
+    "common": {
+      "saving": "Đang lưu…",
+      "uploading": "Đang tải…",
+      "cancel": "Hủy",
+      "errorLabel": "Lỗi",
+      "notFound": "Không tìm thấy công ty"
+    },
+    "toast": {
+      "basicNameRequired": "Tên công ty không được để trống!",
+      "basicUpdateSuccess": "Cập nhật thông tin cơ bản thành công 🎉",
+      "basicUpdateError": "Lỗi khi cập nhật thông tin cơ bản!",
+      "licenseSelectWarning": "Vui lòng chọn file PDF hợp lệ!",
+      "licenseUpdateSuccess": "Cập nhật giấy phép kinh doanh thành công 🎉",
+      "licenseUpdateError": "Lỗi khi tải lên giấy phép!",
+      "additionalUpdateSuccess": "Cập nhật thông tin bổ sung thành công 🎉",
+      "additionalUpdateError": "Lỗi khi cập nhật thông tin bổ sung!",
+      "imagesUpdateSuccess": "Cập nhật hình ảnh thành công 🎉",
+      "imagesUpdateError": "Lỗi khi cập nhật hình ảnh!"
+    },
+    "sections": {
+      "basic": {
+        "title": "Thông tin cơ bản",
+        "subtitle": "Tên, MST, quy mô, địa chỉ, liên hệ…"
+      }
+    },
+    "basic": {
+      "taxCode": "Mã số thuế",
+      "taxNote": "MST không thể chỉnh sửa tại đây.",
+      "name": "Tên công ty ",
+      "companySize": "Quy mô nhân sự",
+      "sizeOptions": {
+        "placeholder": "Chọn quy mô",
+        "lt10": "Dưới 10 nhân viên",
+        "b10_150": "10 - 150 nhân viên",
+        "b150_300": "150 - 300 nhân viên",
+        "gt300": "Trên 300 nhân viên"
+      },
+      "location": "Tỉnh/Thành",
+      "locationPlaceholder": "Chọn tỉnh/thành",
+      "address": "Địa chỉ",
+      "industry": "Lĩnh vực hoạt động",
+      "industryPlaceholder": "Chọn lĩnh vực",
+      "email": "Địa chỉ email liên hệ",
+      "phone": "Điện thoại cố định",
+      "phonePlaceholder": "VD: 028 3xxx xxx / 09xx xxx xxx",
+      "updateButton": "Cập nhật thông tin",
+      "updating": "Đang cập nhật..."
+    },
+    "license": {
+      "title": "Giấy phép kinh doanh",
+      "subtitle": "Tải lên bản PDF GPKD có dấu giáp lai hoặc công chứng.",
+      "currentFile": "Giấy phép hiện tại:",
+      "viewLicense": "Xem giấy phép",
+      "noLicense": "Chưa cập nhật giấy phép kinh doanh",
+      "dropText": "Kéo thả hoặc nhấn để chọn file PDF",
+      "extensionHint": "Chỉ chấp nhận định dạng .pdf",
+      "removeFile": "Xóa file",
+      "uploadButton": "Tải lên",
+      "uploadingButton": "Đang tải lên...",
+      "noteTitle": "Lưu ý:",
+      "notes": {
+        "0": "Chứng thực tài khoản doanh nghiệp.",
+        "1": "Tạo lòng tin với Người Tìm Việc.",
+        "2": "GPKD hợp lệ: có dấu giáp lai; nếu là bản photo phải có dấu công chứng."
+      }
+    },
+    "additional": {
+      "title": "Giới thiệu công ty",
+      "subtitle": "Mô tả, website và năm thành lập.",
+      "descriptionLabel": "Giới thiệu doanh nghiệp",
+      "websiteLabel": "Website",
+      "websitePlaceholder": "https://example.com",
+      "foundedYearLabel": "Năm thành lập",
+      "foundedYearPlaceholder": "VD: 2015",
+      "updateButton": "Cập nhật thông tin",
+      "updating": "Đang lưu..."
+    },
+    "images": {
+      "title": "Ảnh công ty",
+      "subtitle": "Ảnh bìa và logo thương hiệu (PNG/JPG, ≤ 5MB).",
+      "noCover": "Chưa có ảnh bìa",
+      "changeCover": "Đổi ảnh bìa",
+      "coverChip": "Cover:",
+      "removeCoverTitle": "Bỏ chọn cover",
+      "logoChip": "Logo:",
+      "removeLogoTitle": "Bỏ chọn logo",
+      "updateButton": "Cập nhật hình ảnh",
+      "updating": "Đang cập nhật...",
+      "hintTitle": "Gợi ý:",
+      "hints": {
+        "0": "Ảnh bìa ngang, tối thiểu 1200×400 để hiển thị sắc nét.",
+        "1": "Logo nên là hình vuông hoặc PNG nền trong suốt.",
+        "2": "Kích thước tối đa mỗi ảnh 5MB."
+      }
+    }
+  },
+  "companyPage": {
+    "tabs": {
+      "account": "Thông tin tài khoản",
+      "company": "Thông tin công ty"
+    },
+    "viewOnly": {
+      "prefix": "Bạn đang ở",
+      "bold": "chế độ chỉ xem",
+      "suffix": "Vui lòng liên hệ quản trị viên nếu cần quyền chỉnh sửa."
+    },
+    "common": {
+      "saving": "Đang lưu…",
+      "cancel": "Hủy",
+      "error": "Lỗi",
+      "companyNotFound": "Không tìm thấy thông tin công ty"
+    },
+    "toast": {
+      "noEditPermission": "Bạn không có quyền chỉnh sửa. Chỉ được xem.",
+      "nameRequired": "Tên công ty không được để trống!",
+      "basicUpdateSuccess": "Cập nhật thông tin công ty thành công 🎉",
+      "basicUpdateFailed": "Cập nhật thất bại!",
+      "basicUpdateError": "Có lỗi xảy ra khi cập nhật!",
+      "noLicensePermission": "Bạn không có quyền tải lên giấy phép. Chỉ được xem.",
+      "licenseFileRequired": "Vui lòng chọn file giấy phép kinh doanh!",
+      "licensePdfOnly": "Vui lòng chọn file PDF hợp lệ!",
+      "licenseUpdateSuccess": "Cập nhật giấy phép kinh doanh thành công 🎉",
+      "licenseUploadFailed": "Tải lên thất bại!",
+      "licenseUploadError": "Có lỗi xảy ra khi tải lên!"
+    },
+    "basic": {
+      "title": "Thông tin công ty",
+      "subtitle": "Cập nhật tên, MST, địa chỉ, liên hệ…",
+      "taxCode": "Mã số thuế",
+      "taxNote": "MST được cấp và không thể chỉnh sửa tại đây.",
+      "name": "Tên công ty",
+      "companySize": "Quy mô nhân sự",
+      "sizeOptions": {
+        "placeholder": "Chọn quy mô",
+        "lt10": "Dưới 10 nhân viên",
+        "b10_150": "10 - 150 nhân viên",
+        "b150_300": "150 - 300 nhân viên",
+        "gt300": "Trên 300 nhân viên"
+      },
+      "location": "Địa điểm",
+      "locationPlaceholder": "Chọn tỉnh/thành",
+      "locationHelp": "Phục vụ hiển thị vị trí trên hồ sơ công ty.",
+      "address": "Địa chỉ",
+      "industry": "Lĩnh vực hoạt động",
+      "industryPlaceholder": "Chọn lĩnh vực",
+      "email": "Địa chỉ email liên hệ",
+      "phone": "Điện thoại cố định",
+      "phonePlaceholder": "VD: 028 3xxx xxx / 09xx xxx xxx",
+      "updateButton": "Cập nhật",
+      "updating": "Đang cập nhật..."
+    },
+    "license": {
+      "title": "Giấy phép kinh doanh",
+      "subtitle": "Tải lên bản PDF GPKD có dấu giáp lai hoặc công chứng.",
+      "currentFile": "Giấy phép hiện tại:",
+      "viewLicense": "Xem giấy phép",
+      "noLicense": "Chưa cập nhật giấy phép kinh doanh",
+      "dropText": "Kéo thả hoặc nhấn để chọn file PDF",
+      "noPermissionText": "Bạn không có quyền tải lên",
+      "extensionHint": "Chỉ chấp nhận định dạng .pdf",
+      "removeFile": "Xóa file",
+      "uploadButton": "Tải lên",
+      "uploadingButton": "Đang tải lên...",
+      "noteTitle": "Lưu ý:",
+      "notes": {
+        "0": "Chứng thực tài khoản doanh nghiệp.",
+        "1": "Tạo lòng tin với Người Tìm Việc.",
+        "2": "GPKD hợp lệ: có dấu giáp lai cơ quan thẩm quyền; nếu là bản photo phải có dấu công chứng."
+      }
+    }
+  },
+  "companiesManagement": {
+    "title": "Danh sách công ty",
+    "search": {
+      "placeholder": "Tìm kiếm công ty..."
+    },
+    "toast": {
+      "reloadSuccess": "Đã tải lại danh sách công ty"
+    },
+    "table": {
+      "name": "Tên công ty",
+      "taxCode": "Mã số thuế",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "size": "Quy mô",
+      "createdAt": "Ngày tạo",
+      "actions": "Hành động"
+    },
+    "actions": {
+      "reload": "Tải lại",
+      "create": "Tạo công ty mới",
+      "editTooltip": "Chỉnh sửa"
+    }
+  },
+  "companyCreate": {
+    "header": {
+      "chip": "Tạo hồ sơ doanh nghiệp",
+      "title": "Tạo công ty mới",
+      "subtitle": "Điền thông tin cơ bản của doanh nghiệp. Các trường có dấu * là bắt buộc."
+    },
+    "card": {
+      "title": "Thông tin công ty",
+      "subtitle": "Cấu hình tên, MST, địa chỉ, liên hệ…",
+      "loading": "Đang tải dữ liệu…"
+    },
+    "fields": {
+      "name": {
+        "label": "Tên công ty",
+        "placeholder": "VD: Công ty ABC"
+      },
+      "taxCode": {
+        "label": "Mã số thuế",
+        "placeholder": "VD: 0312xxxxxx"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "contact@company.com"
+      },
+      "phone": {
+        "label": "Số điện thoại",
+        "placeholder": "VD: 028 3xxx xxx / 09xx xxx xxx"
+      },
+      "location": {
+        "label": "Tỉnh/Thành phố",
+        "placeholder": "-- Chọn tỉnh/thành --",
+        "helper": "Dùng để gợi ý địa điểm việc làm phù hợp."
+      },
+      "industry": {
+        "label": "Ngành nghề",
+        "placeholder": "-- Chọn ngành nghề --",
+        "helper": "Hiển thị cho ứng viên biết lĩnh vực hoạt động."
+      },
+      "companySize": {
+        "label": "Quy mô công ty",
+        "placeholder": "-- Chọn quy mô --",
+        "options": {
+          "lt10": "Dưới 10 nhân viên",
+          "10_150": "10 - 150 nhân viên",
+          "150_300": "150 - 300 nhân viên",
+          "gt300": "Trên 300 nhân viên"
+        }
+      },
+      "address": {
+        "label": "Địa chỉ",
+        "placeholder": "VD: 123 Lê Lợi, Phường Bến Thành, Quận 1, TP. HCM"
+      }
+    },
+    "validation": {
+      "nameRequired": "Vui lòng nhập tên công ty.",
+      "taxCodeRequired": "Vui lòng nhập mã số thuế.",
+      "emailInvalid": "Email không hợp lệ.",
+      "phoneInvalid": "Số điện thoại không hợp lệ."
+    },
+    "toast": {
+      "loadMetaError": "Không thể tải dữ liệu địa phương/ngành nghề",
+      "createSuccess": "Tạo công ty mới thành công ",
+      "createErrorDefault": "Lỗi khi tạo công ty mới"
+    },
+    "footer": {
+      "notice": "Bằng cách tạo công ty, bạn đồng ý với điều khoản sử dụng của hệ thống.",
+      "cancel": "Hủy",
+      "submit": "Tạo công ty",
+      "submitting": "Đang tạo..."
+    },
+    "helper": {
+      "tip": "Mẹo: Điền đầy đủ thông tin giúp tăng độ tin cậy với ứng viên."
+    }
+  },
+  "promotionModal": {
+    "title": {
+      "create": "Tạo khuyến mãi",
+      "edit": "Chỉnh sửa khuyến mãi"
+    },
+    "fields": {
+      "name": {
+        "label": "Tên khuyến mãi",
+        "placeholder": "VD: Tặng 50% điểm"
+      },
+      "image": {
+        "label": "Ảnh khuyến mãi (banner)",
+        "empty": "Chưa có ảnh",
+        "button": "Chọn ảnh",
+        "helper": "Nên dùng ảnh ngang, khoảng 800×300px, dung lượng < 1MB."
+      },
+      "code": {
+        "label": "Mã khuyến mãi (tuỳ chọn)",
+        "placeholder": "VD: KM50"
+      },
+      "isActive": {
+        "label": "Đang kích hoạt"
+      },
+      "description": {
+        "label": "Mô tả (hiển thị cho nhà tuyển dụng)",
+        "placeholder": "Nhập mô tả ngắn gọn về ưu đãi khuyến mãi…"
+      },
+      "price": {
+        "label": "Giá tiền (VND)"
+      },
+      "points": {
+        "label": "Điểm nhận được"
+      },
+      "startAt": {
+        "label": "Bắt đầu từ"
+      },
+      "endAt": {
+        "label": "Kết thúc"
+      }
+    },
+    "actions": {
+      "cancel": "Huỷ",
+      "save": "Lưu",
+      "saving": "Đang lưu...",
+      "close": "Đóng"
+    },
+    "error": {
+      "save": "Có lỗi khi lưu khuyến mãi: {{details}}"
+    }
+  },
+  "promotion": {
+    "pageTitle": "Quản lý khuyến mãi",
+    "createButton": "Tạo khuyến mãi",
+    "fetchError": "Không tải được danh sách khuyến mãi",
+    "confirmDelete": "Xoá khuyến mãi này?",
+    "deleteError": "Không xoá được khuyến mãi",
+    "loading": "Đang tải dữ liệu...",
+    "empty": "Chưa có khuyến mãi nào.",
+    "noLimit": "Không giới hạn",
+
+    "table": {
+      "headers": {
+        "name": "Tên",
+        "price": "Giá",
+        "points": "Điểm",
+        "validity": "Hiệu lực",
+        "status": "Trạng thái",
+        "actions": "Thao tác"
+      },
+      "codePrefix": "Mã:",
+      "status": {
+        "active": "Đang kích hoạt",
+        "inactive": "Tạm tắt"
+      },
+      "actions": {
+        "edit": "Sửa",
+        "delete": "Xoá",
+        "deleting": "Đang xoá..."
+      }
+    },
+
+    "modal": {
+      "titleCreate": "Tạo khuyến mãi",
+      "titleEdit": "Chỉnh sửa khuyến mãi",
+      "close": "Đóng",
+
+      "fields": {
+        "name": {
+          "label": "Tên khuyến mãi",
+          "required": "Vui lòng nhập tên khuyến mãi."
+        },
+        "banner": {
+          "label": "Ảnh khuyến mãi (banner)",
+          "noImage": "Chưa có ảnh",
+          "choose": "Chọn ảnh",
+          "hint": "Nên dùng ảnh ngang, khoảng 800×300px, dung lượng < 1MB."
+        },
+        "code": {
+          "label": "Mã khuyến mãi (tuỳ chọn)"
+        },
+        "isActive": {
+          "label": "Đang kích hoạt"
+        },
+        "description": {
+          "label": "Mô tả (hiển thị cho nhà tuyển dụng)"
+        },
+        "price": {
+          "label": "Giá tiền (VND)",
+          "minError": "Giá tiền phải từ 1.000 VND trở lên."
+        },
+        "points": {
+          "label": "Điểm nhận được",
+          "minError": "Điểm phải lớn hơn 0."
+        },
+        "startAt": {
+          "label": "Bắt đầu từ"
+        },
+        "endAt": {
+          "label": "Kết thúc"
+        }
+      },
+
+      "actions": {
+        "cancel": "Huỷ",
+        "save": "Lưu",
+        "saving": "Đang lưu..."
+      },
+
+      "errors": {
+        "savePrefix": "Có lỗi khi lưu khuyến mãi: ",
+        "unknown": "Đã xảy ra lỗi không xác định."
+      }
+    }
   }
 }

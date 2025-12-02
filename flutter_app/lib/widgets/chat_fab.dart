@@ -15,7 +15,6 @@ class ChatFab extends StatelessWidget {
   }
 }
 
-/// ---------- Bottom Sheet UX ----------
 Future<void> _showChatBottomSheet(BuildContext context) async {
   final theme = Theme.of(context);
   await showModalBottomSheet(
@@ -23,7 +22,7 @@ Future<void> _showChatBottomSheet(BuildContext context) async {
     isScrollControlled: true,
     useSafeArea: true,
     barrierColor: Colors.black.withOpacity(0.35),
-    backgroundColor: Colors.transparent, // để thấy hiệu ứng "kính"
+    backgroundColor: Colors.transparent,
     builder: (_) {
       return DraggableScrollableSheet(
         expand: false,
@@ -78,7 +77,6 @@ class _ChatSheet extends StatelessWidget {
     return CustomScrollView(
       controller: controller,
       slivers: [
-        // Drag handle + header
         SliverToBoxAdapter(
           child: Column(
             children: [
@@ -155,9 +153,7 @@ class _ChatSheet extends StatelessWidget {
             ],
           ),
         ),
-
-        // Nội dung Chat
-        SliverFillRemaining(hasScrollBody: true, child: const _ChatBody()),
+        const SliverFillRemaining(hasScrollBody: true, child: _ChatBody()),
       ],
     );
   }
@@ -168,8 +164,6 @@ class _ChatBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Nếu ChatBox tự cuộn nội bộ, vẫn hoạt động tốt vì SliverFillRemaining cung cấp không gian còn lại
-    // và DraggableScrollableSheet quản lý tổng thể chiều cao.
     return const Padding(
       padding: EdgeInsets.only(bottom: 12),
       child: ChatBox(),
@@ -177,7 +171,6 @@ class _ChatBody extends StatelessWidget {
   }
 }
 
-/// ---------- Nâng cấp FAB xanh gradient ----------
 class _BlueExtendedFab extends StatelessWidget {
   const _BlueExtendedFab({
     required this.icon,
@@ -191,7 +184,6 @@ class _BlueExtendedFab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Tạo “extended FAB” custom để có gradient + ripple đẹp.
     return Material(
       color: Colors.transparent,
       elevation: 8,
@@ -214,22 +206,26 @@ class _BlueExtendedFab extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(width: 2),
-              const Icon(
-                Icons.chat_bubble_rounded,
-                color: Colors.white,
-                size: 20,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(999),
+                child: Image.asset(
+                  'assets/images/jobonline_logo.png',
+                  height: 18,
+                  width: 18,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) =>
+                      Icon(icon, size: 18, color: Colors.white),
+                ),
               ),
-              const SizedBox(width: 10),
-              const Text(
-                'Chat AI',
-                style: TextStyle(
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.2,
                 ),
               ),
-              const SizedBox(width: 2),
             ],
           ),
         ),

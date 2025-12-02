@@ -7,12 +7,18 @@ import {
 } from "@admin/store/services/promotionService";
 import AddPromotion from "./AddPromotion";
 import { Promotion, PromotionPayload } from "@admin/store/redux/promotionSlice";
+import { useTranslation } from "react-i18next";
 
-function formatMoney(value: number) {
-  return value.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+function formatMoney(value: number, locale: string) {
+  const lang = locale.startsWith("vi") ? "vi-VN" : "en-US";
+  return new Intl.NumberFormat(lang, {
+    style: "currency",
+    currency: "VND",
+  }).format(value);
 }
 
 export default function AdminRootPromotion() {
+  const { t, i18n } = useTranslation();
   const [items, setItems] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -27,7 +33,7 @@ export default function AdminRootPromotion() {
       setItems(res.data ?? res);
     } catch (e) {
       console.error(e);
-      alert("Không tải được danh sách khuyến mãi");
+      alert(t("promotion.fetchError"));
     } finally {
       setLoading(false);
     }
@@ -35,6 +41,7 @@ export default function AdminRootPromotion() {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleOpenCreate = () => {
@@ -67,28 +74,30 @@ export default function AdminRootPromotion() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Xoá khuyến mãi này?")) return;
+    if (!window.confirm(t("promotion.confirmDelete"))) return;
     try {
       setDeletingId(id);
       await deletePromotionApi(id);
       await fetchData();
     } catch (e) {
       console.error(e);
-      alert("Không xoá được khuyến mãi");
+      alert(t("promotion.deleteError"));
     } finally {
       setDeletingId(null);
     }
   };
 
+  const locale = i18n.language || "vi";
+
   return (
     <div className="mx-auto max-w-6xl">
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Quản lý khuyến mãi</h1>
+        <h1 className="text-2xl font-bold">{t("promotion.pageTitle")}</h1>
         <button
           onClick={handleOpenCreate}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
         >
-          + Tạo khuyến mãi
+          + {t("promotion.createButton")}
         </button>
       </div>
 
@@ -96,19 +105,31 @@ export default function AdminRootPromotion() {
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-2 text-left">Tên</th>
-              <th className="px-4 py-2 text-left">Giá</th>
-              <th className="px-4 py-2 text-left">Điểm</th>
-              <th className="px-4 py-2 text-left">Hiệu lực</th>
-              <th className="px-4 py-2 text-left">Trạng thái</th>
-              <th className="px-4 py-2 text-right">Thao tác</th>
+              <th className="px-4 py-2 text-left">
+                {t("promotion.table.headers.name")}
+              </th>
+              <th className="px-4 py-2 text-left">
+                {t("promotion.table.headers.price")}
+              </th>
+              <th className="px-4 py-2 text-left">
+                {t("promotion.table.headers.points")}
+              </th>
+              <th className="px-4 py-2 text-left">
+                {t("promotion.table.headers.validity")}
+              </th>
+              <th className="px-4 py-2 text-left">
+                {t("promotion.table.headers.status")}
+              </th>
+              <th className="px-4 py-2 text-right">
+                {t("promotion.table.headers.actions")}
+              </th>
             </tr>
           </thead>
           <tbody>
             {loading && (
               <tr>
                 <td colSpan={6} className="px-4 py-4 text-center text-gray-500">
-                  Đang tải dữ liệu...
+                  {t("promotion.loading")}
                 </td>
               </tr>
             )}
@@ -116,7 +137,7 @@ export default function AdminRootPromotion() {
             {!loading && items.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-4 py-4 text-center text-gray-500">
-                  Chưa có khuyến mãi nào.
+                  {t("promotion.empty")}
                 </td>
               </tr>
             )}
@@ -124,11 +145,15 @@ export default function AdminRootPromotion() {
             {!loading &&
               items.map((item) => {
                 const start = item.start_at
-                  ? new Date(item.start_at).toLocaleDateString("vi-VN")
-                  : "Không giới hạn";
+                  ? new Date(item.start_at).toLocaleDateString(
+                      locale.startsWith("vi") ? "vi-VN" : "en-US"
+                    )
+                  : t("promotion.noLimit");
                 const end = item.end_at
-                  ? new Date(item.end_at).toLocaleDateString("vi-VN")
-                  : "Không giới hạn";
+                  ? new Date(item.end_at).toLocaleDateString(
+                      locale.startsWith("vi") ? "vi-VN" : "en-US"
+                    )
+                  : t("promotion.noLimit");
 
                 return (
                   <tr key={item.id} className="border-t border-gray-100">
@@ -141,26 +166,30 @@ export default function AdminRootPromotion() {
                       )}
                       {item.code && (
                         <div className="text-xs text-indigo-600">
-                          Mã: {item.code}
+                          {t("promotion.table.codePrefix")} {item.code}
                         </div>
                       )}
                     </td>
                     <td className="px-4 py-2 align-top">
-                      {formatMoney(item.price)}
+                      {formatMoney(item.price, locale)}
                     </td>
                     <td className="px-4 py-2 align-top">{item.points}</td>
                     <td className="px-4 py-2 align-top text-xs text-gray-600">
-                      <div>Từ: {start}</div>
-                      <div>Đến: {end}</div>
+                      <div>
+                        {t("promotion.modal.fields.startAt.label")}: {start}
+                      </div>
+                      <div>
+                        {t("promotion.modal.fields.endAt.label")}: {end}
+                      </div>
                     </td>
                     <td className="px-4 py-2 align-top">
                       {item.is_active ? (
                         <span className="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-2 py-1 text-xs text-green-700">
-                          Đang kích hoạt
+                          {t("promotion.table.status.active")}
                         </span>
                       ) : (
                         <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2 py-1 text-xs text-gray-600">
-                          Tạm tắt
+                          {t("promotion.table.status.inactive")}
                         </span>
                       )}
                     </td>
@@ -169,14 +198,16 @@ export default function AdminRootPromotion() {
                         onClick={() => handleOpenEdit(item)}
                         className="rounded-lg border border-gray-300 px-3 py-1 text-xs hover:bg-gray-50"
                       >
-                        Sửa
+                        {t("promotion.table.actions.edit")}
                       </button>
                       <button
                         onClick={() => handleDelete(item.id)}
                         disabled={deletingId === item.id}
                         className="rounded-lg border border-red-200 px-3 py-1 text-xs text-red-600 hover:bg-red-50 disabled:opacity-60"
                       >
-                        {deletingId === item.id ? "Đang xoá..." : "Xoá"}
+                        {deletingId === item.id
+                          ? t("promotion.table.actions.deleting")
+                          : t("promotion.table.actions.delete")}
                       </button>
                     </td>
                   </tr>

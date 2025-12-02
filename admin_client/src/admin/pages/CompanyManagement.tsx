@@ -14,29 +14,28 @@ import { toast } from "react-toastify";
 import { Editor } from "@tinymce/tinymce-react";
 import { useDropzone } from "react-dropzone";
 import Loading from "@components/Loading";
+import { useTranslation } from "react-i18next";
 
 export default function CompanyManagement() {
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { company, loading, error } = useAppSelector((state) => state.company);
   const { provinces } = useAppSelector((state) => state.location);
   const { industries } = useAppSelector((state) => state.industry);
 
-  // --- UI state ---
   const [tab, setTab] = useState<"basic" | "license" | "additional" | "images">(
     "basic"
   );
   const [isFetching, setIsFetching] = useState(true);
 
-  // saving flags
   const [savingBasic, setSavingBasic] = useState(false);
   const [uploadingLicense, setUploadingLicense] = useState(false);
   const [savingAdd, setSavingAdd] = useState(false);
   const [savingImages, setSavingImages] = useState(false);
 
-  // --- Form state ---
   const [formData, setFormData] = useState({
     name: "",
     company_size: "",
@@ -97,7 +96,6 @@ export default function CompanyManagement() {
     }
   }, [company]);
 
-  // --- Handlers ---
   const handleBasicChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -105,7 +103,7 @@ export default function CompanyManagement() {
   const handleUpdateBasic = async () => {
     if (!id) return;
     if (!formData.name.trim()) {
-      toast.error("Tên công ty không được để trống!");
+      toast.error(t("companyManagement.toast.basicNameRequired"));
       return;
     }
     try {
@@ -113,10 +111,10 @@ export default function CompanyManagement() {
       await dispatch(
         updateCompanyBasicById({ id: Number(id), data: formData })
       ).unwrap();
-      toast.success("Cập nhật thông tin cơ bản thành công 🎉");
+      toast.success(t("companyManagement.toast.basicUpdateSuccess"));
       await dispatch(fetchCompanyById(Number(id))).unwrap();
     } catch {
-      toast.error("Lỗi khi cập nhật thông tin cơ bản!");
+      toast.error(t("companyManagement.toast.basicUpdateError"));
     } finally {
       setSavingBasic(false);
     }
@@ -124,7 +122,7 @@ export default function CompanyManagement() {
 
   const handleUploadLicense = async () => {
     if (!id || !licenseFile) {
-      toast.warning("Vui lòng chọn file PDF hợp lệ!");
+      toast.warning(t("companyManagement.toast.licenseSelectWarning"));
       return;
     }
     try {
@@ -132,11 +130,11 @@ export default function CompanyManagement() {
       await dispatch(
         updateCompanyLicenseById({ id: Number(id), file: licenseFile })
       ).unwrap();
-      toast.success("Cập nhật giấy phép kinh doanh thành công 🎉");
+      toast.success(t("companyManagement.toast.licenseUpdateSuccess"));
       setLicenseFile(null);
       dispatch(fetchCompanyById(Number(id)));
     } catch {
-      toast.error("Lỗi khi tải lên giấy phép!");
+      toast.error(t("companyManagement.toast.licenseUpdateError"));
     } finally {
       setUploadingLicense(false);
     }
@@ -152,10 +150,10 @@ export default function CompanyManagement() {
       await dispatch(
         updateCompanyAdditionalById({ id: Number(id), data: additionalForm })
       ).unwrap();
-      toast.success("Cập nhật thông tin bổ sung thành công 🎉");
+      toast.success(t("companyManagement.toast.additionalUpdateSuccess"));
       dispatch(fetchCompanyById(Number(id)));
     } catch {
-      toast.error("Lỗi khi cập nhật thông tin bổ sung!");
+      toast.error(t("companyManagement.toast.additionalUpdateError"));
     } finally {
       setSavingAdd(false);
     }
@@ -171,12 +169,12 @@ export default function CompanyManagement() {
       await dispatch(
         updateCompanyImageById({ id: Number(id), data: payload })
       ).unwrap();
-      toast.success("Cập nhật hình ảnh thành công 🎉");
+      toast.success(t("companyManagement.toast.imagesUpdateSuccess"));
       setLogoFile(null);
       setCoverFile(null);
       dispatch(fetchCompanyById(Number(id)));
     } catch {
-      toast.error("Lỗi khi cập nhật hình ảnh!");
+      toast.error(t("companyManagement.toast.imagesUpdateError"));
     } finally {
       setSavingImages(false);
     }
@@ -189,8 +187,14 @@ export default function CompanyManagement() {
   });
 
   if (loading || isFetching) return <Loading />;
-  if (error) return <div className="p-6 text-red-600">Lỗi: {error}</div>;
-  if (!company) return <div className="p-6">Không tìm thấy công ty</div>;
+  if (error)
+    return (
+      <div className="p-6 text-red-600">
+        {t("companyManagement.common.errorLabel")}: {error}
+      </div>
+    );
+  if (!company)
+    return <div className="p-6">{t("companyManagement.common.notFound")}</div>;
 
   const coverSrc = coverFile
     ? URL.createObjectURL(coverFile)
@@ -209,35 +213,40 @@ export default function CompanyManagement() {
       {/* Header */}
       <div className="mx-auto mb-6 flex max-w-6xl items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900">
-          Quản lý công ty: {company.name}
+          {t("companyManagement.header.title")} {company.name}
         </h2>
         <button
           onClick={() => navigate("/admin/companies")}
           className="text-sm font-medium text-purple-700 underline underline-offset-2 hover:opacity-90"
         >
-          ← Quay lại
+          {t("companyManagement.header.back")}
         </button>
       </div>
 
-      {/* Tabs - pill style */}
+      {/* Tabs */}
       <div className="mx-auto mb-6 max-w-6xl">
         <div className="inline-flex rounded-xl bg-white p-1 shadow-sm ring-1 ring-gray-200">
-          {[
-            { key: "basic", label: "Thông tin cơ bản" },
-            { key: "license", label: "Giấy phép" },
-            { key: "additional", label: "Giới thiệu" },
-            { key: "images", label: "Hình ảnh" },
-          ].map((t) => (
+          {(
+            [
+              { key: "basic", label: t("companyManagement.tabs.basic") },
+              { key: "license", label: t("companyManagement.tabs.license") },
+              {
+                key: "additional",
+                label: t("companyManagement.tabs.additional"),
+              },
+              { key: "images", label: t("companyManagement.tabs.images") },
+            ] as const
+          ).map((tItem) => (
             <button
-              key={t.key}
-              onClick={() => setTab(t.key as any)}
+              key={tItem.key}
+              onClick={() => setTab(tItem.key)}
               className={`rounded-lg px-4 py-2 text-sm transition ${
-                tab === t.key
+                tab === tItem.key
                   ? "bg-purple-600 font-medium text-white shadow-sm"
                   : "text-gray-600 hover:bg-gray-50 hover:text-purple-700"
               }`}
             >
-              {t.label}
+              {tItem.label}
             </button>
           ))}
         </div>
@@ -263,10 +272,10 @@ export default function CompanyManagement() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-900">
-                    Thông tin cơ bản
+                    {t("companyManagement.sections.basic.title")}
                   </p>
                   <p className="text-xs text-gray-500">
-                    Tên, MST, quy mô, địa chỉ, liên hệ…
+                    {t("companyManagement.sections.basic.subtitle")}
                   </p>
                 </div>
               </div>
@@ -290,7 +299,7 @@ export default function CompanyManagement() {
                       fill="none"
                     />
                   </svg>
-                  Đang lưu…
+                  {t("companyManagement.common.saving")}
                 </div>
               )}
             </div>
@@ -300,7 +309,7 @@ export default function CompanyManagement() {
                 {/* MST */}
                 <div className="flex flex-col">
                   <label className="mb-1.5 text-sm font-medium text-gray-700">
-                    Mã số thuế
+                    {t("companyManagement.basic.taxCode")}
                   </label>
                   <input
                     type="text"
@@ -309,14 +318,15 @@ export default function CompanyManagement() {
                     className="w-full rounded-lg border border-gray-300 bg-gray-100 px-3 py-2.5 text-gray-700 outline-none"
                   />
                   <p className="mt-1 text-xs text-gray-500">
-                    MST không thể chỉnh sửa tại đây.
+                    {t("companyManagement.basic.taxNote")}
                   </p>
                 </div>
 
                 {/* Tên công ty */}
                 <div className="flex flex-col">
                   <label className="mb-1.5 text-sm font-medium text-gray-700">
-                    Tên công ty <span className="text-red-500">*</span>
+                    {t("companyManagement.basic.name")}
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -330,7 +340,7 @@ export default function CompanyManagement() {
                 {/* Quy mô */}
                 <div className="flex flex-col">
                   <label className="mb-1.5 text-sm font-medium text-gray-700">
-                    Quy mô nhân sự
+                    {t("companyManagement.basic.companySize")}
                   </label>
                   <select
                     name="company_size"
@@ -338,16 +348,20 @@ export default function CompanyManagement() {
                     onChange={handleBasicChange}
                     className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-gray-900 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
                   >
-                    <option value="">Chọn quy mô</option>
-                    <option value="Dưới 10 nhân viên">Dưới 10 nhân viên</option>
+                    <option value="">
+                      {t("companyManagement.basic.sizeOptions.placeholder")}
+                    </option>
+                    <option value="Dưới 10 nhân viên">
+                      {t("companyManagement.basic.sizeOptions.lt10")}
+                    </option>
                     <option value="10 - 150 nhân viên">
-                      10 - 150 nhân viên
+                      {t("companyManagement.basic.sizeOptions.b10_150")}
                     </option>
                     <option value="150 - 300 nhân viên">
-                      150 - 300 nhân viên
+                      {t("companyManagement.basic.sizeOptions.b150_300")}
                     </option>
                     <option value="Trên 300 nhân viên">
-                      Trên 300 nhân viên
+                      {t("companyManagement.basic.sizeOptions.gt300")}
                     </option>
                   </select>
                 </div>
@@ -355,7 +369,7 @@ export default function CompanyManagement() {
                 {/* Tỉnh/Thành */}
                 <div className="flex flex-col">
                   <label className="mb-1.5 text-sm font-medium text-gray-700">
-                    Tỉnh/Thành
+                    {t("companyManagement.basic.location")}
                   </label>
                   <select
                     name="location_id"
@@ -363,7 +377,9 @@ export default function CompanyManagement() {
                     onChange={handleBasicChange}
                     className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-gray-900 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
                   >
-                    <option value={0}>Chọn tỉnh/thành</option>
+                    <option value={0}>
+                      {t("companyManagement.basic.locationPlaceholder")}
+                    </option>
                     {provinces.map((p) => (
                       <option key={p.id} value={p.id}>
                         {p.name}
@@ -375,7 +391,7 @@ export default function CompanyManagement() {
                 {/* Địa chỉ */}
                 <div className="flex flex-col">
                   <label className="mb-1.5 text-sm font-medium text-gray-700">
-                    Địa chỉ
+                    {t("companyManagement.basic.address")}
                   </label>
                   <input
                     type="text"
@@ -389,7 +405,7 @@ export default function CompanyManagement() {
                 {/* Lĩnh vực */}
                 <div className="flex flex-col">
                   <label className="mb-1.5 text-sm font-medium text-gray-700">
-                    Lĩnh vực hoạt động
+                    {t("companyManagement.basic.industry")}
                   </label>
                   <select
                     name="industry_id"
@@ -397,7 +413,9 @@ export default function CompanyManagement() {
                     onChange={handleBasicChange}
                     className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-gray-900 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
                   >
-                    <option value={0}>Chọn lĩnh vực</option>
+                    <option value={0}>
+                      {t("companyManagement.basic.industryPlaceholder")}
+                    </option>
                     {industries.map((i) => (
                       <option key={i.id} value={i.id}>
                         {i.title}
@@ -409,7 +427,7 @@ export default function CompanyManagement() {
                 {/* Email */}
                 <div className="flex flex-col">
                   <label className="mb-1.5 text-sm font-medium text-gray-700">
-                    Địa chỉ email liên hệ
+                    {t("companyManagement.basic.email")}
                   </label>
                   <input
                     type="text"
@@ -424,14 +442,14 @@ export default function CompanyManagement() {
                 {/* Điện thoại */}
                 <div className="flex flex-col">
                   <label className="mb-1.5 text-sm font-medium text-gray-700">
-                    Điện thoại cố định
+                    {t("companyManagement.basic.phone")}
                   </label>
                   <input
                     type="text"
                     name="phone"
                     value={formData.phone}
                     onChange={handleBasicChange}
-                    placeholder="VD: 028 3xxx xxx / 09xx xxx xxx"
+                    placeholder={t("companyManagement.basic.phonePlaceholder")}
                     className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
                   />
                 </div>
@@ -442,7 +460,7 @@ export default function CompanyManagement() {
                   onClick={() => navigate(-1)}
                   className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
                 >
-                  Hủy
+                  {t("companyManagement.common.cancel")}
                 </button>
                 <button
                   onClick={handleUpdateBasic}
@@ -469,7 +487,9 @@ export default function CompanyManagement() {
                       />
                     </svg>
                   )}
-                  {savingBasic ? "Đang cập nhật..." : "Cập nhật thông tin"}
+                  {savingBasic
+                    ? t("companyManagement.basic.updating")
+                    : t("companyManagement.basic.updateButton")}
                 </button>
               </div>
             </div>
@@ -482,10 +502,10 @@ export default function CompanyManagement() {
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
               <div>
                 <h2 className="text-sm font-medium text-gray-900">
-                  Giấy phép kinh doanh
+                  {t("companyManagement.license.title")}
                 </h2>
                 <p className="text-xs text-gray-500">
-                  Tải lên bản PDF GPKD có dấu giáp lai hoặc công chứng.
+                  {t("companyManagement.license.subtitle")}
                 </p>
               </div>
               {uploadingLicense && (
@@ -508,16 +528,15 @@ export default function CompanyManagement() {
                       fill="none"
                     />
                   </svg>
-                  Đang tải…
+                  {t("companyManagement.common.uploading")}
                 </div>
               )}
             </div>
 
             <div className="px-6 py-6">
-              {/* Giấy phép hiện tại */}
               {company.business_license ? (
                 <p className="mb-3 text-sm text-gray-600">
-                  Giấy phép hiện tại:
+                  {t("companyManagement.license.currentFile")}
                   <a
                     href={`${company.business_license}`}
                     target="_blank"
@@ -525,16 +544,15 @@ export default function CompanyManagement() {
                     className="ml-2 font-medium text-purple-700 underline"
                   >
                     {company.business_license.split("/").pop() ||
-                      "Xem giấy phép"}
+                      t("companyManagement.license.viewLicense")}
                   </a>
                 </p>
               ) : (
                 <p className="mb-3 text-sm italic text-gray-500">
-                  Chưa cập nhật giấy phép kinh doanh
+                  {t("companyManagement.license.noLicense")}
                 </p>
               )}
 
-              {/* Dropzone */}
               <div
                 {...getRootProps()}
                 className={`group cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition
@@ -566,21 +584,16 @@ export default function CompanyManagement() {
                   ) : (
                     <>
                       <p className="text-sm text-gray-700">
-                        Kéo thả hoặc{" "}
-                        <span className="font-medium text-purple-700 underline">
-                          nhấn để chọn
-                        </span>{" "}
-                        file PDF
+                        {t("companyManagement.license.dropText")}
                       </p>
                       <p className="text-xs text-gray-500">
-                        Chỉ chấp nhận định dạng .pdf
+                        {t("companyManagement.license.extensionHint")}
                       </p>
                     </>
                   )}
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="mt-4 flex items-center gap-3">
                 {licenseFile && (
                   <button
@@ -588,7 +601,7 @@ export default function CompanyManagement() {
                     disabled={uploadingLicense}
                     className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed"
                   >
-                    Xóa file
+                    {t("companyManagement.license.removeFile")}
                   </button>
                 )}
                 <button
@@ -616,19 +629,20 @@ export default function CompanyManagement() {
                       />
                     </svg>
                   )}
-                  {uploadingLicense ? "Đang tải lên..." : "Tải lên"}
+                  {uploadingLicense
+                    ? t("companyManagement.license.uploadingButton")
+                    : t("companyManagement.license.uploadButton")}
                 </button>
               </div>
 
               <div className="mt-6 rounded-lg bg-gray-50 p-4 text-xs text-gray-600">
-                <p className="font-medium text-gray-700">Lưu ý:</p>
+                <p className="font-medium text-gray-700">
+                  {t("companyManagement.license.noteTitle")}
+                </p>
                 <ul className="mt-1 list-disc pl-5">
-                  <li>Chứng thực tài khoản doanh nghiệp.</li>
-                  <li>Tạo lòng tin với Người Tìm Việc.</li>
-                  <li>
-                    GPKD hợp lệ: có dấu giáp lai; nếu là bản photo phải có dấu
-                    công chứng.
-                  </li>
+                  <li>{t("companyManagement.license.notes.0")}</li>
+                  <li>{t("companyManagement.license.notes.1")}</li>
+                  <li>{t("companyManagement.license.notes.2")}</li>
                 </ul>
               </div>
             </div>
@@ -641,10 +655,10 @@ export default function CompanyManagement() {
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
               <div>
                 <h2 className="text-sm font-medium text-gray-900">
-                  Giới thiệu công ty
+                  {t("companyManagement.additional.title")}
                 </h2>
                 <p className="text-xs text-gray-500">
-                  Mô tả, website và năm thành lập.
+                  {t("companyManagement.additional.subtitle")}
                 </p>
               </div>
               {savingAdd && (
@@ -667,14 +681,14 @@ export default function CompanyManagement() {
                       fill="none"
                     />
                   </svg>
-                  Đang lưu…
+                  {t("companyManagement.common.saving")}
                 </div>
               )}
             </div>
 
             <div className="px-6 py-6">
               <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                Giới thiệu doanh nghiệp
+                {t("companyManagement.additional.descriptionLabel")}
               </label>
               <Editor
                 apiKey="haxna3coe03d4qdw3k17ba77ij7f5jt1hgglor6y0yc0yu3s"
@@ -695,28 +709,32 @@ export default function CompanyManagement() {
               <div className="mt-5 grid gap-5 md:grid-cols-2">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                    Website
+                    {t("companyManagement.additional.websiteLabel")}
                   </label>
                   <input
                     type="text"
                     name="website"
                     value={additionalForm.website}
                     onChange={handleAdditionalChange}
-                    placeholder="https://example.com"
+                    placeholder={t(
+                      "companyManagement.additional.websitePlaceholder"
+                    )}
                     className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
                   />
                 </div>
 
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                    Năm thành lập
+                    {t("companyManagement.additional.foundedYearLabel")}
                   </label>
                   <input
                     type="text"
                     name="founded_year"
                     value={additionalForm.founded_year}
                     onChange={handleAdditionalChange}
-                    placeholder="VD: 2015"
+                    placeholder={t(
+                      "companyManagement.additional.foundedYearPlaceholder"
+                    )}
                     className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
                   />
                 </div>
@@ -748,7 +766,9 @@ export default function CompanyManagement() {
                       />
                     </svg>
                   )}
-                  {savingAdd ? "Đang lưu..." : "Cập nhật thông tin"}
+                  {savingAdd
+                    ? t("companyManagement.additional.updating")
+                    : t("companyManagement.additional.updateButton")}
                 </button>
               </div>
             </div>
@@ -759,14 +779,15 @@ export default function CompanyManagement() {
         {tab === "images" && (
           <section className="rounded-2xl border border-gray-200 bg-white shadow-sm">
             <div className="border-b border-gray-100 px-6 py-4">
-              <h2 className="text-sm font-medium text-gray-900">Ảnh công ty</h2>
+              <h2 className="text-sm font-medium text-gray-900">
+                {t("companyManagement.images.title")}
+              </h2>
               <p className="text-xs text-gray-500">
-                Ảnh bìa và logo thương hiệu (PNG/JPG, ≤ 5MB).
+                {t("companyManagement.images.subtitle")}
               </p>
             </div>
 
             <div className="px-6 py-6">
-              {/* Cover */}
               <div className="relative mb-20 w-full">
                 <div className="h-56 w-full overflow-hidden rounded-xl bg-gray-200 md:h-72">
                   {coverSrc ? (
@@ -777,7 +798,7 @@ export default function CompanyManagement() {
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-sm text-gray-500">
-                      Chưa có ảnh bìa
+                      {t("companyManagement.images.noCover")}
                     </div>
                   )}
 
@@ -789,7 +810,7 @@ export default function CompanyManagement() {
                     >
                       <path d="M4 13V16H7L14.293 8.707L11.293 5.707L4 13Z" />
                     </svg>
-                    Đổi ảnh bìa
+                    {t("companyManagement.images.changeCover")}
                     <input
                       type="file"
                       accept="image/*"
@@ -801,7 +822,6 @@ export default function CompanyManagement() {
                   </label>
                 </div>
 
-                {/* Logo overlay */}
                 <div className="absolute left-1/2 top-full z-10 -translate-x-1/2 -translate-y-1/2">
                   <div className="relative w-36 aspect-square overflow-hidden rounded-full border-4 border-white bg-gray-100 shadow-lg md:w-44">
                     {logoSrc ? (
@@ -819,7 +839,6 @@ export default function CompanyManagement() {
                     )}
                   </div>
 
-                  {/* Button đổi logo đặt BÊN NGOÀI avatar để không bị che */}
                   <label className="absolute bottom-0 right-7 translate-x-1/4 translate-y-1/4 inline-flex cursor-pointer items-center gap-2 rounded-full bg-white/95 p-2 shadow-md transition hover:bg-white">
                     <svg
                       className="h-5 w-5 text-gray-700"
@@ -838,18 +857,17 @@ export default function CompanyManagement() {
                 </div>
               </div>
 
-              {/* Chips remove */}
               <div className="mt-2 flex flex-wrap items-center gap-3 pt-10">
                 {coverFile && (
                   <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs">
                     <span className="font-medium text-gray-700">
-                      Cover: {coverFile.name}
+                      {t("companyManagement.images.coverChip")} {coverFile.name}
                     </span>
                     <button
                       type="button"
                       onClick={() => setCoverFile(null)}
                       className="flex h-5 w-5 items-center justify-center rounded-full bg-red-100 text-red-600 hover:bg-red-200"
-                      title="Bỏ chọn cover"
+                      title={t("companyManagement.images.removeCoverTitle")}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -871,13 +889,13 @@ export default function CompanyManagement() {
                 {logoFile && (
                   <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs">
                     <span className="font-medium text-gray-700">
-                      Logo: {logoFile.name}
+                      {t("companyManagement.images.logoChip")} {logoFile.name}
                     </span>
                     <button
                       type="button"
                       onClick={() => setLogoFile(null)}
                       className="flex h-5 w-5 items-center justify-center rounded-full bg-red-100 text-red-600 hover:bg-red-200"
-                      title="Bỏ chọn logo"
+                      title={t("companyManagement.images.removeLogoTitle")}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -924,18 +942,20 @@ export default function CompanyManagement() {
                       />
                     </svg>
                   )}
-                  {savingImages ? "Đang cập nhật..." : "Cập nhật hình ảnh"}
+                  {savingImages
+                    ? t("companyManagement.images.updating")
+                    : t("companyManagement.images.updateButton")}
                 </button>
               </div>
 
               <div className="mt-6 rounded-lg bg-gray-50 p-4 text-xs text-gray-600">
-                <p className="font-medium text-gray-700">Gợi ý:</p>
+                <p className="font-medium text-gray-700">
+                  {t("companyManagement.images.hintTitle")}
+                </p>
                 <ul className="mt-1 list-disc pl-5">
-                  <li>
-                    Ảnh bìa ngang, tối thiểu 1200×400 để hiển thị sắc nét.
-                  </li>
-                  <li>Logo nên là hình vuông hoặc PNG nền trong suốt.</li>
-                  <li>Kích thước tối đa mỗi ảnh 5MB.</li>
+                  <li>{t("companyManagement.images.hints.0")}</li>
+                  <li>{t("companyManagement.images.hints.1")}</li>
+                  <li>{t("companyManagement.images.hints.2")}</li>
                 </ul>
               </div>
             </div>

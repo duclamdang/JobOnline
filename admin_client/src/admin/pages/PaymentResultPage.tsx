@@ -1,8 +1,10 @@
 import { useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import { createEmployerPayment } from "@admin/store/services/paymentService";
+import { useTranslation } from "react-i18next";
 
 export default function EmployerPaymentPage() {
+  const { t } = useTranslation();
   const [search] = useSearchParams();
   const status = search.get("status");
   const order = search.get("order");
@@ -46,7 +48,7 @@ export default function EmployerPaymentPage() {
 
     // cho đúng với message: phải từ 10.000đ
     if (!amountToPay || amountToPay < 10000) {
-      alert("Số tiền phải từ 10.000đ trở lên");
+      alert(t("employerPaymentPage.validation.minAmount"));
       return;
     }
 
@@ -57,22 +59,19 @@ export default function EmployerPaymentPage() {
       if (res?.payUrl) {
         window.location.href = res.payUrl;
       } else {
-        alert("Không tạo được thanh toán, vui lòng thử lại.");
+        alert(t("employerPaymentPage.toast.createFail"));
       }
     } catch (error: any) {
       console.error("Create payment error", error);
       alert(
         error?.response?.data?.message ||
-          "Có lỗi khi tạo thanh toán, vui lòng thử lại."
+          t("employerPaymentPage.toast.createError")
       );
     } finally {
       setLoading(false);
     }
   };
 
-  // ------------------------------------------------
-  // MODE 1: KẾT QUẢ THANH TOÁN (KHI CÓ status)
-  // ------------------------------------------------
   if (isResultMode) {
     return (
       <main className="p-6 flex flex-col items-center justify-center min-h-[60vh]">
@@ -88,7 +87,9 @@ export default function EmployerPaymentPage() {
           </div>
 
           <h1 className="text-2xl font-bold mb-1">
-            {isSuccess ? "Mua điểm thành công" : "Mua điểm không thành công"}
+            {isSuccess
+              ? t("employerPaymentPage.result.successTitle")
+              : t("employerPaymentPage.result.failTitle")}
           </h1>
 
           <p
@@ -98,27 +99,30 @@ export default function EmployerPaymentPage() {
                 : "bg-red-50 text-red-700"
             }`}
           >
-            {isSuccess ? "Thanh toán hoàn tất" : "Thanh toán thất bại"}
+            {isSuccess
+              ? t("employerPaymentPage.result.successBadge")
+              : t("employerPaymentPage.result.failBadge")}
           </p>
 
           <div className="text-sm text-gray-600 mb-4 space-y-1">
             <p>
-              Mã đơn hàng:{" "}
+              {t("employerPaymentPage.result.orderCode")}:{" "}
               <span className="font-mono font-semibold">{order || "—"}</span>
             </p>
             <p>
-              Số tiền:{" "}
+              {t("employerPaymentPage.result.amount")}:{" "}
               <span className="font-semibold">{formattedAmount} ₫</span>
             </p>
             <p>
-              Số điểm: <span className="font-semibold">{formattedPoints}</span>
+              {t("employerPaymentPage.result.points")}:{" "}
+              <span className="font-semibold">{formattedPoints}</span>
             </p>
           </div>
 
           <p className="text-gray-500 mb-8 text-sm">
             {isSuccess
-              ? "Điểm đã được cộng vào tài khoản tuyển dụng của bạn. Bạn có thể sử dụng để đăng tin và nâng cấp dịch vụ ngay."
-              : "Có lỗi xảy ra trong quá trình thanh toán. Điểm chưa được cộng vào tài khoản. Vui lòng thử lại hoặc liên hệ hỗ trợ nếu cần."}
+              ? t("employerPaymentPage.result.successDescription")
+              : t("employerPaymentPage.result.failDescription")}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -126,13 +130,13 @@ export default function EmployerPaymentPage() {
               href="/admin/payment"
               className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm font-medium"
             >
-              Mua thêm điểm
+              {t("employerPaymentPage.result.buyMore")}
             </a>
             <a
               href="/admin/employer-dashboard"
               className="inline-flex items-center justify-center px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-medium"
             >
-              Quay về trang quản trị
+              {t("employerPaymentPage.result.backToDashboard")}
             </a>
           </div>
         </div>
@@ -140,13 +144,12 @@ export default function EmployerPaymentPage() {
     );
   }
 
-  // ------------------------------------------------
-  // MODE 2: FORM MUA ĐIỂM (KHI KHÔNG CÓ status)
-  // ------------------------------------------------
   return (
     <main className="p-6 flex justify-center">
       <div className="bg-white shadow rounded-2xl p-8 max-w-2xl w-full">
-        <h1 className="text-2xl font-bold mb-6">Mua điểm dịch vụ</h1>
+        <h1 className="text-2xl font-bold mb-6">
+          {t("employerPaymentPage.form.title")}
+        </h1>
 
         {/* Gói điểm nhanh */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -157,8 +160,12 @@ export default function EmployerPaymentPage() {
               selectedPackage === "small" ? "border-blue-600 bg-blue-50" : ""
             }`}
           >
-            <div className="font-semibold mb-1">Gói 100.000đ</div>
-            <div className="text-sm text-gray-600">~ 100 điểm</div>
+            <div className="font-semibold mb-1">
+              {t("employerPaymentPage.form.packages.smallTitle")}
+            </div>
+            <div className="text-sm text-gray-600">
+              {t("employerPaymentPage.form.packages.smallDesc")}
+            </div>
           </button>
           <button
             type="button"
@@ -167,8 +174,12 @@ export default function EmployerPaymentPage() {
               selectedPackage === "medium" ? "border-blue-600 bg-blue-50" : ""
             }`}
           >
-            <div className="font-semibold mb-1">Gói 300.000đ</div>
-            <div className="text-sm text-gray-600">~ 300 điểm</div>
+            <div className="font-semibold mb-1">
+              {t("employerPaymentPage.form.packages.mediumTitle")}
+            </div>
+            <div className="text-sm text-gray-600">
+              {t("employerPaymentPage.form.packages.mediumDesc")}
+            </div>
           </button>
           <button
             type="button"
@@ -177,15 +188,19 @@ export default function EmployerPaymentPage() {
               selectedPackage === "large" ? "border-blue-600 bg-blue-50" : ""
             }`}
           >
-            <div className="font-semibold mb-1">Gói 500.000đ</div>
-            <div className="text-sm text-gray-600">~ 500 điểm</div>
+            <div className="font-semibold mb-1">
+              {t("employerPaymentPage.form.packages.largeTitle")}
+            </div>
+            <div className="text-sm text-gray-600">
+              {t("employerPaymentPage.form.packages.largeDesc")}
+            </div>
           </button>
         </div>
 
         {/* Nhập số tiền tùy chọn */}
         <div className="mb-6">
           <label className="block text-sm font-medium mb-1">
-            Hoặc nhập số tiền khác (VND)
+            {t("employerPaymentPage.form.customLabel")}
           </label>
           <div className="flex gap-3">
             <input
@@ -203,7 +218,7 @@ export default function EmployerPaymentPage() {
             />
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            1.000đ ≈ 1 điểm. Số điểm dự kiến:{" "}
+            {t("employerPaymentPage.form.rateText")}{" "}
             <span className="font-semibold">
               {computePoints(
                 selectedPackage === "custom" ? customAmount : packageAmount
@@ -216,15 +231,16 @@ export default function EmployerPaymentPage() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
           <div className="text-sm text-gray-700">
             <p>
-              Số tiền thanh toán:{" "}
+              {t("employerPaymentPage.form.summaryAmount")}:{" "}
               <span className="font-semibold">
                 {new Intl.NumberFormat("vi-VN").format(packageAmount)} ₫
               </span>
             </p>
             <p>
-              Số điểm nhận được:{" "}
+              {t("employerPaymentPage.form.summaryPoints")}:{" "}
               <span className="font-semibold">
-                {computePoints(packageAmount)} điểm
+                {computePoints(packageAmount)}{" "}
+                {t("employerPaymentPage.form.pointsUnit")}
               </span>
             </p>
           </div>
@@ -235,13 +251,14 @@ export default function EmployerPaymentPage() {
             disabled={loading}
             className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60 text-sm font-medium"
           >
-            {loading ? "Đang tạo thanh toán..." : "Thanh toán qua VNPAY"}
+            {loading
+              ? t("employerPaymentPage.form.submitLoading")
+              : t("employerPaymentPage.form.submit")}
           </button>
         </div>
 
         <p className="text-xs text-gray-400">
-          Sau khi thanh toán thành công, điểm sẽ được cộng trực tiếp vào tài
-          khoản tuyển dụng của bạn.
+          {t("employerPaymentPage.form.note")}
         </p>
       </div>
     </main>

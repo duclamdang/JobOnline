@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getEmployerPromotionsApi } from "@admin/store/services/promotionService";
 import { createEmployerPromotionPayment } from "@admin/store/services/paymentService";
+import { useTranslation } from "react-i18next";
 
 interface Promotion {
   id: number;
@@ -14,6 +15,7 @@ interface Promotion {
 }
 
 export default function PromotionPage() {
+  const { t } = useTranslation();
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingPayId, setLoadingPayId] = useState<number | null>(null);
@@ -42,17 +44,19 @@ export default function PromotionPage() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-gray-900">Khuyến mãi</h2>
+      <h2 className="text-xl font-semibold text-gray-900">
+        {t("promotionPage.title")}
+      </h2>
 
       {loading ? (
-        <p>Đang tải khuyến mãi...</p>
+        <p>{t("promotionPage.loading")}</p>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {promotions.map((promo) => (
             <div key={promo.id} className="relative">
               {loadingPayId === promo.id && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/60 text-sm font-medium text-gray-700">
-                  Đang chuyển đến cổng thanh toán...
+                  {t("promotionPage.overlayRedirect")}
                 </div>
               )}
 
@@ -77,6 +81,7 @@ const formatDate = (dateStr?: string | null) => {
 };
 
 const PromotionCard = ({ promo, onPay }: PromotionCardProps) => {
+  const { t } = useTranslation();
   const hasImage = !!promo.image_url;
 
   return (
@@ -97,7 +102,7 @@ const PromotionCard = ({ promo, onPay }: PromotionCardProps) => {
         {/* Tag + thời gian */}
         <div className="flex items-center justify-between gap-2">
           <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
-            Khuyến mãi
+            {t("promotionPage.tag")}
           </span>
 
           {promo.start_at && promo.end_at && (
@@ -122,7 +127,9 @@ const PromotionCard = ({ promo, onPay }: PromotionCardProps) => {
         {/* Giá & điểm */}
         <div className="mt-1 flex items-end justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-wide text-gray-400">Giá</p>
+            <p className="text-xs uppercase tracking-wide text-gray-400">
+              {t("promotionPage.labels.price")}
+            </p>
             <p className="text-lg font-bold text-gray-900">
               {promo.price.toLocaleString("vi-VN")} đ
             </p>
@@ -130,7 +137,7 @@ const PromotionCard = ({ promo, onPay }: PromotionCardProps) => {
 
           <div className="text-right">
             <p className="text-xs uppercase tracking-wide text-gray-400">
-              Điểm nhận được
+              {t("promotionPage.labels.points")}
             </p>
             <p className="text-xl font-extrabold text-blue-600">
               {promo.points.toLocaleString("vi-VN")}
@@ -144,7 +151,7 @@ const PromotionCard = ({ promo, onPay }: PromotionCardProps) => {
           onClick={() => onPay(promo)}
           className="mt-3 inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
         >
-          Thanh toán khuyến mãi này
+          {t("promotionPage.button.pay")}
         </button>
       </div>
 

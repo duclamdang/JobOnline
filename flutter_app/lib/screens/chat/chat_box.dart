@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/api/models/chat_message.dart';
 import 'package:mobile/api/services/ai_service.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
@@ -7,102 +8,111 @@ import 'package:mobile/providers/chat_provider.dart';
 class ChatBox extends StatelessWidget {
   const ChatBox({super.key});
 
+  static const Color _primaryBlue = Color(0xFF4C6FFF);
+  static const Color _assistantBg = Color(0xFFF4F6FB);
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => ChatProvider(AiService(AiService.defaultBaseUrl)),
       child: SafeArea(
         top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 44,
-                height: 5,
-                margin: const EdgeInsets.only(bottom: 10),
-                decoration: BoxDecoration(
-                  color: Colors.black26,
-                  borderRadius: BorderRadius.circular(8),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFFF3F6FF),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 44,
+                  height: 5,
+                  margin: const EdgeInsets.only(bottom: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.black26,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-              ),
-              Row(
-                children: [
-                  const Text(
-                    'Trợ lý AI',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-
-              // STATUS: ping / lỗi
-              Consumer<ChatProvider>(
-                builder: (_, p, __) {
-                  if (p.error != null) {
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.red.withOpacity(0.3)),
+                Row(
+                  children: [
+                    Container(
+                      height: 32,
+                      width: 32,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFFE0E7FF),
                       ),
-                      child: Text(
-                        p.error!,
-                        style: const TextStyle(color: Colors.red),
+                      child: Image.asset(
+                        'assets/images/jobonline_logo.png',
+                        height: 18,
+                        fit: BoxFit.contain,
                       ),
-                    );
-                  }
-                  if (!p.ready) {
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.amber.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: Colors.amber.withOpacity(0.3),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Trợ lý AI JobOnline',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
+                      ],
+                    ),
+                    child: Consumer<ChatProvider>(
+                      builder: (_, p, __) => ListView.separated(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        itemCount: p.messages.length + (p.loading ? 1 : 0),
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemBuilder: (_, i) {
+                          if (p.loading && i == p.messages.length) {
+                            return const _Bubble(
+                              isUser: false,
+                              child: Text('Trợ lý đang trả lời…'),
+                            );
+                          }
+                          final m = p.messages[i];
+                          return _Bubble(
+                            isUser: m.role == 'user',
+                            child: renderMessage(m, context),
+                          );
+                        },
                       ),
-                      child: const Text('Đang kiểm tra kết nối (ping)…'),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
-
-              Flexible(
-                child: Consumer<ChatProvider>(
-                  builder: (_, p, __) => ListView.separated(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: p.messages.length + (p.loading ? 1 : 0),
-                    separatorBuilder: (_, __) => const SizedBox(height: 8),
-                    itemBuilder: (_, i) {
-                      if (p.loading && i == p.messages.length) {
-                        return const _Bubble(
-                          isUser: false,
-                          child: Text('Đang gõ...'),
-                        );
-                      }
-                      final m = p.messages[i];
-                      return _Bubble(
-                        isUser: m.role == 'user',
-                        child: Text(m.content),
-                      );
-                    },
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              const _Composer(),
-            ],
+
+                const SizedBox(height: 10),
+
+                // COMPOSER
+                const _Composer(),
+              ],
+            ),
           ),
         ),
       ),
@@ -118,6 +128,7 @@ class _Composer extends StatefulWidget {
 
 class _ComposerState extends State<_Composer> {
   final _ctrl = TextEditingController();
+
   @override
   void dispose() {
     _ctrl.dispose();
@@ -134,18 +145,50 @@ class _ComposerState extends State<_Composer> {
             controller: _ctrl,
             minLines: 1,
             maxLines: 4,
-            decoration: const InputDecoration(
-              hintText: 'Nhập câu hỏi…',
-              border: OutlineInputBorder(),
+            textInputAction: TextInputAction.send,
+            decoration: InputDecoration(
+              hintText: 'Nhập câu hỏi của bạn…',
+              filled: true,
+              fillColor: Colors.white,
               isDense: true,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 10,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(18),
+                borderSide: const BorderSide(color: Colors.transparent),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(18),
+                borderSide: const BorderSide(color: Colors.transparent),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(18),
+                borderSide: const BorderSide(
+                  color: ChatBox._primaryBlue,
+                  width: 1.2,
+                ),
+              ),
             ),
             onSubmitted: (_) => _send(context),
           ),
         ),
         const SizedBox(width: 8),
-        IconButton(
-          onPressed: p.loading ? null : () => _send(context),
-          icon: const Icon(Icons.send),
+        SizedBox(
+          height: 40,
+          width: 40,
+          child: ElevatedButton(
+            onPressed: p.loading ? null : () => _send(context),
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.zero,
+              shape: const CircleBorder(),
+              backgroundColor: ChatBox._primaryBlue,
+              foregroundColor: Colors.white,
+              elevation: 1,
+            ),
+            child: const Icon(Icons.send_rounded, size: 18),
+          ),
         ),
       ],
     );
@@ -163,20 +206,80 @@ class _Bubble extends StatelessWidget {
   final bool isUser;
   final Widget child;
   const _Bubble({required this.isUser, required this.child});
+
   @override
   Widget build(BuildContext context) {
+    final bg = isUser ? ChatBox._primaryBlue : ChatBox._assistantBg;
+    final textColor = isUser ? Colors.white : Colors.black87;
+
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         constraints: const BoxConstraints(maxWidth: 320),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isUser ? Colors.blue.shade50 : Colors.grey.shade100,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.black12),
+          color: bg,
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(16),
+            topRight: const Radius.circular(16),
+            bottomLeft: isUser
+                ? const Radius.circular(16)
+                : const Radius.circular(4),
+            bottomRight: isUser
+                ? const Radius.circular(4)
+                : const Radius.circular(16),
+          ),
+          boxShadow: [
+            if (!isUser)
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+          ],
         ),
-        child: child,
+        child: DefaultTextStyle.merge(
+          style: TextStyle(color: textColor, fontSize: 14, height: 1.4),
+          child: child,
+        ),
       ),
     );
   }
+}
+
+Widget renderMessage(ChatMessage m, BuildContext context) {
+  final text = m.content;
+
+  if (text.contains("Link truy cập") &&
+      m.metadata != null &&
+      m.metadata!['job_url'] != null) {
+    final url = m.metadata!['job_url'];
+    final jobId = url.toString().split('/').last;
+
+    return RichText(
+      text: TextSpan(
+        style: const TextStyle(color: Colors.white),
+        children: [
+          const TextSpan(text: "Bạn có thể xem chi tiết công việc tại đây: "),
+          WidgetSpan(
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, '/job-detail', arguments: jobId);
+              },
+              child: const Text(
+                "Link truy cập",
+                style: TextStyle(
+                  color: Colors.yellowAccent,
+                  decoration: TextDecoration.underline,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  return Text(text);
 }

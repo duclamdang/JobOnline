@@ -23,6 +23,7 @@ class JobServices
         $jobs = Job::query()
             ->where('end_date', '>=', $now)
             ->where('is_active', Job::IS_ACTIVE)
+            ->orderByDesc('created_at')
             ->paginate($perPage);
 
         return JobResource::collection($jobs);

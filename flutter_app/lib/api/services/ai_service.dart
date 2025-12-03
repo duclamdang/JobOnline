@@ -14,12 +14,11 @@ class AiService {
           receiveTimeout: const Duration(seconds: 30),
         ),
       ) {
-    // log baseUrl khi khởi tạo
     // ignore: avoid_print
     print('[AiService] baseUrl=${_dio.options.baseUrl}');
   }
 
-  Future<ChatMessage> ask(List<Map<String, String>> messages) async {
+  Future<ChatMessage> ask(List<Map<String, dynamic>> messages) async {
     final r = await _dio.post('/ai/chat', data: {'messages': messages});
 
     return ChatMessage(
@@ -29,7 +28,6 @@ class AiService {
     );
   }
 
-  /// GET /api/ping để kiểm tra kết nối/network_security_config/BASE_URL
   Future<bool> ping() async {
     try {
       final r = await _dio.get('/ping');
@@ -47,7 +45,6 @@ class AiService {
     const env = String.fromEnvironment('BASE_URL', defaultValue: '');
     if (env.isNotEmpty) return env;
 
-    // Emulator Android dùng 10.0.2.2, máy thật dùng IP LAN
     if (Platform.isAndroid) return 'http://192.168.37.1:8000/api';
     return 'http://192.168.37.1:8000/api';
   }

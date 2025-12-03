@@ -4,6 +4,7 @@ import 'package:mobile/api/services/ai_service.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
 import 'package:mobile/providers/chat_provider.dart';
+import 'package:mobile/screens/job/job_detail_screen.dart';
 
 class ChatBox extends StatelessWidget {
   const ChatBox({super.key});
@@ -248,38 +249,63 @@ class _Bubble extends StatelessWidget {
 }
 
 Widget renderMessage(ChatMessage m, BuildContext context) {
-  final text = m.content;
+  final meta = m.metadata ?? {};
+  final jobUrl = meta['job_url'];
 
-  if (text.contains("Link truy cập") &&
-      m.metadata != null &&
-      m.metadata!['job_url'] != null) {
-    final url = m.metadata!['job_url'];
-    final jobId = url.toString().split('/').last;
+  // Nếu backend trả về job_url (intent: job_link)
+  if (jobUrl != null && jobUrl.toString().isNotEmpty) {
+    String? jobIdStr;
 
-    return RichText(
-      text: TextSpan(
-        style: const TextStyle(color: Colors.white),
-        children: [
-          const TextSpan(text: "Bạn có thể xem chi tiết công việc tại đây: "),
-          WidgetSpan(
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, '/job-detail', arguments: jobId);
-              },
-              child: const Text(
-                "Link truy cập",
-                style: TextStyle(
-                  color: Colors.yellowAccent,
-                  decoration: TextDecoration.underline,
-                  fontWeight: FontWeight.w600,
+    try {
+      final uri = Uri.parse(jobUrl.toString());
+      if (uri.pathSegments.isNotEmpty) {
+        jobIdStr = uri.pathSegments.last;
+      }
+    } catch (_) {
+      // nếu parse fail thì fallback split '/'
+      jobIdStr = jobUrl.toString().split('/').last;
+    }
+
+    jobIdStr ??= jobUrl.toString().split('/').last;
+    final jobId = int.tryParse(jobIdStr);
+
+    final baseStyle = DefaultTextStyle.of(context).style;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('Mình đã tìm được công việc bạn đang xem.', style: baseStyle),
+        const SizedBox(height: 4),
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            if (jobId == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Không đọc được mã tin tuyển dụng.'),
                 ),
-              ),
+              );
+              return;
+            }
+
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => JobDetailScreen(jobId: jobId)),
+            );
+          },
+          child: Text(
+            'Mở chi tiết công việc',
+            style: baseStyle.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              decoration: TextDecoration.underline,
+              fontWeight: FontWeight.w600,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  return Text(text);
+  // Mặc định: chỉ hiển thị text bình thường
+  return Text(m.content);
 }

@@ -256,11 +256,6 @@ export default function JobEditor(props: JobEditorProps) {
       <div className="bg-white p-10 rounded-2xl shadow-xl border border-gray-200 w-full max-w-7xl mx-auto">
         {isEdit && (
           <div className="flex items-center gap-6 border-b pb-6 mb-8 bg-gray-50 rounded-lg p-4">
-            <div className="w-20 h-20 rounded-md bg-gray-100 flex items-center justify-center shadow-inner">
-              <span className="text-gray-400 text-xs">
-                {t("jobEditor.noLogo")}
-              </span>
-            </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-800">{job.title}</h1>
             </div>

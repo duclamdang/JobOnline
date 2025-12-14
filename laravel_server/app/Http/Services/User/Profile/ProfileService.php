@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Cloudinary\Configuration\Configuration;
+use Illuminate\Support\Str;
 
 
 class ProfileService
@@ -159,41 +160,27 @@ class ProfileService
 
     public function createCV(User $user, UploadedFile $fileOrPath): array
     {
-        if (!$fileOrPath || !is_object($fileOrPath)) {
+        if (!$fileOrPath || !$fileOrPath->isValid()) {
             return [
                 'success' => false,
                 'message' => 'File CV không hợp lệ',
             ];
         }
-        $originalName = pathinfo($fileOrPath->getClientOriginalName(), PATHINFO_FILENAME);
-        $extension    = $fileOrPath->getClientOriginalExtension();
-        $uniqueId     = uniqid();
-        $filename     = $originalName . '_' . $uniqueId . '.' . $extension;
-        $config = new Configuration([
-            'cloud' => [
-                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                'api_key'    => env('CLOUDINARY_API_KEY'),
-                'api_secret' => env('CLOUDINARY_API_SECRET'),
-            ],
-        ]);
 
-        $cloudinary = new Cloudinary($config);
+        // Tạo tên file đẹp + unique
+        $originalName = pathinfo($fileOrPath->getClientOriginalName(), PATHINFO_FILENAME);
+        $extension    = $fileOrPath->getClientOriginalExtension() ?: 'pdf';
+        $safeName     = Str::slug($originalName) ?: 'cv';
+        $filename     = $safeName . '_' . uniqid() . '.' . $extension;
 
         try {
-            $uploaded = $cloudinary->uploadApi()->upload(
-                $fileOrPath->getRealPath(),
-                [
-                    'folder'        => 'users/cvs',
-                    'resource_type' => 'raw',
-                    'public_id'     => $filename,
-                ]
-            );
-
-            $fileUrl  = $uploaded['secure_url'];
-            $publicId = $uploaded['public_id'];
+            // Lưu vào storage/app/public/users/cvs
+            // disk: public  ->  url = APP_URL/storage/...
+            $path = $fileOrPath->storeAs('users/cvs', $filename, 'public');
+            // $path ví dụ: "users/cvs/cv-duc-lam_68d0c6d7edeb6.pdf"
 
         } catch (\Exception $e) {
-            Log::error('Cloudinary upload CV error: ' . $e->getMessage());
+            \Log::error('Upload CV local error: ' . $e->getMessage());
 
             return [
                 'success' => false,
@@ -204,10 +191,10 @@ class ProfileService
         $hasCV = $user->cvs()->exists();
 
         $cv = $user->cvs()->create([
-            'file_name' => $fileOrPath->getClientOriginalName(),
-            'file_path' => $fileUrl,
-            'main_cv'   => !$hasCV,
-            'cv_public_id' => $publicId,
+            'file_name'    => $fileOrPath->getClientOriginalName(),
+            'file_path'    => $path,
+            'main_cv'      => !$hasCV,
+            'cv_public_id' => null,
         ]);
 
         return [

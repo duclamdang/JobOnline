@@ -23,8 +23,8 @@ class AiService {
 
     return ChatMessage(
       role: 'assistant',
-      content: r.data['text'],
-      metadata: r.data['metadata'],
+      content: r.data['text'] ?? '',
+      metadata: (r.data['metadata'] as Map?)?.cast<String, dynamic>(),
     );
   }
 

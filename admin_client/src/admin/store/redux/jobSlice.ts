@@ -211,8 +211,12 @@ const jobSlice = createSlice({
         }
       })
       .addCase(toggleJobStatus.fulfilled, (state, action) => {
-        const updated = action.payload;
-        state.jobs = state.jobs.map((j) => (j.id === updated.id ? updated : j));
+        const updated = action.payload as Partial<Job> & { id: number };
+
+        state.jobs = state.jobs.map((j) =>
+          j.id === updated.id ? { ...j, ...updated } : j
+        );
+
         if (state.selectedJob?.id === updated.id) {
           state.selectedJob = { ...state.selectedJob, ...updated };
         }

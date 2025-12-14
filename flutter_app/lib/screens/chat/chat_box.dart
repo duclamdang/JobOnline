@@ -305,7 +305,5 @@ Widget renderMessage(ChatMessage m, BuildContext context) {
       ],
     );
   }
-
-  // Mặc định: chỉ hiển thị text bình thường
   return Text(m.content);
 }

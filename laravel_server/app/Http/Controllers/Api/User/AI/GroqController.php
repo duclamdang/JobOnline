@@ -355,9 +355,25 @@ class GroqController extends Controller
 
                 $ctx = $this->formatJobList($jobs, $total, $page, self::PAGE_SIZE);
 
-                // lưu ID đầu tiên trong danh sách để dùng cho "link"
-                if (!empty($jobs) && isset($jobs[0])) {
-                    $meta['last_job_id'] = $jobs[0]->id;
+                // --- CHỌN last_job_id THÔNG MINH HƠN ---
+                if ($total > 0 && $jobs->isNotEmpty()) {
+                    $chosen = $jobs->first();
+
+                    if (!empty($intent['query'])) {
+                        $kwNorm = $this->norm($intent['query']);
+
+                        // Ưu tiên job có keyword xuất hiện trong TITLE
+                        $candidate = $jobs->first(function ($j) use ($kwNorm) {
+                            $titleNorm = $this->norm($j->title ?? '');
+                            return \Illuminate\Support\Str::contains($titleNorm, $kwNorm);
+                        });
+
+                        if ($candidate) {
+                            $chosen = $candidate;
+                        }
+                    }
+
+                    $meta['last_job_id'] = $chosen->id;
                 }
 
                 $meta['total'] = $total;
@@ -367,6 +383,10 @@ class GroqController extends Controller
 
             case 'job_link':
                 $lastId = $this->getLastJobIdFromMessages($messages);
+                Log::info('job_link-debug', [
+                    'messages' => $messages,
+                    'last_id'  => $lastId,
+                ]);
                 if ($lastId) {
                     $job = $this->jobById($lastId);
                     if ($job) {

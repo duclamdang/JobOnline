@@ -16,7 +16,7 @@ class ChatMessage {
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
     return ChatMessage(
       role: json['role'] as String,
-      content: json['content'] as String,
+      content: json['content'] as String? ?? '',
       metadata: json['metadata'] as Map<String, dynamic>?,
     );
   }
